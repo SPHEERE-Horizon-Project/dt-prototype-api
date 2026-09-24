@@ -1,6 +1,14 @@
 # DT Prototype API
 
-Exposes the DT Prototype (dynamic, monthly, simplified) via a local HTTP API. The unmodified prototype is in `prototype/`, with the API wrapper in `src/spheere_dt_api/`.
+The **DT Prototype API** provides annual heating and cooling estimates for buildings. Submit a single request with a building description—including its zones, walls, windows, schedules, and systems—plus a weather file for the target location. The API performs the calculations and returns results as JSON showing both monthly and annual heating and cooling demand (kWh).
+
+All three calculation methods accept the same input:
+
+- **Dynamic**: Simulates each hour of the year to capture how demand varies throughout the day.
+- **Monthly**: Uses monthly-averaged inputs; ideal if you just need total demand per month.
+- **Simplified**: A coarser, alternative approach for cross-checking results from the other methods.
+
+This project wraps the DT Prototype engines (dynamic, monthly, and simplified) in an HTTP API. The original prototype code is located in `prototype/`, and the API wrapper can be found in `src/spheere_dt_api/`.
 
 ## Start
 
