@@ -1,0 +1,2 @@
+building_id,scenario_id,useful_heating_kWh,useful_cooling_kWh,useful_dhw_kWh,solar_thermal_kWh,pv_generation_kWh,pv_self_used_kWh,pv_exported_kWh,delivered_electricity_kWh,delivered_natural_gas_kWh,delivered_district_heat_kWh,delivered_total_kWh,primary_energy_kWh,operational_carbon_kgCO2e
+B001,S00,48392.58362310427,11060.99113562681,2757.15,2274.79,16368.0,16368.0,0.0,57525.92236569454,0.0,0.0,57525.92236569454,120804.43696795854,13403.539911206828

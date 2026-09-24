@@ -1,0 +1,4 @@
+factor_key,scenario_id,carrier,primary_energy_factor,carbon_factor_kgCO2e_kWh,source
+S00|electricity,S00,electricity,2.1,0.233,Synthetic placeholder - replace for project location and year
+S00|natural_gas,S00,natural_gas,1.1,0.202,Synthetic placeholder - replace for project location and year
+S00|district_heat,S00,district_heat,1.3,0.15,Synthetic placeholder - replace for project location and year

@@ -1,0 +1,2 @@
+scenario_key,building_id,scenario_id,scenario_name,envelope_htc_multiplier,ground_htc_multiplier,ventilation_multiplier,infiltration_multiplier,occupancy_multiplier,operation_multiplier,solar_gain_multiplier,heating_setpoint_delta_K,cooling_setpoint_delta_K,system_efficiency_multiplier,dhw_multiplier,pv_multiplier
+B001|S00,B001,S00,Base synthetic scenario,1,1,1,1,1,1,1,0,0,1,1,1

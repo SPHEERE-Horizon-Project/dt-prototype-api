@@ -1,0 +1,1875 @@
+{
+  "_comment": "1:1 port of the retained reference Materials.xlsx (Envelopes/Constructions/Materials/Windows) by validation/port_reference_databases.py. Constructions are full multi-layer stratigraphies, outside->inside. 'wwr' is the retained reference's hardcoded 0.125 from reference_ubem/city.py (absent from the workbook); 'infiltration_ach' is 0 here because the retained reference carries infiltration as an hourly schedule - see schedules.json, whose per-end-use 'infiltration_ach' profile overrides this value.",
+  "envelopes": {
+    "Before 1930": {
+      "ext_wall": {
+        "layers": [
+          {
+            "thickness": 0.02,
+            "conductivity": 0.9,
+            "density": 1800.0,
+            "specific_heat": 910.0
+          },
+          {
+            "thickness": 0.4,
+            "conductivity": 2.4,
+            "density": 2500.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.9,
+        "_source": "Stone Masonry (ExtWall)"
+      },
+      "roof": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 0.575,
+            "density": 1800.0,
+            "specific_heat": 840.0
+          },
+          {
+            "thickness": 0.03,
+            "conductivity": 0.15,
+            "density": 550.0,
+            "specific_heat": 1600.0
+          }
+        ],
+        "absorptance": 0.9,
+        "_source": "Wooden roof/No insulation (Roof)"
+      },
+      "ground_floor": {
+        "layers": [
+          {
+            "thickness": 0.3,
+            "conductivity": 1.2,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.1,
+            "conductivity": 1.16,
+            "density": 2000.0,
+            "specific_heat": 670.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 670.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Concrete ground slab (GroundFloor)"
+      },
+      "int_wall": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          },
+          {
+            "thickness": 0.06,
+            "conductivity": 0.694,
+            "density": 600.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Hollow tiles and plaster (6 cm) (IntWall)"
+      },
+      "int_ceiling": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.06,
+            "conductivity": 0.18,
+            "density": 710.0,
+            "specific_heat": 2700.0
+          },
+          {
+            "thickness": 0.2,
+            "conductivity": 1.11,
+            "density": 1.2,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.01,
+            "conductivity": 0.1,
+            "density": 450.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Beams-wooden slab (6 cm+20 cm) (IntCeiling)"
+      },
+      "window": {
+        "u_value": 5.7,
+        "shgc": 0.82,
+        "frame_factor": 0.0,
+        "shading_coef": 0.9
+      },
+      "wwr": 0.125,
+      "infiltration_ach": 0.0
+    },
+    "1930-1945": {
+      "ext_wall": {
+        "layers": [
+          {
+            "thickness": 0.02,
+            "conductivity": 0.9,
+            "density": 1800.0,
+            "specific_heat": 910.0
+          },
+          {
+            "thickness": 0.375,
+            "conductivity": 0.72,
+            "density": 1800.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.9,
+        "_source": "Solid Bricks (37.5 cm) (ExtWall)"
+      },
+      "roof": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 0.575,
+            "density": 1800.0,
+            "specific_heat": 840.0
+          },
+          {
+            "thickness": 0.03,
+            "conductivity": 0.15,
+            "density": 550.0,
+            "specific_heat": 1600.0
+          }
+        ],
+        "absorptance": 0.9,
+        "_source": "Wooden roof/No insulation (Roof)"
+      },
+      "ground_floor": {
+        "layers": [
+          {
+            "thickness": 0.3,
+            "conductivity": 1.2,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.1,
+            "conductivity": 1.16,
+            "density": 2000.0,
+            "specific_heat": 670.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 670.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Concrete ground slab (GroundFloor)"
+      },
+      "int_wall": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          },
+          {
+            "thickness": 0.06,
+            "conductivity": 0.694,
+            "density": 600.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Hollow tiles and plaster (6 cm) (IntWall)"
+      },
+      "int_ceiling": {
+        "layers": [
+          {
+            "thickness": 0.02,
+            "conductivity": 0.9,
+            "density": 1800.0,
+            "specific_heat": 910.0
+          },
+          {
+            "thickness": 0.16,
+            "conductivity": 0.64,
+            "density": 600.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 670.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.9,
+        "_source": "Steel beams and hollow bricks (16 cm) (IntCeiling)"
+      },
+      "window": {
+        "u_value": 5.7,
+        "shgc": 0.82,
+        "frame_factor": 0.0,
+        "shading_coef": 0.9
+      },
+      "wwr": 0.125,
+      "infiltration_ach": 0.0
+    },
+    "1945-1960": {
+      "ext_wall": {
+        "layers": [
+          {
+            "thickness": 0.02,
+            "conductivity": 0.9,
+            "density": 1800.0,
+            "specific_heat": 910.0
+          },
+          {
+            "thickness": 0.25,
+            "conductivity": 0.72,
+            "density": 1800.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.05,
+            "conductivity": 0.2777777777777778,
+            "density": 1.2,
+            "specific_heat": 1005.0
+          },
+          {
+            "thickness": 0.08,
+            "conductivity": 0.4,
+            "density": 800.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.9,
+        "_source": "Hollow wall brick masonry (12-5-8) (ExtWall)"
+      },
+      "roof": {
+        "layers": [
+          {
+            "thickness": 0.01,
+            "conductivity": 0.17,
+            "density": 1200.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.12,
+            "conductivity": 1.16,
+            "density": 2000.0,
+            "specific_heat": 670.0
+          },
+          {
+            "thickness": 0.03,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.04,
+            "conductivity": 1.4,
+            "density": 2400.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.16,
+            "conductivity": 0.48,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.8,
+        "_source": "Ceiling with reinforced brick-concrete slab (20 cm) (Roof)"
+      },
+      "ground_floor": {
+        "layers": [
+          {
+            "thickness": 0.3,
+            "conductivity": 1.2,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.1,
+            "conductivity": 1.16,
+            "density": 2000.0,
+            "specific_heat": 670.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 670.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Floor with reinforced concrete slab, traditional screed (12 cm)  (GroundFloor)"
+      },
+      "int_wall": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          },
+          {
+            "thickness": 0.06,
+            "conductivity": 0.694,
+            "density": 600.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Hollow tiles and plaster (6 cm) (IntWall)"
+      },
+      "int_ceiling": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.06,
+            "conductivity": 1.06,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.16,
+            "conductivity": 0.49,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.9,
+            "density": 1800.0,
+            "specific_heat": 910.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Brick-concrete slab - traditional screed (16 cm+ 10 cm) (IntCeiling)"
+      },
+      "window": {
+        "u_value": 4.9,
+        "shgc": 0.82,
+        "frame_factor": 0.0,
+        "shading_coef": 0.9
+      },
+      "wwr": 0.125,
+      "infiltration_ach": 0.0
+    },
+    "1961-1970": {
+      "ext_wall": {
+        "layers": [
+          {
+            "thickness": 0.02,
+            "conductivity": 0.9,
+            "density": 1800.0,
+            "specific_heat": 910.0
+          },
+          {
+            "thickness": 0.12,
+            "conductivity": 0.39,
+            "density": 800.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.06,
+            "conductivity": 0.3333333333333333,
+            "density": 1.2,
+            "specific_heat": 1005.0
+          },
+          {
+            "thickness": 0.12,
+            "conductivity": 0.39,
+            "density": 800.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.9,
+        "_source": "Hollow wall brick masonry (8-6-12) (ExtWall)"
+      },
+      "roof": {
+        "layers": [
+          {
+            "thickness": 0.01,
+            "conductivity": 0.17,
+            "density": 1200.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.12,
+            "conductivity": 1.16,
+            "density": 2000.0,
+            "specific_heat": 670.0
+          },
+          {
+            "thickness": 0.03,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.04,
+            "conductivity": 1.4,
+            "density": 2400.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.16,
+            "conductivity": 0.48,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.8,
+        "_source": "Ceiling with reinforced brick-concrete slab (16 cm), trad. screed (12 cm) (Roof)"
+      },
+      "ground_floor": {
+        "layers": [
+          {
+            "thickness": 0.3,
+            "conductivity": 1.2,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.1,
+            "conductivity": 1.16,
+            "density": 2000.0,
+            "specific_heat": 670.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 670.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Floor with reinforced concrete slab, traditional screed (12 cm) (GroundFloor)"
+      },
+      "int_wall": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          },
+          {
+            "thickness": 0.06,
+            "conductivity": 0.694,
+            "density": 600.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Hollow tiles and plaster (6 cm) (IntWall)"
+      },
+      "int_ceiling": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.06,
+            "conductivity": 0.58,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.16,
+            "conductivity": 0.49,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.9,
+            "density": 1800.0,
+            "specific_heat": 910.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Brick-concrete slab - lightweight screed (6 cm) (IntCeiling)"
+      },
+      "window": {
+        "u_value": 4.9,
+        "shgc": 0.82,
+        "frame_factor": 0.0,
+        "shading_coef": 0.9
+      },
+      "wwr": 0.125,
+      "infiltration_ach": 0.0
+    },
+    "1971-1980": {
+      "ext_wall": {
+        "layers": [
+          {
+            "thickness": 0.02,
+            "conductivity": 0.9,
+            "density": 1800.0,
+            "specific_heat": 910.0
+          },
+          {
+            "thickness": 0.12,
+            "conductivity": 0.39,
+            "density": 800.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.08,
+            "conductivity": 0.4444444444444445,
+            "density": 1.2,
+            "specific_heat": 1005.0
+          },
+          {
+            "thickness": 0.12,
+            "conductivity": 0.39,
+            "density": 800.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.9,
+        "_source": "Hollow/solid bricks with cavity (12-8-12) (ExtWall)"
+      },
+      "roof": {
+        "layers": [
+          {
+            "thickness": 0.01,
+            "conductivity": 0.17,
+            "density": 1200.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.12,
+            "conductivity": 1.16,
+            "density": 2000.0,
+            "specific_heat": 670.0
+          },
+          {
+            "thickness": 0.03,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.04,
+            "conductivity": 1.4,
+            "density": 2400.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.16,
+            "conductivity": 0.48,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.8,
+        "_source": "Ceiling with reinforced brick-concrete slab (16 cm + 12 cm) (Roof)"
+      },
+      "ground_floor": {
+        "layers": [
+          {
+            "thickness": 0.3,
+            "conductivity": 1.2,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.1,
+            "conductivity": 1.16,
+            "density": 2000.0,
+            "specific_heat": 670.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 670.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Floor with reinforced concrete slab, traditional screed (12 cm) (GroundFloor)"
+      },
+      "int_wall": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          },
+          {
+            "thickness": 0.08,
+            "conductivity": 0.694,
+            "density": 600.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Hollow tiles and plaster (8 cm) (IntWall)"
+      },
+      "int_ceiling": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.12,
+            "conductivity": 1.06,
+            "density": 1900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.04,
+            "conductivity": 1.4,
+            "density": 2400.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.16,
+            "conductivity": 0.49,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.9,
+            "density": 1800.0,
+            "specific_heat": 910.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Brick-concrete slab - traditional screed (16 cm+ 10 cm) (IntCeiling)"
+      },
+      "window": {
+        "u_value": 3.7,
+        "shgc": 0.7,
+        "frame_factor": 0.0,
+        "shading_coef": 0.9
+      },
+      "wwr": 0.125,
+      "infiltration_ach": 0.0
+    },
+    "1981-1990": {
+      "ext_wall": {
+        "layers": [
+          {
+            "thickness": 0.02,
+            "conductivity": 0.9,
+            "density": 1800.0,
+            "specific_heat": 910.0
+          },
+          {
+            "thickness": 0.25,
+            "conductivity": 0.4,
+            "density": 1000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.045,
+            "density": 1.2,
+            "specific_heat": 1005.0
+          },
+          {
+            "thickness": 0.08,
+            "conductivity": 0.4,
+            "density": 800.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.9,
+        "_source": "Hollow bricks with cavity (8-2-25) (ExtWall)"
+      },
+      "roof": {
+        "layers": [
+          {
+            "thickness": 0.03,
+            "conductivity": 0.7,
+            "density": 1500.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.045,
+            "density": 30.0,
+            "specific_heat": 1220.0
+          },
+          {
+            "thickness": 0.01,
+            "conductivity": 0.17,
+            "density": 1200.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.12,
+            "conductivity": 1.06,
+            "density": 1900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.04,
+            "conductivity": 1.4,
+            "density": 2400.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.16,
+            "conductivity": 0.49,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.8,
+        "_source": "Ceiling with reinforced brick-concrete slab (16 cm) (Roof)"
+      },
+      "ground_floor": {
+        "layers": [
+          {
+            "thickness": 0.3,
+            "conductivity": 1.2,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.1,
+            "conductivity": 1.16,
+            "density": 2000.0,
+            "specific_heat": 670.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 670.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Floor with reinforced concrete slab, lightweight screed (12 cm) (GroundFloor)"
+      },
+      "int_wall": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          },
+          {
+            "thickness": 0.08,
+            "conductivity": 0.694,
+            "density": 600.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Hollow tiles and plaster (8 cm) (IntWall)"
+      },
+      "int_ceiling": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.06,
+            "conductivity": 0.58,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.04,
+            "conductivity": 1.4,
+            "density": 2400.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.16,
+            "conductivity": 0.49,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.9,
+            "density": 1800.0,
+            "specific_heat": 910.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Brick-concrete slab - lightweight screed (6 cm) (IntCeiling)"
+      },
+      "window": {
+        "u_value": 3.7,
+        "shgc": 0.7,
+        "frame_factor": 0.0,
+        "shading_coef": 0.9
+      },
+      "wwr": 0.125,
+      "infiltration_ach": 0.0
+    },
+    "1991-2000": {
+      "ext_wall": {
+        "layers": [
+          {
+            "thickness": 0.02,
+            "conductivity": 0.9,
+            "density": 1800.0,
+            "specific_heat": 910.0
+          },
+          {
+            "thickness": 0.25,
+            "conductivity": 0.72,
+            "density": 1800.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.04,
+            "conductivity": 0.045,
+            "density": 15.0,
+            "specific_heat": 1220.0
+          },
+          {
+            "thickness": 0.08,
+            "conductivity": 0.4,
+            "density": 800.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.9,
+        "_source": "Hollow/solid bricks with insulated cavity (25-4-8) (ExtWall)"
+      },
+      "roof": {
+        "layers": [
+          {
+            "thickness": 0.03,
+            "conductivity": 0.7,
+            "density": 1500.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.045,
+            "density": 30.0,
+            "specific_heat": 1220.0
+          },
+          {
+            "thickness": 0.01,
+            "conductivity": 0.17,
+            "density": 1200.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.12,
+            "conductivity": 1.06,
+            "density": 1900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.04,
+            "conductivity": 1.4,
+            "density": 2400.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.24,
+            "conductivity": 0.65,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.8,
+        "_source": "Ceiling with reinforced brick-concrete slab (24 cm) (Roof)"
+      },
+      "ground_floor": {
+        "layers": [
+          {
+            "thickness": 0.3,
+            "conductivity": 1.2,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.12,
+            "conductivity": 0.33,
+            "density": 1200.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.03,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Floor with reinforced concrete slab, lightweight screed (12 cm) (GroundFloor)"
+      },
+      "int_wall": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          },
+          {
+            "thickness": 0.08,
+            "conductivity": 0.694,
+            "density": 600.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Hollow tiles and plaster (8 cm) (IntWall)"
+      },
+      "int_ceiling": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.06,
+            "conductivity": 0.58,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.04,
+            "conductivity": 1.4,
+            "density": 2400.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.24,
+            "conductivity": 0.65,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.9,
+            "density": 1800.0,
+            "specific_heat": 910.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Internal Floor with reinforced brick-concrete slab (24 cm), trad. screed (12 cm) - insulation (2 cm) (IntCeiling)"
+      },
+      "window": {
+        "u_value": 3.4,
+        "shgc": 0.7,
+        "frame_factor": 0.0,
+        "shading_coef": 0.9
+      },
+      "wwr": 0.125,
+      "infiltration_ach": 0.0
+    },
+    "2000-2005": {
+      "ext_wall": {
+        "layers": [
+          {
+            "thickness": 0.02,
+            "conductivity": 0.9,
+            "density": 1800.0,
+            "specific_heat": 910.0
+          },
+          {
+            "thickness": 0.38,
+            "conductivity": 0.72,
+            "density": 1800.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.04,
+            "conductivity": 0.0449438202247191,
+            "density": 1.2,
+            "specific_heat": 1005.0
+          },
+          {
+            "thickness": 0.08,
+            "conductivity": 0.4,
+            "density": 800.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.9,
+        "_source": "Hollow/solid bricks with cavity (8-5-25) (ExtWall)"
+      },
+      "roof": {
+        "layers": [
+          {
+            "thickness": 0.03,
+            "conductivity": 0.7,
+            "density": 1500.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.05,
+            "conductivity": 0.045,
+            "density": 30.0,
+            "specific_heat": 1220.0
+          },
+          {
+            "thickness": 0.01,
+            "conductivity": 0.17,
+            "density": 1200.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.12,
+            "conductivity": 1.06,
+            "density": 1900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.04,
+            "conductivity": 1.4,
+            "density": 2400.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.24,
+            "conductivity": 0.65,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.8,
+        "_source": "Ceiling with reinforced brick-concrete slab, insulated (24 cm + 5 cm) (Roof)"
+      },
+      "ground_floor": {
+        "layers": [
+          {
+            "thickness": 0.3,
+            "conductivity": 1.2,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.12,
+            "conductivity": 0.33,
+            "density": 1200.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.24,
+            "conductivity": 0.65,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 670.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Floor with reinforced concrete slab, lightweight screed - insulation (5 cm) (GroundFloor)"
+      },
+      "int_wall": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          },
+          {
+            "thickness": 0.08,
+            "conductivity": 0.694,
+            "density": 600.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Hollow tiles and plaster (8 cm) (IntWall)"
+      },
+      "int_ceiling": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.045,
+            "density": 30.0,
+            "specific_heat": 1220.0
+          },
+          {
+            "thickness": 0.06,
+            "conductivity": 0.58,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.04,
+            "conductivity": 1.4,
+            "density": 2400.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.24,
+            "conductivity": 0.65,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.9,
+            "density": 1800.0,
+            "specific_heat": 910.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Brick-concrete slab - lightweight screed (6 cm) - insulation (5 cm) (IntCeiling)"
+      },
+      "window": {
+        "u_value": 3.4,
+        "shgc": 0.7,
+        "frame_factor": 0.0,
+        "shading_coef": 0.9
+      },
+      "wwr": 0.125,
+      "infiltration_ach": 0.0
+    },
+    "2005-2010": {
+      "ext_wall": {
+        "layers": [
+          {
+            "thickness": 0.02,
+            "conductivity": 0.9,
+            "density": 1800.0,
+            "specific_heat": 910.0
+          },
+          {
+            "thickness": 0.1,
+            "conductivity": 0.045,
+            "density": 30.0,
+            "specific_heat": 1220.0
+          },
+          {
+            "thickness": 0.3,
+            "conductivity": 0.34,
+            "density": 1000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.9,
+        "_source": "Perforated bricks and medium insulation (30-10) (ExtWall)"
+      },
+      "roof": {
+        "layers": [
+          {
+            "thickness": 0.03,
+            "conductivity": 0.7,
+            "density": 1500.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.1,
+            "conductivity": 0.045,
+            "density": 30.0,
+            "specific_heat": 1220.0
+          },
+          {
+            "thickness": 0.01,
+            "conductivity": 0.17,
+            "density": 1200.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.12,
+            "conductivity": 1.06,
+            "density": 1900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.04,
+            "conductivity": 1.4,
+            "density": 2400.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.24,
+            "conductivity": 0.65,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.8,
+        "_source": "Ceiling with reinforced brick-concrete slab, insulated (24 cm + 10 cm) (Roof)"
+      },
+      "ground_floor": {
+        "layers": [
+          {
+            "thickness": 0.3,
+            "conductivity": 1.2,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.12,
+            "conductivity": 0.33,
+            "density": 1200.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.1,
+            "conductivity": 0.045,
+            "density": 30.0,
+            "specific_heat": 1220.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 670.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Floor with reinforced concrete slab, lightweight screed (12 cm) - insulation (10 cm) (GroundFloor)"
+      },
+      "int_wall": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          },
+          {
+            "thickness": 0.08,
+            "conductivity": 0.694,
+            "density": 600.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Hollow tiles and plaster (8 cm) (IntWall)"
+      },
+      "int_ceiling": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.05,
+            "conductivity": 0.045,
+            "density": 30.0,
+            "specific_heat": 1220.0
+          },
+          {
+            "thickness": 0.06,
+            "conductivity": 0.58,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.04,
+            "conductivity": 1.4,
+            "density": 2400.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.24,
+            "conductivity": 0.65,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.9,
+            "density": 1800.0,
+            "specific_heat": 910.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Brick-concrete slab - lightweight screed (12 cm)- insulation (10 cm) (IntCeiling)"
+      },
+      "window": {
+        "u_value": 2.2,
+        "shgc": 0.27,
+        "frame_factor": 0.0,
+        "shading_coef": 0.9
+      },
+      "wwr": 0.125,
+      "infiltration_ach": 0.0
+    },
+    "After 2010": {
+      "ext_wall": {
+        "layers": [
+          {
+            "thickness": 0.02,
+            "conductivity": 0.9,
+            "density": 1800.0,
+            "specific_heat": 910.0
+          },
+          {
+            "thickness": 0.15,
+            "conductivity": 0.045,
+            "density": 30.0,
+            "specific_heat": 1220.0
+          },
+          {
+            "thickness": 0.3,
+            "conductivity": 0.34,
+            "density": 1000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.9,
+        "_source": "Brick blocks ad external high insulation (2-30-15-2) (ExtWall)"
+      },
+      "roof": {
+        "layers": [
+          {
+            "thickness": 0.03,
+            "conductivity": 0.7,
+            "density": 1500.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.1,
+            "conductivity": 0.045,
+            "density": 30.0,
+            "specific_heat": 1220.0
+          },
+          {
+            "thickness": 0.01,
+            "conductivity": 0.17,
+            "density": 1200.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.12,
+            "conductivity": 1.06,
+            "density": 1900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.04,
+            "conductivity": 1.4,
+            "density": 2400.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.24,
+            "conductivity": 0.65,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.8,
+        "_source": "Ceiling with reinforced brick-concrete slab, insulated (24 cm + 5 cm) (Roof)"
+      },
+      "ground_floor": {
+        "layers": [
+          {
+            "thickness": 0.3,
+            "conductivity": 1.2,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.12,
+            "conductivity": 0.33,
+            "density": 1200.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.1,
+            "conductivity": 0.045,
+            "density": 30.0,
+            "specific_heat": 1220.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 670.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Floor with reinforced concrete slab, lightweight screed (12 cm) - insulation (10 cm) (GroundFloor)"
+      },
+      "int_wall": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          },
+          {
+            "thickness": 0.08,
+            "conductivity": 0.694,
+            "density": 600.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.015,
+            "conductivity": 0.7,
+            "density": 1400.0,
+            "specific_heat": 1010.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Hollow tiles and plaster (8 cm) (IntWall)"
+      },
+      "int_ceiling": {
+        "layers": [
+          {
+            "thickness": 0.015,
+            "conductivity": 1.47,
+            "density": 1700.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.1,
+            "conductivity": 0.045,
+            "density": 30.0,
+            "specific_heat": 1220.0
+          },
+          {
+            "thickness": 0.06,
+            "conductivity": 0.58,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 1.4,
+            "density": 2000.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.04,
+            "conductivity": 1.4,
+            "density": 2400.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.24,
+            "conductivity": 0.65,
+            "density": 900.0,
+            "specific_heat": 1000.0
+          },
+          {
+            "thickness": 0.02,
+            "conductivity": 0.9,
+            "density": 1800.0,
+            "specific_heat": 910.0
+          }
+        ],
+        "absorptance": 0.7,
+        "_source": "Brick-concrete slab - lightweight screed (12 cm) - insulation (10 cm) (IntCeiling)"
+      },
+      "window": {
+        "u_value": 2.0,
+        "shgc": 0.27,
+        "frame_factor": 0.0,
+        "shading_coef": 0.9
+      },
+      "wwr": 0.125,
+      "infiltration_ach": 0.0
+    }
+  }
+}

@@ -1,0 +1,3 @@
+building_id,scenario_id,carrier,beta_base_kWh_day,beta_heating_kWh_day_K,heating_change_point_C,beta_cooling_kWh_day_K,cooling_change_point_C,SSE_daily,R2,observations,degrees_of_freedom
+B001,S00,electricity,156.8782937333098,5.897953605965322,11.5,8.565750244082505,16.5,278.42391002132047,0.936977254228515,12,7
+B001,S00,natural_gas,40.07429813323191,20.13245543597375,12.0,-2.8157435982206054,14.0,277.3792056200456,0.995444288525838,12,7

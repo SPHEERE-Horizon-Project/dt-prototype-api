@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "inputs": {
+    "geometry": "../data/examples/example_district.geojson",
+    "geometry_format": "geojson",
+    "weather_epw": "../data/examples/ITA_Venezia-Tessera.161050_IGDG.epw",
+    "envelopes": "../data/examples/archetypes.json",
+    "schedules": "../data/examples/schedules.json",
+    "systems": "../data/examples/systems_templates.json",
+    "calendar_year": 2023,
+    "time_steps_per_hour": 1,
+    "azimuth_subdivisions": 8
+  },
+  "operating": {
+    "heating_season": [288, 120],
+    "cooling_season": [152, 273],
+    "ahu_mode": "extended",
+    "initial_temperature": 15.0,
+    "initial_specific_humidity": 0.0105
+  },
+  "dynamic": {
+    "model": "5R1C",
+    "latent": false,
+    "plants": false,
+    "sizing": "design_day",
+    "dhw_tank": true,
+    "pv_battery": false
+  },
+  "simplified": {"comparison_mode": "seasonal_ahu", "zone_mode": "sum"}
+}

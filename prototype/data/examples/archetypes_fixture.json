@@ -1,0 +1,65 @@
+{
+  "_comment": "TABULA/URBEM-style envelope archetype database (illustrative values inspired by the TABULA Italian residential typology; replace with project data). U-values in W/(m2 K), SI units throughout. Schema: see dt_prototype.common.preprocessing.archetypes.load_envelope_archetypes.",
+  "envelopes": {
+    "<1945": {
+      "ext_wall": {"u_value": 1.48, "mass_class": "Very heavy", "absorptance": 0.7},
+      "roof": {"u_value": 1.8, "mass_class": "Heavy", "absorptance": 0.8},
+      "ground_floor": {"u_value": 1.6, "mass_class": "Heavy"},
+      "int_wall": {"u_value": 1.8, "mass_class": "Medium"},
+      "int_ceiling": {"u_value": 1.5, "mass_class": "Heavy"},
+      "window": {"u_value": 4.9, "shgc": 0.85, "frame_factor": 0.2},
+      "wwr": 0.12,
+      "infiltration_ach": 0.5
+    },
+    "1946-1960": {
+      "ext_wall": {"u_value": 1.4, "mass_class": "Heavy", "absorptance": 0.6},
+      "roof": {"u_value": 1.6, "mass_class": "Heavy", "absorptance": 0.8},
+      "ground_floor": {"u_value": 1.5, "mass_class": "Heavy"},
+      "int_wall": {"u_value": 1.8, "mass_class": "Medium"},
+      "int_ceiling": {"u_value": 1.5, "mass_class": "Heavy"},
+      "window": {"u_value": 4.9, "shgc": 0.85, "frame_factor": 0.2},
+      "wwr": 0.13,
+      "infiltration_ach": 0.5
+    },
+    "1961-1980": {
+      "ext_wall": {"u_value": 1.1, "mass_class": "Heavy", "absorptance": 0.6},
+      "roof": {"u_value": 1.2, "mass_class": "Medium", "absorptance": 0.8},
+      "ground_floor": {"u_value": 1.3, "mass_class": "Heavy"},
+      "int_wall": {"u_value": 1.8, "mass_class": "Medium"},
+      "int_ceiling": {"u_value": 1.5, "mass_class": "Heavy"},
+      "window": {"u_value": 4.9, "shgc": 0.85, "frame_factor": 0.2},
+      "wwr": 0.15,
+      "infiltration_ach": 0.4
+    },
+    "1981-1990": {
+      "ext_wall": {"u_value": 0.8, "mass_class": "Heavy", "absorptance": 0.6},
+      "roof": {"u_value": 0.9, "mass_class": "Medium", "absorptance": 0.8},
+      "ground_floor": {"u_value": 0.9, "mass_class": "Heavy"},
+      "int_wall": {"u_value": 1.8, "mass_class": "Medium"},
+      "int_ceiling": {"u_value": 1.5, "mass_class": "Heavy"},
+      "window": {"u_value": 3.7, "shgc": 0.75, "frame_factor": 0.2},
+      "wwr": 0.16,
+      "infiltration_ach": 0.4
+    },
+    "1991-2005": {
+      "ext_wall": {"u_value": 0.59, "mass_class": "Medium", "absorptance": 0.6},
+      "roof": {"u_value": 0.6, "mass_class": "Medium", "absorptance": 0.7},
+      "ground_floor": {"u_value": 0.7, "mass_class": "Heavy"},
+      "int_wall": {"u_value": 1.8, "mass_class": "Medium"},
+      "int_ceiling": {"u_value": 1.5, "mass_class": "Heavy"},
+      "window": {"u_value": 2.8, "shgc": 0.7, "frame_factor": 0.2},
+      "wwr": 0.18,
+      "infiltration_ach": 0.3
+    },
+    "2006-present": {
+      "ext_wall": {"u_value": 0.3, "mass_class": "Medium", "absorptance": 0.5},
+      "roof": {"u_value": 0.28, "mass_class": "Medium", "absorptance": 0.6},
+      "ground_floor": {"u_value": 0.33, "mass_class": "Heavy"},
+      "int_wall": {"u_value": 1.8, "mass_class": "Medium"},
+      "int_ceiling": {"u_value": 1.5, "mass_class": "Heavy"},
+      "window": {"u_value": 1.8, "shgc": 0.6, "frame_factor": 0.25},
+      "wwr": 0.2,
+      "infiltration_ach": 0.2
+    }
+  }
+}

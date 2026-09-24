@@ -1,0 +1,10 @@
+building_id,zone_id,zone_name,end_use,n_floors,net_floor_area_m2,volume_m3
+1,upper,Test building 1_upper,services,3,2235.243896484375,8382.164611816406
+1,lower,Test building 1_lower,food,1,745.081298828125,2794.0548706054688
+18,upper,Test building 2_upper,residential,2,613.37158203125,1635.6575520833335
+18,lower,Test building 2_lower,food,1,306.685791015625,817.8287760416667
+19,upper,Test building 3_upper,residential,3,1167.076171875,8169.533203125
+19,lower,Test building 3_lower,food,1,389.025390625,2723.177734375
+20,upper,Test building 4_upper,services,7,11776.968505859375,42397.086621093746
+20,lower,Test building 4_lower,residential,1,1682.424072265625,6056.72666015625
+21,single,Test building 5,services,12,43748.3408203125,91871.51572265624

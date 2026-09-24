@@ -1,0 +1,21 @@
+system_key,configuration_id,service,carrier,form,c0,c1,c2,breakpoint_C,c0_high,c1_high,description
+1|H_pri,1,H_pri,natural_gas,const,0.9,0,0,,,0,Gas boiler
+1|H_sec,1,H_sec,none,const,1,0,0,,,0,Unused
+1|W_pri,1,W_pri,natural_gas,const,0.85,0,0,,,0,Gas DHW
+1|W_sec,1,W_sec,none,const,1,0,0,,,0,Unused
+1|C,1,C,electricity,const,2.8,0,0,,,0,Electric chiller
+2|H_pri,2,H_pri,electricity,linear,2.2,0.09,0,,,0,Air-source heat pump
+2|H_sec,2,H_sec,none,const,1,0,0,,,0,Unused
+2|W_pri,2,W_pri,electricity,const,2.5,0,0,,,0,Heat-pump DHW
+2|W_sec,2,W_sec,none,const,1,0,0,,,0,Unused
+2|C,2,C,electricity,linear,5.2,-0.09,0,,,0,Reversible heat-pump cooling
+3|H_pri,3,H_pri,electricity,piecewise,2.1,0.1,0,2,2.16,0.07,Hybrid heat pump
+3|H_sec,3,H_sec,natural_gas,const,0.9,0,0,,,0,Hybrid backup boiler
+3|W_pri,3,W_pri,electricity,const,2.4,0,0,,,0,Heat-pump DHW
+3|W_sec,3,W_sec,natural_gas,const,0.85,0,0,,,0,Backup DHW
+3|C,3,C,electricity,linear,5.2,-0.09,0,,,0,Heat-pump cooling
+4|H_pri,4,H_pri,district_heat,const,0.97,0,0,,,0,District-heating substation
+4|H_sec,4,H_sec,none,const,1,0,0,,,0,Unused
+4|W_pri,4,W_pri,district_heat,const,0.95,0,0,,,0,District-heating DHW
+4|W_sec,4,W_sec,none,const,1,0,0,,,0,Unused
+4|C,4,C,electricity,const,3,0,0,,,0,Split-system cooling

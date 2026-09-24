@@ -1,0 +1,6 @@
+building_id,building_name,envelope,heating_system,cooling_system,solar_technologies,n_floors,height_m,footprint_area_m2
+1,Test building 1,1981-1990,"Traditional Gas Boiler, Centralized, Low Temp Radiator",A-A split,ST,4,12.0,745.081298828125
+18,Test building 2,1981-1990,s19,s4,"PV,ST",3,10.0,306.685791015625
+19,Test building 3,1981-1990,"A-W Heat Pump, Single, Fan coil",s2,,4,14.0,389.025390625
+20,Test building 4,1981-1990,s14,"A-W chiller, Centralized, Fan coil",PV,8,24.0,1682.424072265625
+21,Test building 5,1981-1990,"Condensing Gas Boiler, Centralized, High Temp Radiator",A-A split,ST,12,36.0,3645.695068359375
