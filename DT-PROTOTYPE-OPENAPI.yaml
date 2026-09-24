@@ -1,0 +1,1919 @@
+openapi: 3.1.0
+info:
+  title: DT Prototype API
+  version: 0.2.0
+  description: |
+    Local synchronous HTTP adapter for the DT Prototype's three calculation
+    runners. Each request waits until its calculation has finished and returns
+    the result as JSON. The copied calculation package is unchanged.
+
+    The `project` JSON part combines `configs/example_tabular.json` with the
+    building, envelope, schedule, and system files it names. The `weather_epw`
+    part carries the EPW file. The adapter writes these parts to isolated files,
+    calls the selected runner, and translates its CSV files and manifest to JSON.
+    The source package remains the authority for accepted values and calculations.
+    The source configuration requires `dynamic` and `simplified` sections even
+    when another runner is selected; the adapter supplies inert required sections
+    where they are not part of the selected path. See `src/dt_prototype/cli.py`, `common/project.py`,
+    `dynamic/simulation/runner.py`, `monthly/simulation/quasi_steady_state.py`,
+    and `integration/engines/model3.py` in the DT Prototype source tree.
+
+    Each path calculates a full non-leap calendar year for every supplied building.
+    Buildings have one zone or two independent zones. The shared monthly results
+    report positive useful sensible heating and cooling in kWh. Purchased fuel or
+    electricity is a separate quantity, available only in some dynamic details.
+servers:
+  - url: http://127.0.0.1:8000
+    description: Local Taskfile server.
+tags:
+  - name: Dynamic
+    description: |
+      Estimates heating and cooling by walking through the year in short
+      time steps (typically hourly). Uses a compact heat-flow model of the
+      building fabric (5R1C or 7R2C). Best when you need how demand changes
+      through a day, or optional equipment detail.
+  - name: Monthly
+    description: |
+      Estimates heating and cooling once per calendar month from average
+      weather and operation. Reports the heat that must be added or removed
+      to hold indoor temperature (not purchased fuel or electricity). The
+      usual choice when monthly totals are enough.
+  - name: Simplified
+    description: |
+      A separate, coarser monthly estimate (Model 3). Shared building and
+      weather data are translated into Model 3's own inputs, then Model 3
+      runs on its own. Use it to compare methods, not as a simpler switch
+      on the Monthly path.
+paths:
+  /runs/dynamic:
+    post:
+      tags: [Dynamic]
+      operationId: runDynamic
+      summary: Run an hour-by-hour heating and cooling estimate
+      description: |
+        Runs `runners/run_dynamic.py --config ... --output ...` through the HTTP adapter.
+        `dynamic.model` selects 5R1C or 7R2C. The runner writes time-step detail
+        rows and common monthly and annual energy tables. Plant, humidity, hot
+        water, solar, and battery details depend on the selected options and input.
+      requestBody:
+        $ref: "#/components/requestBodies/DynamicRun"
+      responses:
+        "200":
+          description: The run finished. Inspect `manifest.status` and per-building failures.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DynamicRunResult"
+              examples:
+                singleZone:
+                  $ref: "#/components/examples/DynamicResult"
+        "422":
+          $ref: "#/components/responses/InvalidInput"
+        "409":
+          $ref: "#/components/responses/DuplicateRun"
+        "500":
+          $ref: "#/components/responses/RunnerFailed"
+  /runs/monthly:
+    post:
+      tags: [Monthly]
+      operationId: runMonthly
+      summary: Run a month-by-month heating and cooling estimate
+      description: |
+        Runs `runners/run_monthly.py --config ... --output ...` through the HTTP adapter.
+        This path uses the shared operating settings. It reports monthly zone and
+        air-handling-unit demand, heat-transfer and gain diagnostics, and annual
+        sums. It does not use `dynamic` or `simplified` options.
+      requestBody:
+        $ref: "#/components/requestBodies/MonthlyRun"
+      responses:
+        "200":
+          description: The run finished. Inspect `manifest.status` and per-building failures.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MonthlyRunResult"
+              examples:
+                singleZone:
+                  $ref: "#/components/examples/MonthlyResult"
+        "422":
+          $ref: "#/components/responses/InvalidInput"
+        "409":
+          $ref: "#/components/responses/DuplicateRun"
+        "500":
+          $ref: "#/components/responses/RunnerFailed"
+  /runs/simplified:
+    post:
+      tags: [Simplified]
+      operationId: runSimplified
+      summary: Run the separate Model 3 monthly estimate
+      description: |
+        Runs `runners/run_simplified.py --config ... --output ...` through the HTTP adapter.
+        The adapter maps the shared building and weather inputs into Model 3's
+        monthly inputs. `zone_mode` selects a sum of independent zones, one
+        collapsed equivalent zone, or both. In `both`, the headline monthly and
+        annual totals use the zone sum; the collapsed case stays in detail rows.
+      requestBody:
+        $ref: "#/components/requestBodies/SimplifiedRun"
+      responses:
+        "200":
+          description: The run finished. Inspect `manifest.status` and per-building failures.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimplifiedRunResult"
+              examples:
+                singleZone:
+                  $ref: "#/components/examples/SimplifiedResult"
+        "422":
+          $ref: "#/components/responses/InvalidInput"
+        "409":
+          $ref: "#/components/responses/DuplicateRun"
+        "500":
+          $ref: "#/components/responses/RunnerFailed"
+components:
+  requestBodies:
+    DynamicRun:
+      required: true
+      description: Typed project input plus the 8,760-hour EPW weather file.
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [project, weather_epw]
+            properties:
+              project:
+                $ref: "#/components/schemas/DynamicProject"
+              weather_epw:
+                $ref: "#/components/schemas/EpwFile"
+          encoding:
+            project:
+              contentType: application/json
+            weather_epw:
+              contentType: text/plain
+          examples:
+            singleZone:
+              $ref: "#/components/examples/DynamicRequest"
+    MonthlyRun:
+      required: true
+      description: Typed project input plus the 8,760-hour EPW weather file.
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [project, weather_epw]
+            properties:
+              project:
+                $ref: "#/components/schemas/MonthlyProject"
+              weather_epw:
+                $ref: "#/components/schemas/EpwFile"
+          encoding:
+            project:
+              contentType: application/json
+            weather_epw:
+              contentType: text/plain
+          examples:
+            singleZone:
+              $ref: "#/components/examples/MonthlyRequest"
+    SimplifiedRun:
+      required: true
+      description: Typed project input plus the 8,760-hour EPW weather file.
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [project, weather_epw]
+            properties:
+              project:
+                $ref: "#/components/schemas/SimplifiedProject"
+              weather_epw:
+                $ref: "#/components/schemas/EpwFile"
+          encoding:
+            project:
+              contentType: application/json
+            weather_epw:
+              contentType: text/plain
+          examples:
+            singleZone:
+              $ref: "#/components/examples/SimplifiedRequest"
+  responses:
+    InvalidInput:
+      description: Project settings, source data, or weather failed pre-run checks.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/InputProblem"
+    DuplicateRun:
+      description: The supplied run ID has already been used.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/InputProblem"
+    RunnerFailed:
+      description: The runner failed without a completed manifest or usable result.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/InputProblem"
+  schemas:
+    EpwFile:
+      type: string
+      format: binary
+      description: |
+        EnergyPlus Weather file. The source reader requires 8,760 ordered hourly
+        records for a non-leap year, checks consumed weather fields, and does not
+        fill missing values. The selected `calendar_year` sets schedule weekdays;
+        EPW source-year fields may vary in a typical meteorological year.
+    CommonProject:
+      type: object
+      description: |
+        Shared data for one run. The CLI reads these values from a configuration
+        file and separate input files. `run_id` names a unique output directory.
+      required: [run_id, schema_version, inputs, operating]
+      properties:
+        run_id:
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: '^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$'
+          description: Unique run identifier. Windows device names are reserved.
+          example: campus_a_baseline
+        schema_version:
+          type: string
+          const: "1.0"
+          description: Version required by `ProjectInputs.load` for the source configuration.
+        inputs:
+          $ref: "#/components/schemas/ProjectInputs"
+        operating:
+          $ref: "#/components/schemas/OperatingOptions"
+    DynamicProject:
+      allOf:
+        - $ref: "#/components/schemas/CommonProject"
+        - type: object
+          required: [dynamic]
+          properties:
+            dynamic:
+              $ref: "#/components/schemas/DynamicOptions"
+      description: Shared project data and dynamic-only options.
+    MonthlyProject:
+      allOf:
+        - $ref: "#/components/schemas/CommonProject"
+      description: Shared project data; the monthly runner has no extra CLI option.
+    SimplifiedProject:
+      allOf:
+        - $ref: "#/components/schemas/CommonProject"
+        - type: object
+          required: [simplified]
+          properties:
+            simplified:
+              $ref: "#/components/schemas/SimplifiedOptions"
+      description: Shared project data and simplified-only options.
+    ProjectInputs:
+      type: object
+      description: |
+        The source `inputs` section, with file paths replaced by typed geometry
+        and library data. Building references to envelopes, schedules, and systems
+        must match keys in the corresponding libraries.
+      required:
+        [
+          geometry,
+          envelopes,
+          schedules,
+          systems,
+          calendar_year,
+          time_steps_per_hour,
+          azimuth_subdivisions,
+        ]
+      properties:
+        geometry:
+          oneOf:
+            - $ref: "#/components/schemas/TabularGeometry"
+            - $ref: "#/components/schemas/GeoJsonGeometry"
+          description: Simulation-ready tables or a projected GeoJSON footprint collection.
+        envelopes:
+          $ref: "#/components/schemas/EnvelopeLibrary"
+        schedules:
+          $ref: "#/components/schemas/ScheduleLibrary"
+        systems:
+          $ref: "#/components/schemas/SystemLibrary"
+        calendar_year:
+          type: integer
+          minimum: 1
+          maximum: 9998
+          description: Non-leap calendar year used for timestamps and schedule weekdays.
+          example: 2023
+        time_steps_per_hour:
+          type: integer
+          enum: [1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60]
+          description: Dynamic steps per hour. Weather is interpolated; schedules hold within each hour.
+          example: 1
+        azimuth_subdivisions:
+          type: integer
+          minimum: 1
+          maximum: 360
+          description: Number of compass bins used for solar calculations.
+          example: 8
+    OperatingOptions:
+      type: object
+      required:
+        [
+          heating_season,
+          cooling_season,
+          ahu_mode,
+          initial_temperature,
+          initial_specific_humidity,
+        ]
+      properties:
+        heating_season:
+          $ref: "#/components/schemas/Season"
+        cooling_season:
+          $ref: "#/components/schemas/Season"
+        ahu_mode:
+          type: string
+          enum: [basic, extended]
+          description: Basic uses outdoor air; extended allows recirculation and fuller coil accounting.
+          example: extended
+        initial_temperature:
+          type: number
+          description: Initial indoor thermal state in degrees Celsius.
+          example: 15.0
+        initial_specific_humidity:
+          type: number
+          minimum: 0
+          description: Initial water-vapour mass per dry-air mass, in kg/kg.
+          example: 0.0105
+    Season:
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        type: integer
+        minimum: 1
+        maximum: 365
+      description: Inclusive start and end day of year. Start after end wraps over New Year.
+      example: [288, 120]
+    DynamicOptions:
+      type: object
+      required: [model]
+      properties:
+        model:
+          type: string
+          enum: [5R1C, 7R2C, 1C, 2C]
+          description: RC thermal network. `1C` and `2C` are legacy config aliases; the CLI `--model` flag accepts only `5R1C` and `7R2C`.
+          example: 5R1C
+        latent:
+          type: boolean
+          default: true
+          description: Calculate humidity balance and latent loads.
+        plants:
+          type: boolean
+          default: false
+          description: Calculate named heating/cooling equipment and purchased energy; false uses ideal loads.
+        sizing:
+          type: string
+          enum: [design_day, static]
+          default: design_day
+          description: Plant capacity estimate when plants are enabled and no explicit power limit is supplied.
+        dhw_tank:
+          type: boolean
+          default: true
+          description: Route domestic hot water through an auto-sized storage tank when applicable.
+        pv_battery:
+          type: boolean
+          default: false
+          description: Add battery dispatch for a building with photovoltaic generation when plants are enabled.
+        heating_max_power:
+          type: [number, "null"]
+          minimum: 0
+          default: null
+          description: Heating capacity limit in W; null lets sizing or ideal-load logic choose it.
+        cooling_max_power:
+          type: [number, "null"]
+          maximum: 0
+          default: null
+          description: Cooling capacity limit in signed W; cooling is negative. Null means no explicit limit.
+    SimplifiedOptions:
+      type: object
+      required: [comparison_mode, zone_mode]
+      properties:
+        comparison_mode:
+          type: string
+          enum: [legacy, seasonal_ahu]
+          description: "`seasonal_ahu` maps seasonal availability and separate sensible air-handling demand; `legacy` retains the earlier Model 3 comparison boundary."
+          example: seasonal_ahu
+        zone_mode:
+          type: string
+          enum: [sum, collapsed, both]
+          description: "`sum` solves zones separately; `collapsed` combines two-zone inputs before one solve; `both` keeps both details and reports the sum in headline tables."
+          example: sum
+    TabularGeometry:
+      type: object
+      description: |
+        Typed form of `buildings.csv`, `zones.csv`, and `surfaces.csv`. IDs join
+        the arrays. Every building has at least one zone and every zone has at
+        least one surface. The current engines support one or two independent
+        zones; they do not model heat transfer between zones.
+      required: [format, buildings, zones, surfaces]
+      properties:
+        format:
+          type: string
+          const: tabular
+          description: Selects the normalized-table input route.
+        buildings:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/BuildingRow"
+          description: One record per physical building; IDs and names must be unique.
+        zones:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/ZoneRow"
+          description: One record per thermal zone, joined by building_id.
+        surfaces:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/SurfaceRow"
+          description: Heat-exchange surfaces, joined by building_id and zone_id.
+    BuildingRow:
+      type: object
+      required:
+        [
+          building_id,
+          building_name,
+          envelope,
+          heating_system,
+          cooling_system,
+          solar_technologies,
+          n_floors,
+          height_m,
+          footprint_area_m2,
+        ]
+      properties:
+        building_id:
+          type: string
+          minLength: 1
+          description: Stable ID used to join zones, surfaces, and results; source CSV values are strings.
+        building_name:
+          type: string
+          minLength: 1
+          description: Unique display name within the project.
+        envelope:
+          type: string
+          minLength: 1
+          description: Key in `inputs.envelopes.envelopes`.
+        heating_system:
+          type: string
+          minLength: 1
+          description: Heating template key or supported catalogue name; `IdealLoad` requests ideal equipment.
+        cooling_system:
+          type: string
+          minLength: 1
+          description: Cooling template key or supported catalogue name; `IdealLoad` requests ideal equipment.
+        solar_technologies:
+          type: string
+          enum: ["", PV, ST, "PV,ST", "PV, ST"]
+          description: Roof solar technologies; empty string means none. The loader also accepts `PV, ST`.
+        n_floors:
+          type: integer
+          minimum: 1
+          description: Total number of building floors across all zones.
+        height_m:
+          type: number
+          exclusiveMinimum: 0
+          description: Total building height in metres.
+        footprint_area_m2:
+          type: number
+          exclusiveMinimum: 0
+          description: Ground footprint area in square metres.
+    ZoneRow:
+      type: object
+      required:
+        [
+          building_id,
+          zone_id,
+          zone_name,
+          end_use,
+          n_floors,
+          net_floor_area_m2,
+          volume_m3,
+        ]
+      properties:
+        building_id:
+          type: string
+          minLength: 1
+          description: Parent building's stable ID.
+        zone_id:
+          type: string
+          minLength: 1
+          description: Zone ID unique within its building; examples use `single`, `upper`, or `lower`.
+        zone_name:
+          type: string
+          minLength: 1
+          description: Display name, unique within the supplied portfolio.
+        end_use:
+          type: string
+          minLength: 1
+          description: Key in `inputs.schedules.end_uses` for occupancy and operation profiles.
+        n_floors:
+          type: integer
+          minimum: 1
+          description: Floors represented by this zone.
+        net_floor_area_m2:
+          type: number
+          exclusiveMinimum: 0
+          description: Conditioned net floor area in square metres.
+        volume_m3:
+          type: number
+          exclusiveMinimum: 0
+          description: Conditioned air volume in cubic metres.
+    SurfaceRow:
+      type: object
+      required:
+        [
+          building_id,
+          zone_id,
+          surface_index,
+          surface_type,
+          area_m2,
+          azimuth_deg,
+          tilt_deg,
+        ]
+      properties:
+        building_id:
+          type: string
+          minLength: 1
+          description: Parent building's stable ID.
+        zone_id:
+          type: string
+          minLength: 1
+          description: Parent zone's ID within that building.
+        surface_index:
+          type: integer
+          minimum: 0
+          description: Stable order of surfaces within the zone; unique for each building and zone.
+        surface_type:
+          type: string
+          enum: [ExtWall, Roof, GroundFloor, IntWall, IntCeiling, IntFloor]
+          description: Which construction and boundary rule applies to this surface.
+        area_m2:
+          type: number
+          exclusiveMinimum: 0
+          description: Gross area in square metres; window area is derived from the envelope window-to-wall ratio.
+        azimuth_deg:
+          type: number
+          description: Outward compass direction; 0 north, 90 east, 180 south, 270 west.
+        tilt_deg:
+          type: number
+          description: Angle from horizontal; 0 is horizontal and 90 is vertical.
+    GeoJsonGeometry:
+      type: object
+      description: |
+        Building-footprint route. Coordinates must use a projected coordinate
+        system in metres. The loader extrudes each Polygon or MultiPolygon by
+        its height to create walls, roof, and ground floor. Distinct lower and
+        upper end uses create two independent zones when there are at least two
+        floors. This route does not read IFC files.
+      required: [format, feature_collection]
+      properties:
+        format:
+          type: string
+          const: geojson
+          description: Selects the GeoJSON footprint input route.
+        feature_collection:
+          $ref: "#/components/schemas/BuildingFeatureCollection"
+    BuildingFeatureCollection:
+      type: object
+      required: [type, features]
+      properties:
+        type:
+          type: string
+          const: FeatureCollection
+          description: GeoJSON collection marker.
+        crs:
+          type: object
+          additionalProperties: true
+          description: Source coordinate reference metadata; coordinates must be projected in metres.
+        features:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/BuildingFeature"
+          description: One Polygon or MultiPolygon feature per building.
+    BuildingFeature:
+      type: object
+      required: [type, properties, geometry]
+      properties:
+        type:
+          type: string
+          const: Feature
+          description: GeoJSON feature marker.
+        properties:
+          $ref: "#/components/schemas/BuildingFeatureProperties"
+        geometry:
+          type: object
+          required: [type, coordinates]
+          properties:
+            type:
+              type: string
+              enum: [Polygon, MultiPolygon]
+              description: Footprint geometry kind; the loader accepts no other GeoJSON geometry kind.
+            coordinates:
+              type: array
+              items: {}
+              description: GeoJSON Polygon or MultiPolygon coordinate nesting, with projected x/y metres and closed rings.
+    BuildingFeatureProperties:
+      type: object
+      description: |
+        Source GeoJSON names are preserved here. The loader accepts case
+        differences. Several fields have source defaults, but supplying stable
+        IDs and explicit assumptions makes a case easier to review.
+      properties:
+        id:
+          oneOf:
+            - type: string
+            - type: integer
+          description: Building ID; falls back to `Name`, then `0` if absent.
+        Name:
+          type: string
+          description: Building display name; falls back to `id`, then `building`.
+        End Use:
+          type: string
+          description: Main schedule key; defaults to `residential` when absent.
+        Upper End Use:
+          type: string
+          description: Upper-floor schedule key for a two-zone split; falls back to End Use.
+        Lower End Use:
+          type: string
+          description: Ground-floor schedule key; a distinct nonempty value triggers two zones when Floors is at least 2.
+        Envelope:
+          type: string
+          description: Envelope library key; missing or unknown keys cannot produce a usable model.
+        Height:
+          type: number
+          exclusiveMinimum: 0
+          description: Total building height in metres; loader default is 3.0.
+        Floors:
+          type: integer
+          minimum: 1
+          description: Total number of floors; loader default is 1. `Nfloors` is also accepted.
+        ExtWallCoeff:
+          type: number
+          description: Multiplier applied to derived external wall area; loader default is 1.0.
+        VolCoeff:
+          type: number
+          description: Multiplier applied to derived zone volume; loader default is 1.0.
+        Heating System:
+          type: string
+          description: System template key or catalogue name; defaults to `IdealLoad`.
+        Cooling System:
+          type: string
+          description: System template key or catalogue name; defaults to `IdealLoad`.
+        Solar technologies:
+          type: string
+          description: PV and/or solar thermal label; empty means neither. Key case may vary.
+    EnvelopeLibrary:
+      type: object
+      required: [envelopes]
+      properties:
+        envelopes:
+          type: object
+          minProperties: 1
+          additionalProperties:
+            $ref: "#/components/schemas/Envelope"
+          description: Named construction sets; a building's `envelope` selects one key.
+    Envelope:
+      type: object
+      required: [ext_wall, roof, ground_floor, int_wall, int_ceiling, window]
+      properties:
+        ext_wall:
+          $ref: "#/components/schemas/OpaqueElement"
+        roof:
+          $ref: "#/components/schemas/OpaqueElement"
+        ground_floor:
+          $ref: "#/components/schemas/OpaqueElement"
+        int_wall:
+          $ref: "#/components/schemas/OpaqueElement"
+        int_ceiling:
+          $ref: "#/components/schemas/OpaqueElement"
+        int_floor:
+          $ref: "#/components/schemas/OpaqueElement"
+        window:
+          $ref: "#/components/schemas/Window"
+        wwr:
+          type: number
+          minimum: 0
+          maximum: 1
+          default: 0.15
+          description: Window area as a fraction of exposed wall area; source default 0.15.
+        infiltration_ach:
+          type: number
+          minimum: 0
+          default: 0.3
+          description: Uncontrolled outdoor air changes per hour; source default 0.3.
+    OpaqueElement:
+      description: Wall, roof, or floor construction. Supply material layers or a U-value and mass class.
+      oneOf:
+        - $ref: "#/components/schemas/LayeredElement"
+        - $ref: "#/components/schemas/EquivalentElement"
+    LayeredElement:
+      type: object
+      required: [layers]
+      properties:
+        layers:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/MaterialLayer"
+          description: Ordered material layers used to derive heat transfer and stored heat.
+        absorptance:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Fraction of incident sunlight absorbed by the outside surface.
+    MaterialLayer:
+      type: object
+      required: [thickness, conductivity, density, specific_heat]
+      properties:
+        thickness:
+          type: number
+          exclusiveMinimum: 0
+          description: Layer thickness in metres.
+        conductivity:
+          type: number
+          exclusiveMinimum: 0
+          description: Heat conductivity in W/(m K).
+        density:
+          type: number
+          exclusiveMinimum: 0
+          description: Material mass density in kg/m³.
+        specific_heat:
+          type: number
+          exclusiveMinimum: 0
+          description: Heat storage per kilogram and kelvin, J/(kg K).
+    EquivalentElement:
+      type: object
+      required: [u_value, mass_class]
+      properties:
+        u_value:
+          type: number
+          exclusiveMinimum: 0
+          description: Steady heat flow per square metre per kelvin, W/(m² K).
+        mass_class:
+          type: string
+          enum: [Very heavy, Heavy, Medium, Light, Very light]
+          description: Approximate heat storage category used when layers are unknown.
+        absorptance:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Fraction of incident sunlight absorbed by the outside surface.
+    Window:
+      type: object
+      required: [u_value, shgc]
+      properties:
+        u_value:
+          type: number
+          exclusiveMinimum: 0
+          description: Window heat flow per area and temperature difference, W/(m² K).
+        shgc:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Fraction of sunlight that becomes indoor heat.
+        frame_factor:
+          type: number
+          minimum: 0
+          maximum: 1
+          default: 0.2
+          description: Fraction of total window area occupied by frame; source default 0.2.
+        shading_coef:
+          type: number
+          minimum: 0
+          maximum: 1
+          default: 1
+          description: Multiplier on solar gain through glass; 1 means no shading reduction.
+    ScheduleLibrary:
+      type: object
+      required: [end_uses]
+      properties:
+        end_uses:
+          type: object
+          minProperties: 1
+          additionalProperties:
+            $ref: "#/components/schemas/EndUseSchedule"
+          description: Named occupancy patterns; each zone's `end_use` selects one key.
+    EndUseSchedule:
+      type: object
+      description: Omitted fields receive reader defaults. Each profile accepts a constant or hourly values by day type.
+      properties:
+        people:
+          $ref: "#/components/schemas/GainProfile"
+        people_latent:
+          $ref: "#/components/schemas/Profile"
+          description: Moisture-producing occupant gain in W/m².
+        appliances:
+          $ref: "#/components/schemas/GainProfile"
+        lighting:
+          $ref: "#/components/schemas/GainProfile"
+        heating_setpoint:
+          $ref: "#/components/schemas/Profile"
+          description: Heating thermostat temperature in °C.
+        cooling_setpoint:
+          $ref: "#/components/schemas/Profile"
+          description: Cooling thermostat temperature in °C.
+        humidity_setpoint_low:
+          $ref: "#/components/schemas/Profile"
+          description: Lower relative-humidity target as a fraction from 0 to 1.
+        humidity_setpoint_high:
+          $ref: "#/components/schemas/Profile"
+          description: Upper relative-humidity target as a fraction from 0 to 1.
+        ventilation_ach:
+          $ref: "#/components/schemas/Profile"
+          description: Supplied outdoor air changes per hour.
+        infiltration_ach:
+          $ref: "#/components/schemas/Profile"
+          description: Uncontrolled outdoor air changes per hour.
+        ventilation_flow_per_area:
+          $ref: "#/components/schemas/Profile"
+          description: Outdoor air flow in m³/(s m²) of floor area.
+        dhw:
+          $ref: "#/components/schemas/HotWaterSchedule"
+        ahu:
+          $ref: "#/components/schemas/AhuSettings"
+        natural_ventilation:
+          $ref: "#/components/schemas/NaturalVentilation"
+    Profile:
+      description: Constant value or one value for each hour of a representative day. Missing weekend values fall back to weekday values.
+      oneOf:
+        - type: number
+        - type: object
+          properties:
+            weekday:
+              $ref: "#/components/schemas/HourlyValues"
+            weekend:
+              $ref: "#/components/schemas/HourlyValues"
+            saturday:
+              $ref: "#/components/schemas/HourlyValues"
+            sunday:
+              $ref: "#/components/schemas/HourlyValues"
+          required: [weekday]
+    HourlyValues:
+      type: array
+      minItems: 24
+      maxItems: 24
+      items:
+        type: number
+      description: Hour 00:00 through 23:00, in the unit of the containing field.
+    GainProfile:
+      description: Occupant, appliance, or lighting gain in W/m²; optional radiant fraction splits heat gain.
+      oneOf:
+        - type: number
+        - type: object
+          required: [weekday]
+          properties:
+            weekday:
+              $ref: "#/components/schemas/HourlyValues"
+            weekend:
+              $ref: "#/components/schemas/HourlyValues"
+            saturday:
+              $ref: "#/components/schemas/HourlyValues"
+            sunday:
+              $ref: "#/components/schemas/HourlyValues"
+            radiant_fraction:
+              type: number
+              minimum: 0
+              maximum: 1
+              description: Fraction released as radiation rather than directly to air.
+    HotWaterSchedule:
+      type: object
+      properties:
+        method:
+          type: string
+          enum: [profile, stochastic]
+          description: Fixed hourly shape or randomized draw timing.
+        flow_l_per_m2_h:
+          $ref: "#/components/schemas/Profile"
+          description: Hot-water draw rate in litres per m² of floor area per hour.
+        volume_per_m2_day:
+          type: number
+          minimum: 0
+          description: Total daily hot-water volume in litres per m² of floor area.
+        profile:
+          $ref: "#/components/schemas/HourlyValues"
+          description: Hourly fractions for allocating daily volume; applies with volume_per_m2_day.
+    AhuSettings:
+      type: object
+      description: Air-handling-unit settings; the unit treats and moves outdoor air.
+      properties:
+        sensible_recovery_eff:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Fraction of exhaust-air temperature difference recovered.
+        latent_recovery_eff:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Fraction of exhaust-air moisture difference recovered.
+        supply_temperature_heating:
+          type: number
+          description: Supply-air target during heating, °C.
+        supply_temperature_cooling:
+          type: number
+          description: Supply-air target during cooling, °C.
+        supply_specific_humidity:
+          type: number
+          minimum: 0
+          description: Supply-air water-vapour mass per dry-air mass, kg/kg.
+        humidity_control:
+          type: boolean
+          description: Whether the unit controls supply-air humidity.
+        outdoor_air_ratio:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Fraction of supplied air drawn from outdoors.
+    NaturalVentilation:
+      type: object
+      properties:
+        ach_max:
+          type: number
+          minimum: 0
+          description: Maximum opening-driven air changes per hour.
+        zone_temperature_threshold:
+          type: number
+          description: Indoor temperature above which opening is allowed, °C.
+        min_outdoor_temperature:
+          type: number
+          description: Minimum outdoor temperature for opening, °C.
+    SystemLibrary:
+      type: object
+      required: [heating_systems, cooling_systems]
+      properties:
+        heating_systems:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/HeatingSystem"
+          description: Named heating and hot-water equipment templates.
+        cooling_systems:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/CoolingSystem"
+          description: Named cooling equipment templates.
+    HeatingSystem:
+      type: object
+      properties:
+        description:
+          type: string
+          description: Human-readable equipment note; does not change the calculation.
+        emitter:
+          type: [string, "null"]
+          description: Room heat-delivery type, such as Radiator or RadiantFloor.
+        emission_target_temperature:
+          type: [number, "null"]
+          description: Target emitter temperature in °C where the equipment model uses one.
+        convective_fraction:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Share of delivered heat transferred directly to room air.
+        emission_efficiency:
+          $ref: "#/components/schemas/Efficiency"
+        distribution_efficiency:
+          $ref: "#/components/schemas/Efficiency"
+        regulation_efficiency:
+          $ref: "#/components/schemas/Efficiency"
+        generation_efficiency:
+          $ref: "#/components/schemas/Efficiency"
+        cop:
+          type: [number, "null"]
+          exclusiveMinimum: 0
+          description: Heat-pump heat output divided by electricity input; null uses efficiency instead.
+        fuel:
+          $ref: "#/components/schemas/Fuel"
+        dhw_emission_efficiency:
+          $ref: "#/components/schemas/Efficiency"
+        dhw_distribution_efficiency:
+          $ref: "#/components/schemas/Efficiency"
+        dhw_regulation_efficiency:
+          $ref: "#/components/schemas/Efficiency"
+        dhw_generation_efficiency:
+          $ref: "#/components/schemas/Efficiency"
+        dhw_cop:
+          type: [number, "null"]
+          exclusiveMinimum: 0
+          description: Hot-water heat-pump output divided by electricity input, if used.
+        dhw_fuel:
+          $ref: "#/components/schemas/Fuel"
+    CoolingSystem:
+      type: object
+      properties:
+        description:
+          type: string
+          description: Human-readable equipment note; does not change the calculation.
+        emitter:
+          type: [string, "null"]
+          description: Room cooling-delivery type, if the template has one.
+        convective_fraction:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Share of delivered cooling applied directly to room air.
+        emission_efficiency:
+          $ref: "#/components/schemas/Efficiency"
+        distribution_efficiency:
+          $ref: "#/components/schemas/Efficiency"
+        regulation_efficiency:
+          $ref: "#/components/schemas/Efficiency"
+        eer:
+          type: [number, "null"]
+          exclusiveMinimum: 0
+          description: Cooling output divided by electricity input; null leaves no rated EER.
+        fuel:
+          $ref: "#/components/schemas/Fuel"
+    Efficiency:
+      type: number
+      exclusiveMinimum: 0
+      maximum: 1
+      description: Useful output divided by input for one equipment stage; source templates supply defaults.
+    Fuel:
+      type: string
+      enum: [gas, electric, district_heat, other_fuel]
+      description: Energy carrier recorded by a plant model; only dynamic plant details expose carrier use.
+    InputProblem:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          description: Adapter error category, such as invalid_project or invalid_weather.
+        message:
+          type: string
+          description: Specific source validation or preprocessing error.
+        field:
+          type: string
+          description: JSON path or input part involved, when known.
+      description: HTTP adapter error. The source CLI itself prints errors and does not return JSON.
+    RunManifest:
+      type: object
+      required:
+        [
+          name,
+          version,
+          engine,
+          status,
+          timestamp_utc,
+          input_hashes,
+          building_outputs,
+          failed_buildings,
+        ]
+      properties:
+        name:
+          type: string
+          const: DT-Prototype
+          description: Source package name.
+        version:
+          type: string
+          description: Source package version recorded by the runner.
+        engine:
+          type: string
+          enum: [dynamic, monthly, simplified]
+          description: Calculation path that ran.
+        status:
+          type: string
+          enum: [complete, failed]
+          description: Failed if any building failed; successful building rows can still be present.
+        timestamp_utc:
+          type: string
+          format: date-time
+          description: Runner start time in UTC.
+        input_hashes:
+          type: object
+          additionalProperties:
+            type: string
+          description: SHA-256 hashes of source inputs; `weather_epw` also forms weather_id.
+        building_outputs:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/BuildingOutput"
+          description: Building ID to detail-file record. The source adds an entry before solving each building.
+        failed_buildings:
+          type: array
+          items:
+            $ref: "#/components/schemas/FailedBuilding"
+          description: Buildings that raised an exception during calculation.
+        resolved_engine_config:
+          type: object
+          additionalProperties: true
+          description: Runner's resolved simulation settings, including operating values and engine options.
+        zone_mode:
+          type: string
+          enum: [sum, collapsed, both]
+          description: Simplified path only; selected zone representation.
+        comparison_mode:
+          type: string
+          enum: [legacy, seasonal_ahu]
+          description: Simplified path only; Model 3 comparison boundary.
+      description: JSON view of manifest.json. The source also records full configuration, Python/dependency versions, and code hashes.
+    BuildingOutput:
+      type: object
+      required: [building_name, details_file]
+      properties:
+        building_name:
+          type: string
+          description: Display name from input geometry.
+        details_file:
+          type: string
+          description: Source CSV name; dynamic uses `_hourly.csv`, other paths use `_details.csv`.
+    FailedBuilding:
+      type: object
+      required: [building_id, error]
+      properties:
+        building_id:
+          type: string
+          description: Input building ID that failed.
+        error:
+          type: string
+          description: Exception message recorded by the source runner.
+    MonthlyTotal:
+      type: object
+      required:
+        [
+          run_id,
+          engine_id,
+          building_id,
+          building_name,
+          scenario_id,
+          weather_id,
+          period_id,
+          zone_count,
+          representation,
+          zone_heating_kWh,
+          zone_cooling_kWh,
+          ahu_heating_kWh,
+          ahu_cooling_kWh,
+          heating_kWh,
+          cooling_kWh,
+        ]
+      properties:
+        run_id:
+          type: string
+          description: Run output directory name.
+        engine_id:
+          type: string
+          enum: [dynamic, monthly, simplified]
+          description: Calculation path.
+        building_id:
+          type: string
+          description: Building ID from geometry.
+        building_name:
+          type: string
+          description: Building display name.
+        scenario_id:
+          type: string
+          const: baseline
+          description: Fixed scenario label in the current runner.
+        weather_id:
+          type: string
+          description: "`weather_` followed by the first 16 characters of the EPW SHA-256 hash."
+        period_id:
+          type: string
+          pattern: '^\d{4}-(0[1-9]|1[0-2])$'
+          description: Calendar month as YYYY-MM.
+        zone_count:
+          type: integer
+          enum: [1, 2]
+          description: Number of input zones for the building.
+        representation:
+          type: string
+          enum:
+            [
+              native_single_zone,
+              sum_of_independent_zones,
+              single_zone_collapsed_from_two_zones,
+            ]
+          description: How the headline totals represent the building's zones.
+        zone_heating_kWh:
+          type: number
+          minimum: 0
+          description: Useful sensible room-heating energy, excluding air treatment, kWh.
+        zone_cooling_kWh:
+          type: number
+          minimum: 0
+          description: Useful sensible room-cooling energy, excluding air treatment, kWh.
+        ahu_heating_kWh:
+          type: number
+          minimum: 0
+          description: Heating supplied by the air-handling unit, kWh.
+        ahu_cooling_kWh:
+          type: number
+          minimum: 0
+          description: Cooling supplied by the air-handling unit, kWh.
+        heating_kWh:
+          type: number
+          minimum: 0
+          description: Sum of zone_heating_kWh and ahu_heating_kWh.
+        cooling_kWh:
+          type: number
+          minimum: 0
+          description: Sum of zone_cooling_kWh and ahu_cooling_kWh.
+      description: One row of monthly.csv. Positive values are useful sensible energy, not purchased energy.
+    AnnualTotal:
+      type: object
+      required:
+        [
+          building_id,
+          building_name,
+          zone_heating_kWh,
+          zone_cooling_kWh,
+          ahu_heating_kWh,
+          ahu_cooling_kWh,
+          heating_kWh,
+          cooling_kWh,
+        ]
+      properties:
+        building_id:
+          type: string
+          description: Building ID from geometry.
+        building_name:
+          type: string
+          description: Building display name.
+        zone_heating_kWh:
+          type: number
+          description: Sum of the 12 monthly room-heating values, kWh.
+        zone_cooling_kWh:
+          type: number
+          description: Sum of the 12 monthly room-cooling values, kWh.
+        ahu_heating_kWh:
+          type: number
+          description: Sum of the 12 monthly air-unit heating values, kWh.
+        ahu_cooling_kWh:
+          type: number
+          description: Sum of the 12 monthly air-unit cooling values, kWh.
+        heating_kWh:
+          type: number
+          description: Annual zone plus air-unit heating, kWh.
+        cooling_kWh:
+          type: number
+          description: Annual zone plus air-unit cooling, kWh.
+      description: One row of annual.csv. A failed building has no annual row.
+    DynamicRunResult:
+      type: object
+      required: [manifest, monthly, annual, details_by_building]
+      properties:
+        manifest:
+          $ref: "#/components/schemas/RunManifest"
+        monthly:
+          type: array
+          items:
+            $ref: "#/components/schemas/MonthlyTotal"
+          description: Successful buildings' monthly.csv rows; 12 per building.
+        annual:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnnualTotal"
+          description: Successful buildings' annual.csv rows.
+        details_by_building:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/DynamicStep"
+          description: Building ID to time-step detail rows from its `_hourly.csv` file.
+    MonthlyRunResult:
+      type: object
+      required: [manifest, monthly, annual, details_by_building]
+      properties:
+        manifest:
+          $ref: "#/components/schemas/RunManifest"
+        monthly:
+          type: array
+          items:
+            $ref: "#/components/schemas/MonthlyTotal"
+        annual:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnnualTotal"
+        details_by_building:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/MonthlyDetail"
+          description: Building ID to 12 detail rows from its `_details.csv` file.
+    SimplifiedRunResult:
+      type: object
+      required: [manifest, monthly, annual, details_by_building]
+      properties:
+        manifest:
+          $ref: "#/components/schemas/RunManifest"
+        monthly:
+          type: array
+          items:
+            $ref: "#/components/schemas/MonthlyTotal"
+        annual:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnnualTotal"
+        details_by_building:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/SimplifiedDetail"
+          description: Building ID to Model 3 monthly physics rows; `both` can include aggregate and zone rows.
+    DynamicStep:
+      type: object
+      description: |
+        One row of the dynamic detail CSV. `time` is an adapter name for the
+        CSV index. Loads are signed W: heating positive, cooling negative.
+        With two zones, many source columns have `zone_{label}_` prefixes;
+        `zone_values` groups those prefixed values by label for this API view.
+        Optional carrier and storage fields appear only when their models run.
+      required:
+        [
+          time,
+          air_temperature,
+          operative_temperature,
+          mean_radiant_temperature,
+          relative_humidity,
+          sensible_load,
+          latent_load,
+          ahu_sensible_load,
+          ahu_latent_load,
+          heating_load,
+          cooling_load,
+          dhw_demand,
+          natural_ventilation_ach,
+          electric_appliances,
+        ]
+      properties:
+        time:
+          type: string
+          description: Simulation timestamp from the CSV index, without a UTC offset; one row per configured time step.
+        air_temperature:
+          type: number
+          description: Indoor air temperature, °C.
+        operative_temperature:
+          type: number
+          description: Combined air and surrounding-surface temperature, °C.
+        mean_radiant_temperature:
+          type: number
+          description: Average surrounding-surface temperature as felt by occupants, °C.
+        relative_humidity:
+          type: number
+          description: Indoor relative humidity as a fraction from 0 to 1.
+        sensible_load:
+          type: number
+          description: Room heating or cooling rate caused by temperature difference, W.
+        latent_load:
+          type: number
+          description: Humidity-control rate, W; zero when latent modelling is off.
+        ahu_sensible_load:
+          type: number
+          description: Air-handling-unit temperature-control rate, W.
+        ahu_latent_load:
+          type: number
+          description: Air-handling-unit humidity-control rate, W.
+        heating_load:
+          type: number
+          minimum: 0
+          description: Positive room-heating rate used in monthly aggregation, W.
+        cooling_load:
+          type: number
+          maximum: 0
+          description: Negative room-cooling rate used in monthly aggregation, W.
+        dhw_demand:
+          type: number
+          description: Domestic hot-water thermal demand, W.
+        natural_ventilation_ach:
+          type: number
+          description: Opening-driven air changes per hour.
+        electric_appliances:
+          type: number
+          description: Appliance electricity rate, W.
+        electric_plant:
+          type: number
+          description: Plant electricity rate, W, when plant equipment runs.
+        gas:
+          type: number
+          description: Gas input rate, W, when a gas plant runs.
+        district_heat:
+          type: number
+          description: District-heat input rate, W, when that carrier is used.
+        other_fuel:
+          type: number
+          description: Other-fuel input rate, W, when that carrier is used.
+        pv_production:
+          type: number
+          description: Photovoltaic electricity rate, W, when configured.
+        solar_thermal_production:
+          type: number
+          description: Solar thermal heat rate, W, when configured.
+        dhw_tank_temperature:
+          type: number
+          description: Hot-water storage temperature, °C, when tank modelling runs.
+        battery_soc:
+          type: number
+          description: Battery state of charge as a fraction from 0 to 1.
+        grid_import:
+          type: number
+          description: Electricity drawn from the grid, W.
+        grid_export:
+          type: number
+          description: Electricity sent to the grid, W.
+        pv_self_consumed:
+          type: number
+          description: On-site solar electricity used by the building, W.
+        zone_values:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: number
+          description: Zone label to source columns after removal of `zone_{label}_` prefix; used for two-zone runs.
+    MonthlyDetail:
+      type: object
+      required:
+        [
+          month,
+          heating_demand_kWh,
+          cooling_demand_kWh,
+          ahu_heating_demand_kWh,
+          ahu_cooling_demand_kWh,
+          total_sensible_heating_demand_kWh,
+          total_sensible_cooling_demand_kWh,
+          heat_losses_kWh,
+          gains_kWh,
+          eta_gain_heating,
+          eta_loss_cooling,
+        ]
+      properties:
+        month:
+          type: string
+          format: date
+          description: First day of the month; adapter name for the source CSV index.
+        heating_demand_kWh:
+          type: number
+          description: Useful room-heating energy for the month, kWh.
+        cooling_demand_kWh:
+          type: number
+          description: Useful room-cooling energy for the month, kWh.
+        ahu_heating_demand_kWh:
+          type: number
+          description: Air-handling-unit heating energy for the month, kWh.
+        ahu_cooling_demand_kWh:
+          type: number
+          description: Air-handling-unit cooling energy for the month, kWh.
+        total_sensible_heating_demand_kWh:
+          type: number
+          description: Room plus air-unit heating energy, kWh.
+        total_sensible_cooling_demand_kWh:
+          type: number
+          description: Room plus air-unit cooling energy, kWh.
+        heat_losses_kWh:
+          type: number
+          description: Monthly heat transferred out through fabric and air exchange, kWh.
+        gains_kWh:
+          type: number
+          description: Monthly heat gained from sun and internal activity, kWh.
+        eta_gain_heating:
+          type: number
+          description: Share of gains useful for reducing heating demand.
+        eta_loss_cooling:
+          type: number
+          description: Share of losses useful for reducing cooling demand.
+        zone_values:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: number
+          description: Zone label to equivalent zone-prefixed source detail columns for a two-zone building.
+      description: One row of the monthly solver's 12-row `_details.csv` file.
+    SimplifiedDetail:
+      type: object
+      description: One Model 3 MonthlyPhysicsRecord; nullable diagnostics can be absent when calculation fails.
+      required:
+        [
+          run_id,
+          engine_id,
+          building_id,
+          scenario_id,
+          weather_id,
+          period_id,
+          calculation_boundary_id,
+          calculation_status,
+          zone_id,
+          warning_codes,
+        ]
+      properties:
+        run_id:
+          type: string
+          description: Run output directory name.
+        engine_id:
+          type: string
+          description: Model 3 engine identifier recorded by the calculation.
+        building_id:
+          type: string
+          description: Source building ID.
+        scenario_id:
+          type: string
+          const: baseline
+          description: Current fixed scenario label.
+        weather_id:
+          type: string
+          description: Weather input ID based on its file hash.
+        period_id:
+          type: string
+          pattern: '^\d{4}-(0[1-9]|1[0-2])$'
+          description: Calendar month as YYYY-MM.
+        calculation_boundary_id:
+          type: string
+          description: Model 3 boundary definition used for this calculation.
+        calculation_status:
+          type: string
+          enum: [OK, WARNING, FAILED]
+          description: Model 3 status value; check warning_codes for qualification.
+        zone_id:
+          type: [string, "null"]
+          description: Input zone label, or null for the aggregate/collapsed calculation.
+        days:
+          type: [integer, "null"]
+          description: Calendar days in this month.
+        hours_valid:
+          type: [number, "null"]
+          description: Hours with usable monthly input data.
+        outdoor_temp_C:
+          type: [number, "null"]
+          description: Mean outdoor temperature, °C.
+        H_transmission_W_K:
+          type: [number, "null"]
+          description: Above-ground fabric heat flow per kelvin, W/K.
+        H_ventilation_W_K:
+          type: [number, "null"]
+          description: Planned ventilation heat flow per kelvin, W/K.
+        H_infiltration_W_K:
+          type: [number, "null"]
+          description: Uncontrolled-air heat flow per kelvin, W/K.
+        H_ground_W_K:
+          type: [number, "null"]
+          description: Ground-contact heat flow per kelvin, W/K.
+        H_total_W_K:
+          type: [number, "null"]
+          description: Sum of heat-flow coefficients, W/K.
+        thermal_capacity_J_K:
+          type: [number, "null"]
+          description: Effective stored heat per kelvin, J/K.
+        time_constant_h:
+          type: [number, "null"]
+          description: Approximate response time based on capacity and heat transfer, hours.
+        heating_heat_transfer_kWh:
+          type: [number, "null"]
+          description: Heating-season heat transfer before useful gains, kWh.
+        cooling_heat_transfer_kWh:
+          type: [number, "null"]
+          description: Cooling-season heat transfer before useful gains, kWh.
+        solar_gain_kWh:
+          type: [number, "null"]
+          description: Heat entering from sunlight, kWh.
+        internal_gain_kWh:
+          type: [number, "null"]
+          description: Heat from people, lighting, and equipment, kWh.
+        total_gain_kWh:
+          type: [number, "null"]
+          description: Solar plus internal gains, kWh.
+        gamma_heating:
+          type: [number, "null"]
+          description: Heating gain-to-loss ratio used by the monthly method.
+        gamma_cooling:
+          type: [number, "null"]
+          description: Cooling gain-to-loss ratio used by the monthly method.
+        utilisation_factor_heating:
+          type: [number, "null"]
+          description: Fraction of gains usable against heating need.
+        utilisation_factor_cooling:
+          type: [number, "null"]
+          description: Fraction of losses usable against cooling need.
+        zone_sensible_heating_kWh:
+          type: [number, "null"]
+          description: Useful room-heating energy, kWh.
+        zone_sensible_cooling_kWh:
+          type: [number, "null"]
+          description: Useful room-cooling energy, kWh.
+        ahu_sensible_heating_kWh:
+          type: [number, "null"]
+          description: Useful air-unit heating energy, kWh.
+        ahu_sensible_cooling_kWh:
+          type: [number, "null"]
+          description: Useful air-unit cooling energy, kWh.
+        useful_heating_kWh:
+          type: [number, "null"]
+          description: Room plus air-unit heating, kWh.
+        useful_cooling_kWh:
+          type: [number, "null"]
+          description: Room plus air-unit cooling, kWh.
+        warning_codes:
+          type: array
+          items:
+            type: string
+          description: Machine-readable calculation warnings; empty means none.
+  examples:
+    DynamicRequest:
+      summary: One-zone dynamic run
+      description: Illustrative multipart value; `weather_epw` stands for an uploaded EPW file, not its contents.
+      value:
+        project:
+          run_id: example_dynamic
+          schema_version: "1.0"
+          inputs: &sample_inputs
+            geometry:
+              format: tabular
+              buildings:
+                - {
+                    building_id: B1,
+                    building_name: Example building,
+                    envelope: standard,
+                    heating_system: IdealLoad,
+                    cooling_system: IdealLoad,
+                    solar_technologies: "",
+                    n_floors: 1,
+                    height_m: 3,
+                    footprint_area_m2: 100,
+                  }
+              zones:
+                - {
+                    building_id: B1,
+                    zone_id: Z1,
+                    zone_name: Main zone,
+                    end_use: office,
+                    n_floors: 1,
+                    net_floor_area_m2: 100,
+                    volume_m3: 300,
+                  }
+              surfaces:
+                - {
+                    building_id: B1,
+                    zone_id: Z1,
+                    surface_index: 1,
+                    surface_type: ExtWall,
+                    area_m2: 120,
+                    azimuth_deg: 180,
+                    tilt_deg: 90,
+                  }
+                - {
+                    building_id: B1,
+                    zone_id: Z1,
+                    surface_index: 2,
+                    surface_type: Roof,
+                    area_m2: 100,
+                    azimuth_deg: 0,
+                    tilt_deg: 0,
+                  }
+                - {
+                    building_id: B1,
+                    zone_id: Z1,
+                    surface_index: 3,
+                    surface_type: GroundFloor,
+                    area_m2: 100,
+                    azimuth_deg: 0,
+                    tilt_deg: 180,
+                  }
+            envelopes:
+              envelopes:
+                standard:
+                  ext_wall: { u_value: 0.4, mass_class: Medium }
+                  roof: { u_value: 0.3, mass_class: Medium }
+                  ground_floor: { u_value: 0.5, mass_class: Heavy }
+                  int_wall: { u_value: 1.5, mass_class: Medium }
+                  int_ceiling: { u_value: 1.5, mass_class: Medium }
+                  window: { u_value: 1.6, shgc: 0.5 }
+                  wwr: 0.2
+                  infiltration_ach: 0.3
+            schedules:
+              end_uses:
+                office:
+                  {
+                    heating_setpoint: 20,
+                    cooling_setpoint: 26,
+                    ventilation_ach: 0.5,
+                  }
+            systems: { heating_systems: {}, cooling_systems: {} }
+            calendar_year: 2023
+            time_steps_per_hour: 1
+            azimuth_subdivisions: 8
+          operating: &sample_operating
+            heating_season: [288, 120]
+            cooling_season: [121, 287]
+            ahu_mode: basic
+            initial_temperature: 20
+            initial_specific_humidity: 0.008
+          dynamic:
+            {
+              model: 5R1C,
+              latent: true,
+              plants: false,
+              sizing: design_day,
+              dhw_tank: false,
+              pv_battery: false,
+              heating_max_power: null,
+              cooling_max_power: null,
+            }
+        weather_epw: example-city.epw
+    MonthlyRequest:
+      summary: Same inputs through the monthly solver
+      value:
+        project:
+          run_id: example_monthly
+          schema_version: "1.0"
+          inputs: *sample_inputs
+          operating: *sample_operating
+        weather_epw: example-city.epw
+    SimplifiedRequest:
+      summary: Same inputs through mapped Model 3
+      value:
+        project:
+          run_id: example_simplified
+          schema_version: "1.0"
+          inputs: *sample_inputs
+          operating: *sample_operating
+          simplified: { comparison_mode: seasonal_ahu, zone_mode: sum }
+        weather_epw: example-city.epw
+    DynamicResult:
+      summary: Dynamic result excerpt
+      description: One month and one time step are shown; a complete successful run has 12 monthly rows and a full year of steps.
+      value:
+        manifest:
+          name: DT-Prototype
+          version: 0.4.0
+          engine: dynamic
+          status: complete
+          timestamp_utc: "2026-09-24T09:00:00Z"
+          input_hashes:
+            {
+              weather_epw: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+            }
+          building_outputs:
+            {
+              B1:
+                {
+                  building_name: Example building,
+                  details_file: B1_hourly.csv,
+                },
+            }
+          failed_buildings: []
+          resolved_engine_config: { model: 5R1C, plants: false }
+        monthly:
+          - &sample_dynamic_month
+            run_id: example_dynamic
+            engine_id: dynamic
+            building_id: B1
+            building_name: Example building
+            scenario_id: baseline
+            weather_id: weather_0123456789abcdef
+            period_id: 2023-01
+            zone_count: 1
+            representation: native_single_zone
+            zone_heating_kWh: 100
+            zone_cooling_kWh: 0
+            ahu_heating_kWh: 10
+            ahu_cooling_kWh: 0
+            heating_kWh: 110
+            cooling_kWh: 0
+        annual:
+          - &sample_annual
+            building_id: B1
+            building_name: Example building
+            zone_heating_kWh: 500
+            zone_cooling_kWh: 200
+            ahu_heating_kWh: 50
+            ahu_cooling_kWh: 20
+            heating_kWh: 550
+            cooling_kWh: 220
+        details_by_building:
+          B1:
+            - {
+                time: "2023-01-01 00:00:00",
+                air_temperature: 20,
+                operative_temperature: 19.5,
+                mean_radiant_temperature: 19,
+                relative_humidity: 0.45,
+                sensible_load: 900,
+                latent_load: 0,
+                ahu_sensible_load: 90,
+                ahu_latent_load: 0,
+                heating_load: 900,
+                cooling_load: 0,
+                dhw_demand: 0,
+                natural_ventilation_ach: 0,
+                electric_appliances: 300,
+              }
+    MonthlyResult:
+      summary: Monthly result excerpt
+      description: One of 12 months is shown; numbers are illustrative.
+      value:
+        manifest:
+          name: DT-Prototype
+          version: 0.4.0
+          engine: monthly
+          status: complete
+          timestamp_utc: "2026-09-24T09:00:00Z"
+          input_hashes:
+            {
+              weather_epw: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+            }
+          building_outputs:
+            {
+              B1:
+                {
+                  building_name: Example building,
+                  details_file: B1_details.csv,
+                },
+            }
+          failed_buildings: []
+          resolved_engine_config: { ahu_mode: basic }
+        monthly:
+          - <<: *sample_dynamic_month
+            run_id: example_monthly
+            engine_id: monthly
+        annual:
+          - *sample_annual
+        details_by_building:
+          B1:
+            - {
+                month: "2023-01-01",
+                heating_demand_kWh: 100,
+                cooling_demand_kWh: 0,
+                ahu_heating_demand_kWh: 10,
+                ahu_cooling_demand_kWh: 0,
+                total_sensible_heating_demand_kWh: 110,
+                total_sensible_cooling_demand_kWh: 0,
+                heat_losses_kWh: 180,
+                gains_kWh: 80,
+                eta_gain_heating: 0.875,
+                eta_loss_cooling: 0,
+              }
+    SimplifiedResult:
+      summary: Simplified result excerpt
+      description: One of 12 months is shown; numbers are illustrative.
+      value:
+        manifest:
+          name: DT-Prototype
+          version: 0.4.0
+          engine: simplified
+          status: complete
+          timestamp_utc: "2026-09-24T09:00:00Z"
+          input_hashes:
+            {
+              weather_epw: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+            }
+          building_outputs:
+            {
+              B1:
+                {
+                  building_name: Example building,
+                  details_file: B1_details.csv,
+                },
+            }
+          failed_buildings: []
+          resolved_engine_config: { ahu_mode: basic }
+          zone_mode: sum
+          comparison_mode: seasonal_ahu
+        monthly:
+          - <<: *sample_dynamic_month
+            run_id: example_simplified
+            engine_id: simplified
+        annual:
+          - *sample_annual
+        details_by_building:
+          B1:
+            - {
+                run_id: example_simplified,
+                engine_id: model3_legacy,
+                building_id: B1,
+                scenario_id: baseline,
+                weather_id: weather_0123456789abcdef,
+                period_id: 2023-01,
+                calculation_boundary_id: useful_sensible_model3_zone_plus_separate_ahu,
+                calculation_status: WARNING,
+                zone_id: null,
+                days: 31,
+                hours_valid: 744,
+                outdoor_temp_C: 6,
+                H_total_W_K: 180,
+                thermal_capacity_J_K: 20000000,
+                time_constant_h: 31,
+                zone_sensible_heating_kWh: 100,
+                zone_sensible_cooling_kWh: 0,
+                ahu_sensible_heating_kWh: 10,
+                ahu_sensible_cooling_kWh: 0,
+                useful_heating_kWh: 110,
+                useful_cooling_kWh: 0,
+                warning_codes:
+                  [
+                    MODEL3_AIR_EXCHANGE_COMPONENTS_COMBINED,
+                    MODEL3_GROUND_DIRECT_STEADY_INPUT,
+                  ],
+              }

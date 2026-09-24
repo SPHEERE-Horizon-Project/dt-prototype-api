@@ -1,0 +1,60 @@
+version: "3"
+
+env:
+  UV_CACHE_DIR: .cache/uv
+
+tasks:
+  setup:
+    desc: Install the API, copied prototype, and development tools
+    cmds:
+      - uv sync --python 3.12 --extra dev
+
+  serve:
+    desc: Serve the local API at http://127.0.0.1:8000
+    cmds:
+      - uv run --extra dev uvicorn spheere_dt_api.app:app --host 127.0.0.1 --port 8000
+
+  test:
+    desc: Run API and copied prototype tests
+    cmds:
+      - uv run --extra dev pytest -q tests
+      - uv run --extra dev pytest -q -c prototype/pyproject.toml prototype/tests
+
+  lint:
+    desc: Lint the API, helper scripts, and API tests
+    cmds:
+      - uv run --extra dev ruff check src/spheere_dt_api scripts tests
+
+  format:
+    desc: Format the API, helper scripts, and API tests
+    cmds:
+      - uv run --extra dev ruff check --select I --fix src/spheere_dt_api scripts tests
+      - uv run --extra dev ruff format src/spheere_dt_api scripts tests
+
+  format:check:
+    desc: Check API formatting without changing files
+    cmds:
+      - uv run --extra dev ruff format --check src/spheere_dt_api scripts tests
+
+  openapi:validate:
+    desc: Validate the OpenAPI document
+    cmds:
+      - uv run --extra dev openapi-spec-validator DT-PROTOTYPE-OPENAPI.yaml
+
+  example:dynamic:
+    desc: Run the one-zone dynamic example against the local server
+    silent: true
+    cmds:
+      - uv run --extra dev python scripts/example_call.py dynamic
+
+  example:monthly:
+    desc: Run the one-zone monthly example against the local server
+    silent: true
+    cmds:
+      - uv run --extra dev python scripts/example_call.py monthly
+
+  example:simplified:
+    desc: Run the one-zone simplified example against the local server
+    silent: true
+    cmds:
+      - uv run --extra dev python scripts/example_call.py simplified
