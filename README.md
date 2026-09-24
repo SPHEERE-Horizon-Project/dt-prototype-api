@@ -20,3 +20,12 @@ task example:dynamic
 task example:monthly
 task example:simplified
 ```
+
+## Docker
+
+To run the API in a container instead, use the Compose stack. It listens on the same port, so the examples above work unchanged:
+
+```sh
+task compose:up
+task compose:down
+```

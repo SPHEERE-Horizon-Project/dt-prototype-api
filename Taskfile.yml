@@ -58,3 +58,13 @@ tasks:
     silent: true
     cmds:
       - uv run --extra dev python scripts/example_call.py simplified
+
+  compose:up:
+    desc: Build and start the Compose stack at http://127.0.0.1:8000
+    cmds:
+      - docker compose up --build -d --wait
+
+  compose:down:
+    desc: Stop and remove the Compose stack (keeps the runs volume)
+    cmds:
+      - docker compose down
