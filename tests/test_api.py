@@ -4,6 +4,8 @@ import copy
 import csv
 import json
 import subprocess
+import tomllib
+from importlib.metadata import version
 from pathlib import Path
 
 import jsonschema
@@ -18,6 +20,21 @@ ROOT = Path(__file__).resolve().parents[1]
 EXAMPLES = ROOT / "prototype/data/examples"
 WEATHER = (EXAMPLES / "ITA_Venezia-Tessera.161050_IGDG.epw").read_bytes()
 SPEC = openapi_spec()
+
+
+def test_package_lock_and_api_versions_agree(tmp_path: Path) -> None:
+    package = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
+    locked = next(
+        entry
+        for entry in tomllib.loads((ROOT / "uv.lock").read_text())["package"]
+        if entry["name"] == package["name"]
+    )
+    application = create_app(tmp_path)
+    with TestClient(application) as client:
+        assert client.get("/openapi.json").json()["info"]["version"] == package["version"]
+    assert (
+        application.version == version(package["name"]) == locked["version"] == package["version"]
+    )
 
 
 def example_project(engine: str, run_id: str) -> dict:

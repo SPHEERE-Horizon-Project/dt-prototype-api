@@ -139,7 +139,7 @@ async def _run_engine(engine: str, request: Request, root: Path) -> JSONResponse
 def create_app(runs_root: Path | None = None) -> FastAPI:
     """Create the API with its run directory and simulation routes."""
     root = Path(runs_root or os.environ.get("DT_API_RUNS_ROOT", ".runs")).resolve()
-    application = FastAPI(title="DT Prototype API", version="0.2.0")
+    application = FastAPI(title="DT Prototype API", version=openapi_spec()["info"]["version"])
     application.openapi = openapi_spec
 
     @application.post("/runs/dynamic", operation_id="runDynamic")

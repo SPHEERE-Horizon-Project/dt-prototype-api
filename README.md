@@ -37,3 +37,32 @@ To run the API in a container instead, use the Compose stack. It listens on the 
 task compose:up
 task compose:down
 ```
+
+## Releases
+
+The API package and OpenAPI document share a version, separate from the bundled
+calculation engine. Print it with `task version`.
+
+From a clean working tree on `main`, prepare a release:
+
+```sh
+task release:patch  # or release:minor / release:major
+git show
+task release:push
+```
+
+Preparation bumps the package, lockfile, and OpenAPI version, runs the existing
+checks, and creates a release commit and annotated `vX.Y.Z` tag locally. Failed
+checks leave the version edits available for inspection without committing or
+tagging. The separate push command publishes `main` and that tag atomically;
+a failed push can be retried without preparing another release.
+
+GitHub Actions builds pull requests without publishing and publishes images on
+`main`, `v*` tags, and manual runs. A release tag publishes a versioned image:
+
+```sh
+docker run --rm -p 8000:8000 ghcr.io/spheere-horizon-project/dt-prototype-api:0.2.1
+```
+
+The `latest` image follows `main`; release tags do not move it. Releases use Git
+tags and GHCR images without creating GitHub Release records.

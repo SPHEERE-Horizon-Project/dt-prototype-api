@@ -9,6 +9,40 @@ tasks:
     cmds:
       - uv sync --python 3.12 --extra dev
 
+  version:
+    desc: Print the API package version
+    silent: true
+    cmds:
+      - uv version --short
+
+  release:patch:
+    desc: Prepare a patch release locally
+    cmds:
+      - task: release:prepare
+        vars: { BUMP: patch }
+
+  release:minor:
+    desc: Prepare a minor release locally
+    cmds:
+      - task: release:prepare
+        vars: { BUMP: minor }
+
+  release:major:
+    desc: Prepare a major release locally
+    cmds:
+      - task: release:prepare
+        vars: { BUMP: major }
+
+  release:prepare:
+    internal: true
+    cmds:
+      - uv run --no-project --python 3.12 python scripts/release.py prepare {{.BUMP}}
+
+  release:push:
+    desc: Push the prepared release commit and tag to origin
+    cmds:
+      - uv run --no-project --python 3.12 python scripts/release.py push
+
   serve:
     desc: Serve the local API at http://127.0.0.1:8000
     cmds:
