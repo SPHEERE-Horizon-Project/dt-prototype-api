@@ -108,18 +108,26 @@ def test_failed_checks_leave_edits_without_commit_or_tag(repository):
     assert release.run("git", "status", "--porcelain", capture=True)
 
 
-def test_push_is_atomic_and_failed_push_can_be_retried(repository, tmp_path):
-    remote = tmp_path / "remote.git"
-    release.run("git", "init", "--bare", str(remote))
-    release.run("git", "remote", "add", "origin", str(remote))
+@pytest.fixture
+def remote(repository, tmp_path):
+    remote_path = tmp_path / "remote.git"
+    release.run("git", "init", "--bare", str(remote_path))
+    release.run("git", "remote", "add", "origin", str(remote_path))
     release.run("git", "push", "origin", "main")
+    return remote_path
+
+
+def test_failed_tag_push_leaves_main_published_and_can_be_retried(repository, remote):
     initial = release.run("git", "rev-parse", "HEAD", capture=True)
     release.run("git", "--git-dir", str(remote), "update-ref", "refs/tags/v0.2.1", initial)
     release.prepare("patch")
     with pytest.raises(subprocess.CalledProcessError):
         release.push()
+    assert release.run(
+        "git", "--git-dir", str(remote), "rev-parse", "main", capture=True
+    ) == release.run("git", "rev-parse", "HEAD", capture=True)
     assert (
-        release.run("git", "--git-dir", str(remote), "rev-parse", "main", capture=True) == initial
+        release.run("git", "--git-dir", str(remote), "rev-parse", "v0.2.1", capture=True) == initial
     )
     assert release.run("git", "cat-file", "-t", "v0.2.1", capture=True) == "tag"
     release.run("git", "--git-dir", str(remote), "update-ref", "-d", "refs/tags/v0.2.1")
@@ -128,6 +136,31 @@ def test_push_is_atomic_and_failed_push_can_be_retried(repository, tmp_path):
         assert release.run("git", "--git-dir", str(remote), "rev-parse", ref, capture=True) == (
             release.run("git", "rev-parse", ref, capture=True)
         )
+
+
+def test_failed_branch_push_does_not_publish_tag(repository, remote):
+    initial = release.run("git", "rev-parse", "HEAD", capture=True)
+    release.prepare("patch")
+    concurrent = release.run(
+        "git",
+        "commit-tree",
+        f"{initial}^{{tree}}",
+        "-p",
+        initial,
+        "-m",
+        "Concurrent work",
+        capture=True,
+    )
+    release.run("git", "push", "origin", f"{concurrent}:refs/heads/main")
+    with pytest.raises(subprocess.CalledProcessError):
+        release.push()
+    assert (
+        release.run("git", "--git-dir", str(remote), "rev-parse", "main", capture=True)
+        == concurrent
+    )
+    assert (
+        release.run("git", "--git-dir", str(remote), "tag", "--list", "v0.2.1", capture=True) == ""
+    )
 
 
 def test_push_requires_release_tag_at_head(repository):

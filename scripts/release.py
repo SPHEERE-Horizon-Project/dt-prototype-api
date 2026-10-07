@@ -75,7 +75,8 @@ def push() -> None:
         "git", "rev-parse", "HEAD", capture=True
     ):
         raise ValueError(f"Release tag {tag} must point at HEAD")
-    run("git", "push", "--atomic", "origin", "HEAD:refs/heads/main", f"refs/tags/{tag}")
+    run("git", "push", "origin", "HEAD:refs/heads/main")
+    run("git", "push", "origin", f"refs/tags/{tag}")
 
 
 def main() -> None:
