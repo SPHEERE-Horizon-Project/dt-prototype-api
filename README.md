@@ -1,4 +1,7 @@
-# DT Prototype API
+# SPHEERE Digital Twin API
+
+> [!NOTE]
+> This codebase includes portions derived from and adapted from [EUReCA](https://github.com/BETALAB-team/EUReCA).
 
 The **DT Prototype API** provides annual heating and cooling estimates for buildings. Submit a single request with a building description—including its zones, walls, windows, schedules, and systems—plus a weather file for the target location. The API performs the calculations and returns results as JSON showing both monthly and annual heating and cooling demand (kWh).
 

@@ -41,39 +41,3 @@ SOFTWARE.
 
 The EUReCA attribution and MIT Licence impose no research-only or
 non-commercial-use restriction.
-
-## DT-Prototype Contributions
-
-Copyright (c) 2026 [LEGAL COPYRIGHT HOLDER]
-
-Except for third-party material identified in this file, DT-Prototype
-contributions are licensed under the project MIT Licence in `LICENSE`.
-
-## Semi-stationary Reference Snapshot
-
-The project includes material originating from
-`SEMI-STATIONARY/src/semistationary/`, declared as version `1.0.0`.
-
-Imported metadata declares this component to be MIT licensed, but a complete
-licence text and authoritative upstream source reference were not supplied.
-Before redistributing this component, record the applicable licence text and
-upstream provenance.
-
-## Model 3 Legacy Snapshot
-
-The project includes the preserved Model 3 pipeline in
-`src/dt_prototype/integration/model3/`.
-
-The imported material has no recorded upstream licence or source repository.
-It must not be redistributed until a licence or written permission from its
-copyright holder has been obtained and recorded.
-
-## Example Climate Data
-
-The example EPW weather file
-`data/examples/ITA_Venezia-Tessera.161050_IGDG.epw` is reproduced from the
-imported EUReCA snapshot.
-
-Confirm and record its source and redistribution terms before distributing the
-file. Alternatively, exclude it from release packages and require users to
-obtain weather data from an authorised source.
