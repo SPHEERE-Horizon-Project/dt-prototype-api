@@ -1,11 +1,13 @@
 [build-system]
-requires = ["setuptools>=64"]
+requires = ["setuptools>=77.0.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "spheere-dt-prototype-api"
 version = "0.2.0"
 description = "Local HTTP API for the DT Prototype"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.12,<3.13"
 dependencies = [
   "dt-prototype",
