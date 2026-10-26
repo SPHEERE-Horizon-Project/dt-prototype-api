@@ -26,6 +26,7 @@ no code changes required, in either form.
 from __future__ import annotations
 
 import json
+from ..json_io import load_json
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 
@@ -252,7 +253,7 @@ def load_envelope_archetypes(path: str | Path) -> dict[str, EnvelopeArchetype]:
     dict
         Archetype name → :class:`EnvelopeArchetype`.
     """
-    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    data = load_json(path)
     archetypes: dict[str, EnvelopeArchetype] = {}
     for name, spec in data.get("envelopes", data).items():
         if name.startswith("_"):  # comment keys

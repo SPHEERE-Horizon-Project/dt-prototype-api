@@ -1,0 +1,148 @@
+{
+  "schema_version": "1.0",
+  "_comment": "Executable mapping example only. It copies no TABULA or URBEM numerical data. Point each envelope key at a reviewed entry in the configured DT-Prototype envelope library and preserve the external archetype identifier and attribution here.",
+  "defaults": {
+    "envelope": "1981-1990",
+    "end_use": "residential",
+    "storey_height_m": 3.0,
+    "n_floors": 1,
+    "heating_system": "IdealLoad",
+    "cooling_system": "IdealLoad",
+    "solar_technologies": "",
+    "source": "local conservative default",
+    "source_archetype": "unclassified"
+  },
+  "property_aliases": {
+    "building_id": ["building_id", "ID_EDIFICIO"],
+    "construction_year": ["construction_year", "ANNO_COSTRUZIONE"],
+    "use": ["use", "DESTINAZIONE_USO"],
+    "ground_floor_use": ["ground_floor_use", "USO_PIANO_TERRA"],
+    "height_m": ["height_m", "ALTEZZA"],
+    "n_floors": ["n_floors", "NUMERO_PIANI"],
+    "region": ["region", "REGIONE"],
+    "climate_zone": ["climate_zone", "ZONA_CLIMATICA"]
+  },
+  "use_map": {
+    "residential": "residential",
+    "residenziale": "residential",
+    "services": "services",
+    "servizi": "services",
+    "office": "services",
+    "ufficio": "services",
+    "school": "school",
+    "scuola": "school",
+    "university": "university",
+    "universita": "university",
+    "retail": "shop",
+    "shop": "shop",
+    "commerciale": "shop",
+    "restaurant": "food",
+    "food": "food",
+    "ristorazione": "food",
+    "medical": "medical",
+    "sanitario": "medical",
+    "cultural": "cultural",
+    "culturale": "cultural",
+    "worship": "worship",
+    "culto": "worship",
+    "industrial": "industrial",
+    "industriale": "industrial",
+    "supermarket": "supermarket_from_lit",
+    "supermercato": "supermarket_from_lit"
+  },
+  "rules": [
+    {
+      "id": "tabula-it-res-before-1930",
+      "source": "IEE Projects TABULA + EPISCOPE (www.episcope.eu)",
+      "source_archetype": "replace-with-reviewed-TABULA-building-code",
+      "envelope": "Before 1930",
+      "year_max": 1929,
+      "end_uses": ["residential"]
+    },
+    {
+      "id": "tabula-it-res-1930-1945",
+      "source": "IEE Projects TABULA + EPISCOPE (www.episcope.eu)",
+      "source_archetype": "replace-with-reviewed-TABULA-building-code",
+      "envelope": "1930-1945",
+      "year_min": 1930,
+      "year_max": 1945,
+      "end_uses": ["residential"]
+    },
+    {
+      "id": "urbem-piedmont-e-res-1981-1990",
+      "source": "URBEM - Urban Reference Buildings for Energy Modelling",
+      "source_archetype": "RES_APPBLOCK_1981-1990_E_PIE",
+      "envelope": "1981-1990",
+      "year_min": 1981,
+      "year_max": 1990,
+      "end_uses": ["residential"],
+      "building_types": ["apartment block", "blocco appartamenti"],
+      "regions": ["piedmont", "piemonte"],
+      "climate_zones": ["E"],
+      "priority": 10
+    },
+    {
+      "id": "generic-1945-1960",
+      "source": "local reviewed envelope library",
+      "source_archetype": "1945-1960",
+      "envelope": "1945-1960",
+      "year_min": 1946,
+      "year_max": 1960
+    },
+    {
+      "id": "generic-1961-1970",
+      "source": "local reviewed envelope library",
+      "source_archetype": "1961-1970",
+      "envelope": "1961-1970",
+      "year_min": 1961,
+      "year_max": 1970
+    },
+    {
+      "id": "generic-1971-1980",
+      "source": "local reviewed envelope library",
+      "source_archetype": "1971-1980",
+      "envelope": "1971-1980",
+      "year_min": 1971,
+      "year_max": 1980
+    },
+    {
+      "id": "generic-1981-1990",
+      "source": "local reviewed envelope library",
+      "source_archetype": "1981-1990",
+      "envelope": "1981-1990",
+      "year_min": 1981,
+      "year_max": 1990
+    },
+    {
+      "id": "generic-1991-2000",
+      "source": "local reviewed envelope library",
+      "source_archetype": "1991-2000",
+      "envelope": "1991-2000",
+      "year_min": 1991,
+      "year_max": 2000
+    },
+    {
+      "id": "generic-2000-2005",
+      "source": "local reviewed envelope library",
+      "source_archetype": "2000-2005",
+      "envelope": "2000-2005",
+      "year_min": 2001,
+      "year_max": 2005
+    },
+    {
+      "id": "generic-2005-2010",
+      "source": "local reviewed envelope library",
+      "source_archetype": "2005-2010",
+      "envelope": "2005-2010",
+      "year_min": 2006,
+      "year_max": 2010
+    },
+    {
+      "id": "generic-after-2010",
+      "source": "local reviewed envelope library",
+      "source_archetype": "After 2010",
+      "envelope": "After 2010",
+      "year_min": 2011
+    }
+  ]
+}

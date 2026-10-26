@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "description": "Illustrative direct-input inventory, not a survey or equipment selection. No project/weather input is needed. kW is total group thermal capacity for the heat pump and installed module DC capacity for PV.",
+  "default_mode": "direct",
+  "buildings": [
+    {"assessment_id":"direct_example","building_id":"001","assets":[
+      {"asset_id":"heat_pump_system","catalogue_id":"heat_pump_system","direct_quantity":42,"scope_action":"existing","source":"Demonstration only: total rated thermal output of the complete HP group"},
+      {"asset_id":"pv_system","catalogue_id":"pv_system","direct_quantity":6,"scope_action":"existing","source":"Demonstration only: installed module DC kW at STC"},
+      {"asset_id":"battery_system","catalogue_id":"battery_system","direct_quantity":9,"scope_action":"existing","source":"Demonstration only: usable electrical kWh"},
+      {"asset_id":"water_tank","catalogue_id":"water_tank","direct_quantity":180,"scope_action":"existing","source":"Demonstration only: litres of contained water"}
+    ]}
+  ]
+}

@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dt-prototype:input:v1:pipeline",
+  "title": "DT Prototype pipeline contract v1",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "mode": {
+          "const": "inverse"
+        },
+        "inverse_config": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "schema_version",
+        "mode",
+        "inverse_config"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "const": "1.0"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "mode": {
+          "const": "forward"
+        },
+        "project_config": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "energy_config": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "energy": {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "enum": [
+                "run",
+                "reuse"
+              ]
+            },
+            "engine": {
+              "enum": [
+                "all",
+                "Dynamic_RC",
+                "Monthly_SS",
+                "Monthly_SS_simplified",
+                "Monthly_SS_VBDD"
+              ]
+            },
+            "model": {
+              "enum": [
+                "5R1C",
+                "7R2C"
+              ]
+            },
+            "zone_mode": {
+              "enum": [
+                "sum",
+                "collapsed",
+                "both"
+              ]
+            },
+            "vb_solar": {
+              "enum": [
+                "direct",
+                "temperature_linear"
+              ]
+            },
+            "results": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "vb_options": {
+              "type": "object",
+              "properties": {
+                "utilisation": {
+                  "enum": [
+                    "monthly_balance",
+                    "fixed"
+                  ]
+                },
+                "eta_heating": {
+                  "type": "number"
+                },
+                "eta_cooling": {
+                  "type": "number"
+                },
+                "attenuation_heating": {
+                  "type": "number"
+                },
+                "attenuation_cooling": {
+                  "type": "number"
+                }
+              },
+              "required": [],
+              "additionalProperties": false
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "assessment": {
+          "if": {
+            "properties": {
+              "enabled": {
+                "const": true
+              }
+            },
+            "required": [
+              "enabled"
+            ]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "modules": {
+                "type": "array",
+                "items": {
+                  "enum": [
+                    "LCC",
+                    "LCA",
+                    "MCI"
+                  ]
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              },
+              "assessment_id": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "asset_results": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "resolved_quantities": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "design_note": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            },
+            "required": [
+              "assessment_id",
+              "asset_results"
+            ],
+            "additionalProperties": false
+          },
+          "else": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "modules": {},
+              "assessment_id": {},
+              "asset_results": {},
+              "resolved_quantities": {},
+              "design_note": {}
+            },
+            "required": [],
+            "additionalProperties": false
+          }
+        },
+        "analysis": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "config": {}
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema_version",
+        "project_config",
+        "energy_config"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

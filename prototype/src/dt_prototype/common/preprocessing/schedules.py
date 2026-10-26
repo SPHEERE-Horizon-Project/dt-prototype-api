@@ -24,7 +24,7 @@ applicable):
 - ``ahu`` (optional): air handling unit parameters applied to the mechanical
   ventilation air (heat recovery efficiencies, supply set points, humidity
   control, EXTENDED ``outdoor_air_ratio`` for recirculation) — consumed by
-  ``dt_prototype.dynamic.simulation.air_handling_unit``;
+  ``dt_prototype.dynamic_rc.simulation.air_handling_unit``;
 - ``natural_ventilation`` (optional, EXTENDED): window-opening free-cooling
   parameters (``ach_max``, ``zone_temperature_threshold``,
   ``min_outdoor_temperature``).
@@ -36,6 +36,7 @@ no code changes required.
 from __future__ import annotations
 
 import json
+from ..json_io import load_json
 from dataclasses import dataclass, asdict, field
 from pathlib import Path
 
@@ -85,7 +86,7 @@ class EndUseSchedule:
         Domestic hot water draw-off [m3/(s m2) of net floor area].
     ahu : dict or None
         Air handling unit parameters (see
-        :class:`dt_prototype.dynamic.simulation.air_handling_unit.AirHandlingUnit`);
+        :class:`dt_prototype.dynamic_rc.simulation.air_handling_unit.AirHandlingUnit`);
         None = no AHU, ventilation supplies outdoor air.
     """
 
@@ -277,7 +278,7 @@ def load_end_use_schedules(
     dict
         End-use name → :class:`EndUseSchedule`.
     """
-    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    data = load_json(path)
     steps = time_steps_per_hour
     schedules: dict[str, EndUseSchedule] = {}
     for name, spec in data.get("end_uses", data).items():

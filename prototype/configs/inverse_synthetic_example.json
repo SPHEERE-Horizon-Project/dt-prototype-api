@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "operation": "fit",
+  "clock": {
+    "convention": "standard",
+    "timezone": "Etc/GMT-1"
+  },
+  "source": {
+    "type": "csv",
+    "observations": "../data/examples/inverse/synthetic_hourly.csv",
+    "weather": "../data/examples/inverse/synthetic_weather.csv",
+    "series": {
+      "synthetic-building/import": {
+        "source_type": "simulated",
+        "source_id": "SYNTHETIC_testing_only",
+        "building_id": "synthetic-building",
+        "scenario_id": "baseline",
+        "carrier": "electricity",
+        "meter_boundary_id": "electricity_grid_import",
+        "weather_id": "default",
+        "description": "Synthetic hourly load/PV-shaped import; not measured data"
+      }
+    }
+  },
+  "opendsm_python": "../.venv-opendsm/Scripts/python.exe",
+  "worker_timeout_s": 1800,
+  "models": [
+    "5p_monthly",
+    {
+      "backend": "opendsm_billing",
+      "options": {
+        "allow_disqualified": true
+      }
+    },
+    {
+      "backend": "opendsm_hourly",
+      "options": {
+        "variant": "nonsolar",
+        "allow_disqualified": true
+      }
+    },
+    {
+      "backend": "opendsm_hourly",
+      "options": {
+        "variant": "solar",
+        "allow_disqualified": true
+      }
+    }
+  ]
+}

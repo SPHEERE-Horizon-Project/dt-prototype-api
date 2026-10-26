@@ -12,9 +12,9 @@ import jsonschema
 import pytest
 from fastapi.testclient import TestClient
 
-from spheere_dt_api.adapter import result_from_output
 from spheere_dt_api.app import create_app
 from spheere_dt_api.contract import openapi_spec
+from spheere_dt_api.tools.thermal import result_from_output, zone_labels
 
 ROOT = Path(__file__).resolve().parents[1]
 EXAMPLES = ROOT / "prototype/data/examples"
@@ -141,7 +141,7 @@ def test_malformed_multipart_parts_return_input_errors(tmp_path: Path) -> None:
 
 def test_runner_failure_without_manifest_returns_error(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setattr(
-        "spheere_dt_api.app.run_cli",
+        "spheere_dt_api.core.execute",
         lambda *_: subprocess.CompletedProcess([], 1, "", "runner stopped"),
     )
 
@@ -178,7 +178,7 @@ def test_failed_building_manifest_keeps_completed_building(tmp_path: Path) -> No
     (output / "B1_details.csv").write_text("month,heating_demand_kWh\n2023-01-01,12\n")
     (output / "monthly.csv").write_text("building_id,heating_kWh\nB1,12\n")
     (output / "annual.csv").write_text("building_id,heating_kWh\nB1,12\n")
-    result = result_from_output("monthly", output, example_project("monthly", "failed_run"))
+    result = result_from_output("monthly", output, ["single", "upper", "lower"])
     assert result["manifest"]["status"] == "failed"
     assert result["manifest"]["failed_buildings"][0]["building_id"] == "B2"
     assert result["annual"] == [{"building_id": "B1", "heating_kWh": 12.0}]
@@ -206,7 +206,7 @@ def test_csv_details_keep_zone_labels_and_warning_codes(tmp_path: Path) -> None:
         "zone_id,warning_codes,zone_A_heat,zone_A_B_heat\n,first|second,1,2\n"
     )
 
-    result = result_from_output("monthly", tmp_path, project)
+    result = result_from_output("monthly", tmp_path, zone_labels(project))
     detail = result["details_by_building"]["B1"][0]
     assert detail["zone_id"] is None
     assert detail["warning_codes"] == ["first", "second"]

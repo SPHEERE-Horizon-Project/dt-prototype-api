@@ -3,63 +3,122 @@ info:
   title: DT Prototype API
   version: 0.2.0
   description: |
-    Local synchronous HTTP adapter for the DT Prototype's three calculation
-    runners. Each request waits until its calculation has finished and returns
-    the result as JSON. The copied calculation package is unchanged.
+    Building-energy calculations from the DT Prototype package, one per
+    request: heat demand, energy bought, CO2 and cost, life-cycle cost and impact,
+    and models learned from meter readings.
 
-    The `project` JSON part combines `configs/example_tabular.json` with the
-    building, envelope, schedule, and system files it names. The `weather_epw`
-    part carries the EPW file. The adapter writes these parts to isolated files,
-    calls the selected runner, and translates its CSV files and manifest to JSON.
-    The source package remains the authority for accepted values and calculations.
-    The source configuration requires `dynamic` and `simplified` sections even
-    when another runner is selected; the adapter supplies inert required sections
-    where they are not part of the selected path. See `src/dt_prototype/cli.py`, `common/project.py`,
-    `dynamic/simulation/runner.py`, `monthly/simulation/quasi_steady_state.py`,
-    and `integration/engines/model3.py` in the DT Prototype source tree.
+    ## Requests
 
-    Each path calculates a full non-leap calendar year for every supplied building.
-    Buildings have one zone or two independent zones. The shared monthly results
-    report positive useful sensible heating and cooling in kWh. Purchased fuel or
-    electricity is a separate quantity, available only in some dynamic details.
+    Every calculation is a `multipart/form-data` `POST`. JSON documents (`project`,
+    `energy`, configs) go in text parts; files (`weather_epw`, CSVs) in file parts.
+
+    Each run has a `run_id`, usable once. Projects carry their own; other endpoints
+    take an optional `run_id` part or generate one. Later requests refer to earlier
+    runs by ID, such as `energy_run_id`. `GET /runs/{run_id}` returns any run's status
+    and result.
+
+    Most endpoints answer `200` when the calculation ends. `/pipeline`, and `/inverse`
+    with OpenDSM models, answer `202` at once; poll `GET /runs/{run_id}`.
+
+    Example inputs for every endpoint are in the repository under `prototype/configs`,
+    `prototype/data/examples` and `prototype/to_be_integrated`.
+
+    ## Endpoints
+
+    | Endpoint | Answers |
+    |---|---|
+    | `/runs/monthly` | Heating and cooling the rooms need, per month. The usual start. |
+    | `/runs/dynamic` | The same, hour by hour |
+    | `/runs/simplified`, `/runs/vbdd` | The same, from coarser methods, for cross-checking |
+    | `/runs/{method}/energy` | Energy bought, solar used and sold, CO2, cost |
+    | `/geometry/from-footprints` | Building tables from a map of building outlines |
+    | `/validate` | Problems in your inputs, without calculating |
+    | `/assets/quantities` | Material and equipment amounts per building |
+    | `/lcc`, `/lca`, `/circularity` | Life-cycle cost, environmental impact, reuse score |
+    | `/assessment` | Life-cycle totals per building, next to yearly energy |
+    | `/inverse`, `/inverse/acceptance` | A model learned from meter readings, and whether it is accurate enough |
+    | `/pipeline` | Energy, assessment and inverse model in one background run |
+
+    ## Glossary
+
+    - **Zone**: part of a building kept at one temperature. Buildings have one or two.
+    - **Heat demand** (useful heating or cooling): heat added to or removed from the
+      rooms to hold the set temperature. Not a meter reading.
+    - **Sensible heat**: heat that changes air temperature. **Latent heat** changes humidity.
+    - **AHU** (air-handling unit): the ventilation unit that heats or cools fresh air.
+      Reported apart from room heating and cooling.
+    - **Delivered energy**: gas, electricity or district heat bought, after equipment
+      efficiency and losses. What the meters read.
+    - **Energy carrier**: electricity, natural gas, district heat or another fuel.
+    - **Efficiency, COP**: useful heat per unit of energy used. A 0.91 boiler turns
+      1 kWh of gas into 0.91 kWh of heat; a heat pump with COP 2.27 moves 2.27 kWh of
+      heat per kWh of electricity.
+    - **Primary energy**: delivered energy plus the energy spent producing and
+      transporting it, split into renewable and non-renewable.
+    - **PV self-consumption, grid import, grid export**: solar electricity used on site,
+      electricity bought, and surplus sold.
+    - **Solar thermal**: roof collectors that heat water.
+    - **EPW file**: EnergyPlus Weather, 8,760 hourly weather records for one place.
+    - **5R1C, 7R2C**: two models of how walls and air store and pass heat, written as
+      circuits of resistances (R) and capacitances (C). 7R2C is more detailed.
+    - **Degree days**: how far and how long outdoor temperature stays below (heating) or
+      above (cooling) a balance temperature. VBDD works that temperature out per building.
+    - **Adiabatic surface**: one no heat crosses, such as a wall shared with a heated neighbour.
+    - **LCC** (life-cycle cost): purchase, replacement, maintenance and leftover value of
+      an element over its life, in today's money.
+    - **LCA** (life-cycle assessment): environmental impact of materials and equipment
+      over their life, such as the CO2 from making them.
+    - **MCI** (Material Circularity Indicator): 0 to 1; 1 means all material comes from
+      and returns to reuse or recycling.
+    - **Inverse model**: a model fitted to measured consumption against outdoor
+      temperature. The **5P energy signature** is a flat base load plus straight lines
+      for heating below one temperature and cooling above another.
+    - **OpenDSM**: an open-source library of such models for monthly or hourly meter data.
+    - **NMBE, CV(RMSE)**: a fitted model's average bias and typical error on held-back
+      readings, in percent.
+
+    ## Units
+
+    Energy in kWh, power in W, temperature in °C, CO2 in kgCO2e, money in the energy
+    config's currency. Demand is positive. `period_id` is `YYYY-MM`. Columns ending in
+    `_id` are text. Example prices and factors are illustrative.
 servers:
   - url: http://127.0.0.1:8000
     description: Local Taskfile server.
 tags:
-  - name: Dynamic
-    description: |
-      Estimates heating and cooling by walking through the year in short
-      time steps (typically hourly). Uses a compact heat-flow model of the
-      building fabric (5R1C or 7R2C). Best when you need how demand changes
-      through a day, or optional equipment detail.
-  - name: Monthly
-    description: |
-      Estimates heating and cooling once per calendar month from average
-      weather and operation. Reports the heat that must be added or removed
-      to hold indoor temperature (not purchased fuel or electricity). The
-      usual choice when monthly totals are enough.
-  - name: Simplified
-    description: |
-      A separate, coarser monthly estimate (Model 3). Shared building and
-      weather data are translated into Model 3's own inputs, then Model 3
-      runs on its own. Use it to compare methods, not as a simpler switch
-      on the Monthly path.
+  - name: Heat demand
+    description: Heat each building's rooms and ventilation need, from four methods.
+  - name: Energy
+    description: Heat demand turned into energy bought, CO2 and cost.
+  - name: Inputs
+    description: Input preparation and checks.
+  - name: Life cycle
+    description: Material amounts, life-cycle cost, impact and circularity.
+  - name: Measured data
+    description: Models learned from meter readings.
+  - name: Pipeline
+    description: Several calculations in one background run.
+  - name: Runs
+    description: Status, results and files of earlier runs.
+  - name: Experimental
+    description: These endpoints take DT Prototype's input formats unchanged. Those formats may still change.
 paths:
   /runs/dynamic:
     post:
-      tags: [Dynamic]
+      tags: [Heat demand]
       operationId: runDynamic
-      summary: Run an hour-by-hour heating and cooling estimate
+      summary: Heating and cooling demand, hour by hour
       description: |
-        Runs `runners/run_dynamic.py --config ... --output ...` through the HTTP adapter.
-        `dynamic.model` selects 5R1C or 7R2C. The runner writes time-step detail
-        rows and common monthly and annual energy tables. Plant, humidity, hot
-        water, solar, and battery details depend on the selected options and input.
+        Steps through the year (hourly, or finer with `time_steps_per_hour`) with a
+        5R1C or 7R2C model, set by `dynamic.model`. Returns monthly and yearly totals
+        per building plus one detail row per time step. Equipment, humidity, hot-water,
+        solar and battery details appear when the matching `dynamic` options and
+        inputs are set.
       requestBody:
         $ref: "#/components/requestBodies/DynamicRun"
       responses:
         "200":
-          description: The run finished. Inspect `manifest.status` and per-building failures.
+          description: The run finished. A building that failed is listed in `manifest.failed_buildings`; the others still have results.
           content:
             application/json:
               schema:
@@ -67,27 +126,31 @@ paths:
               examples:
                 singleZone:
                   $ref: "#/components/examples/DynamicResult"
-        "422":
-          $ref: "#/components/responses/InvalidInput"
         "409":
           $ref: "#/components/responses/DuplicateRun"
+        "422":
+          $ref: "#/components/responses/InvalidInput"
         "500":
           $ref: "#/components/responses/RunnerFailed"
+        "503":
+          $ref: "#/components/responses/ToolDisabled"
+        "504":
+          $ref: "#/components/responses/RunnerTimeout"
   /runs/monthly:
     post:
-      tags: [Monthly]
+      tags: [Heat demand]
       operationId: runMonthly
-      summary: Run a month-by-month heating and cooling estimate
+      summary: Heating and cooling demand, month by month
       description: |
-        Runs `runners/run_monthly.py --config ... --output ...` through the HTTP adapter.
-        This path uses the shared operating settings. It reports monthly zone and
-        air-handling-unit demand, heat-transfer and gain diagnostics, and annual
-        sums. It does not use `dynamic` or `simplified` options.
+        Balances heat losses and gains once per month from monthly average weather
+        and use. Returns monthly and yearly totals per building plus 12 detail rows
+        explaining each month (losses, gains, how much of the free heat counts). It
+        uses only the shared `operating` settings, not `dynamic` or `simplified`.
       requestBody:
         $ref: "#/components/requestBodies/MonthlyRun"
       responses:
         "200":
-          description: The run finished. Inspect `manifest.status` and per-building failures.
+          description: The run finished. A building that failed is listed in `manifest.failed_buildings`; the others still have results.
           content:
             application/json:
               schema:
@@ -95,28 +158,32 @@ paths:
               examples:
                 singleZone:
                   $ref: "#/components/examples/MonthlyResult"
-        "422":
-          $ref: "#/components/responses/InvalidInput"
         "409":
           $ref: "#/components/responses/DuplicateRun"
+        "422":
+          $ref: "#/components/responses/InvalidInput"
         "500":
           $ref: "#/components/responses/RunnerFailed"
+        "503":
+          $ref: "#/components/responses/ToolDisabled"
+        "504":
+          $ref: "#/components/responses/RunnerTimeout"
   /runs/simplified:
     post:
-      tags: [Simplified]
+      tags: [Heat demand]
       operationId: runSimplified
-      summary: Run the separate Model 3 monthly estimate
+      summary: Heating and cooling demand from the simplified monthly method
       description: |
-        Runs `runners/run_simplified.py --config ... --output ...` through the HTTP adapter.
-        The adapter maps the shared building and weather inputs into Model 3's
-        monthly inputs. `zone_mode` selects a sum of independent zones, one
-        collapsed equivalent zone, or both. In `both`, the headline monthly and
-        annual totals use the zone sum; the collapsed case stays in detail rows.
+        A separate, coarser monthly method (historically called Model 3) for
+        cross-checking. The building and weather are first translated into its own
+        monthly inputs. `simplified.zone_mode` chooses whether two zones are solved
+        separately (`sum`), merged into one (`collapsed`), or both; with `both` the
+        headline totals use the separate-zone sum.
       requestBody:
         $ref: "#/components/requestBodies/SimplifiedRun"
       responses:
         "200":
-          description: The run finished. Inspect `manifest.status` and per-building failures.
+          description: The run finished. A building that failed is listed in `manifest.failed_buildings`; the others still have results.
           content:
             application/json:
               schema:
@@ -124,17 +191,490 @@ paths:
               examples:
                 singleZone:
                   $ref: "#/components/examples/SimplifiedResult"
-        "422":
-          $ref: "#/components/responses/InvalidInput"
         "409":
           $ref: "#/components/responses/DuplicateRun"
+        "422":
+          $ref: "#/components/responses/InvalidInput"
         "500":
           $ref: "#/components/responses/RunnerFailed"
+        "503":
+          $ref: "#/components/responses/ToolDisabled"
+        "504":
+          $ref: "#/components/responses/RunnerTimeout"
+  /runs/vbdd:
+    post:
+      tags: [Heat demand]
+      operationId: runVbdd
+      summary: Heating and cooling demand from degree days
+      description: |
+        Estimates monthly demand from variable-base degree days: each building's
+        heat-loss rate times how far, and for how long, outdoor temperature falls
+        below (or rises above) the building's own balance temperature. Fast and
+        transparent; use it to cross-check the other methods. Optional `vbdd`
+        settings in the project change how free heat is counted.
+
+        Rows are per case: each zone on its own (`individual_zone`) and, for two-zone
+        buildings, the zones merged into one (`single_zone_collapsed_from_two_zones`).
+        Do not add the two kinds together; `zone_sum_monthly` gives the per-building
+        sum of separate zones.
+      requestBody:
+        $ref: "#/components/requestBodies/VbddRun"
+      responses:
+        "200":
+          description: The run finished.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VbddRunResult"
+        "409":
+          $ref: "#/components/responses/DuplicateRun"
+        "422":
+          $ref: "#/components/responses/InvalidInput"
+        "500":
+          $ref: "#/components/responses/RunnerFailed"
+        "503":
+          $ref: "#/components/responses/ToolDisabled"
+        "504":
+          $ref: "#/components/responses/RunnerTimeout"
+  /runs/{method}/energy:
+    post:
+      tags: [Energy, Experimental]
+      operationId: runEnergy
+      summary: Energy bought, CO2 and cost
+      description: |
+        Runs a heat-demand method, then covers each service (room and ventilation
+        heating and cooling, hot water) with the equipment in the `energy` config. Adds
+        rooftop PV and solar collectors, balances the electricity meter, and applies each
+        carrier's primary-energy factors, CO2 factors and prices.
+
+        Every project building needs an entry in `energy.buildings`. If one building
+        fails, the whole run fails.
+      parameters:
+        - name: method
+          in: path
+          required: true
+          description: Heat-demand method to run first.
+          schema:
+            type: string
+            enum: [dynamic, monthly, simplified, vbdd]
+      requestBody:
+        $ref: "#/components/requestBodies/EnergyRun"
+      responses:
+        "200":
+          description: The run finished for every building.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnergyRunResult"
+        "409":
+          $ref: "#/components/responses/DuplicateRun"
+        "422":
+          $ref: "#/components/responses/InvalidInput"
+        "500":
+          $ref: "#/components/responses/RunnerFailed"
+        "503":
+          $ref: "#/components/responses/ToolDisabled"
+        "504":
+          $ref: "#/components/responses/RunnerTimeout"
+  /validate:
+    post:
+      tags: [Inputs, Experimental]
+      operationId: validateInputs
+      summary: Check inputs without calculating
+      description: |
+        Runs DT Prototype's input checks and lists every problem found. `kind` picks
+        what to check: a `project` (with its weather file), an `energy` config, or an
+        inverse-model `config`. Nothing is simulated or fitted, so it is a quick way
+        to catch mistakes before a long run. A failed check still answers `200`; read
+        `status` and `checks`.
+      requestBody:
+        $ref: "#/components/requestBodies/Validate"
+      responses:
+        "200":
+          description: The checks ran.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationReport"
+        "409":
+          $ref: "#/components/responses/DuplicateRun"
+        "422":
+          $ref: "#/components/responses/InvalidInput"
+        "500":
+          $ref: "#/components/responses/RunnerFailed"
+        "503":
+          $ref: "#/components/responses/ToolDisabled"
+        "504":
+          $ref: "#/components/responses/RunnerTimeout"
+  /geometry/from-footprints:
+    post:
+      tags: [Inputs, Experimental]
+      operationId: geometryFromFootprints
+      summary: Building tables from a map of building outlines
+      description: |
+        Turns building footprints (a GeoJSON map layer with attributes such as use,
+        floors and height) and a rules file into the buildings, zones and surfaces
+        tables that the `/runs` endpoints take as tabular geometry. The rules pick
+        each building's construction type and systems from its attributes. A building
+        gets two zones only when it declares a different ground-floor use.
+
+        Known limits: every footprint edge counts as an outside wall, because walls
+        shared with neighbours are not detected yet; and coordinates must be in
+        metres (a projected system), not degrees.
+      requestBody:
+        $ref: "#/components/requestBodies/Footprints"
+      responses:
+        "200":
+          description: The tables were generated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FootprintsResult"
+        "409":
+          $ref: "#/components/responses/DuplicateRun"
+        "422":
+          $ref: "#/components/responses/InvalidInput"
+        "500":
+          $ref: "#/components/responses/RunnerFailed"
+        "503":
+          $ref: "#/components/responses/ToolDisabled"
+        "504":
+          $ref: "#/components/responses/RunnerTimeout"
+  /assets/quantities:
+    post:
+      tags: [Life cycle, Experimental]
+      operationId: resolveAssetQuantities
+      summary: Amounts of materials and equipment per building
+      description: |
+        Works out how much of each asset (m² of insulation, kW of heat pump, litres of
+        tank) each building has, ready for cost and impact calculations. Each asset is
+        either `auto`, an estimate from the building model times a sizing factor, or
+        `direct`, the amount you enter. `auto` assets need the `project` and
+        `weather_epw` parts. Quantities feed the life-cycle tools; they do not change
+        the energy calculations.
+      requestBody:
+        $ref: "#/components/requestBodies/Quantities"
+      responses:
+        "200":
+          description: The quantities were resolved. Check each row's `status`.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuantitiesResult"
+        "409":
+          $ref: "#/components/responses/DuplicateRun"
+        "422":
+          $ref: "#/components/responses/InvalidInput"
+        "500":
+          $ref: "#/components/responses/RunnerFailed"
+        "503":
+          $ref: "#/components/responses/ToolDisabled"
+        "504":
+          $ref: "#/components/responses/RunnerTimeout"
+  /lcc:
+    post:
+      tags: [Life cycle, Experimental]
+      operationId: runLcc
+      summary: Life-cycle cost of a renovation
+      description: |
+        Calculates investment, replacements over the study period, leftover value,
+        maintenance and yearly energy cost, discounted to today's money, and their
+        total ("global cost"). A Python translation of the original LCC spreadsheet;
+        result keys keep the spreadsheet cell names, such as `T560_global_cost_eur`.
+        Known limit: energy cost covers electricity only.
+      requestBody:
+        $ref: "#/components/requestBodies/Lcc"
+      responses:
+        "200":
+          description: The cost was calculated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CalculatorResult"
+        "409":
+          $ref: "#/components/responses/DuplicateRun"
+        "422":
+          $ref: "#/components/responses/InvalidInput"
+        "500":
+          $ref: "#/components/responses/RunnerFailed"
+        "503":
+          $ref: "#/components/responses/ToolDisabled"
+        "504":
+          $ref: "#/components/responses/RunnerTimeout"
+  /lca:
+    post:
+      tags: [Life cycle, Experimental]
+      operationId: runLca
+      summary: Environmental impact of materials and equipment
+      description: |
+        Calculates embodied impacts (for example primary energy and CO2) of the
+        installed technologies and renovation, per year and over the study period,
+        plus the building's operational impacts before the renovation. Each
+        indicator is amount times impact factor, spread over the element's service
+        life. A Python translation of the original LCA spreadsheet; result keys keep the
+        spreadsheet cell names. Known limit: the source spreadsheet has a formula error
+        for hot water heated by a fuel, so cases with fuel-fired hot water are rejected
+        with a 422 instead of returning a wrong number.
+      requestBody:
+        $ref: "#/components/requestBodies/Lca"
+      responses:
+        "200":
+          description: The impacts were calculated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CalculatorResult"
+        "409":
+          $ref: "#/components/responses/DuplicateRun"
+        "422":
+          $ref: "#/components/responses/InvalidInput"
+        "500":
+          $ref: "#/components/responses/RunnerFailed"
+        "503":
+          $ref: "#/components/responses/ToolDisabled"
+        "504":
+          $ref: "#/components/responses/RunnerTimeout"
+  /circularity:
+    post:
+      tags: [Life cycle, Experimental]
+      operationId: runCircularity
+      summary: Material circularity score
+      description: |
+        Calculates the Material Circularity Indicator (MCI), from 0 to 1. `mode=component`
+        scores each material of one component and the component as a whole.
+        `mode=building` combines component scores into building-layer and building
+        scores, weighted by mass.
+      requestBody:
+        $ref: "#/components/requestBodies/Circularity"
+      responses:
+        "200":
+          description: The score was calculated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CalculatorResult"
+        "409":
+          $ref: "#/components/responses/DuplicateRun"
+        "422":
+          $ref: "#/components/responses/InvalidInput"
+        "500":
+          $ref: "#/components/responses/RunnerFailed"
+        "503":
+          $ref: "#/components/responses/ToolDisabled"
+        "504":
+          $ref: "#/components/responses/RunnerTimeout"
+  /assessment:
+    post:
+      tags: [Life cycle, Experimental]
+      operationId: runAssessment
+      summary: Cost, impact and circularity totals per building
+      description: |
+        Checks a table of per-asset results (cost, impact or circularity values
+        worked out elsewhere, for example with `/lcc`, `/lca` and `/circularity`) and
+        totals them per building: costs and impacts are added, circularity is averaged
+        by mass. With `energy_run_id` it also lists each building's yearly energy,
+        CO2 and cost from that run next to the totals. It calculates no new values.
+      requestBody:
+        $ref: "#/components/requestBodies/Assessment"
+      responses:
+        "200":
+          description: The totals were produced. Check each building row's `status` for missing assets.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessmentResult"
+        "409":
+          $ref: "#/components/responses/DuplicateRun"
+        "422":
+          $ref: "#/components/responses/InvalidInput"
+        "500":
+          $ref: "#/components/responses/RunnerFailed"
+        "503":
+          $ref: "#/components/responses/ToolDisabled"
+        "504":
+          $ref: "#/components/responses/RunnerTimeout"
+  /inverse:
+    post:
+      tags: [Measured data, Experimental]
+      operationId: runInverse
+      summary: Learn a model from meter readings, or predict with one
+      description: |
+        Fits statistical models of energy use against outdoor temperature (and
+        sunlight, for the hourly solar model) to measured or simulated readings.
+        `config.operation` is `fit` (learn and score), `evaluate` (score a saved model
+        on new data) or `predict` (apply a saved model). `evaluate` and `predict` need
+        `model_run_id`, the ID of an earlier `fit` run.
+
+        Readings come either as `observations` and `weather` CSV files (`source.type`
+        `csv`), or from an earlier run (`energy_run_id` with `source.type`
+        `energy_run`, or `thermal_run_id` with `thermal_monthly`). The API fills in
+        every file path in the config; values you send for them are replaced.
+
+        Models: `5p_monthly` (the 5P energy signature, always available) and
+        `opendsm_billing` or `opendsm_hourly` (OpenDSM, only when installed). Runs that
+        use OpenDSM can take up to 30 minutes, so they answer `202`.
+      requestBody:
+        $ref: "#/components/requestBodies/Inverse"
+      responses:
+        "200":
+          description: The run finished. Check each model's `status` in `models`.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InverseResult"
+        "202":
+          $ref: "#/components/responses/Accepted"
+        "409":
+          $ref: "#/components/responses/DuplicateRun"
+        "422":
+          $ref: "#/components/responses/InvalidInput"
+        "500":
+          $ref: "#/components/responses/RunnerFailed"
+        "503":
+          $ref: "#/components/responses/ToolDisabled"
+        "504":
+          $ref: "#/components/responses/RunnerTimeout"
+  /inverse/acceptance:
+    post:
+      tags: [Measured data, Experimental]
+      operationId: checkInverseAcceptance
+      summary: Is a learned model accurate enough to use?
+      description: |
+        Scores a completed `/inverse` run on the readings it held back, against the
+        thresholds in `policy` (for example NMBE within 5% and CV(RMSE) within 20%,
+        plus minimum amounts of training and test data). The answer is `accepted` when
+        every model passes, otherwise `review_required`, with the reasons per model. It
+        is a project check, not a formal measurement-and-verification certificate.
+      requestBody:
+        $ref: "#/components/requestBodies/Acceptance"
+      responses:
+        "200":
+          description: The check ran.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcceptanceReport"
+        "409":
+          $ref: "#/components/responses/DuplicateRun"
+        "422":
+          $ref: "#/components/responses/InvalidInput"
+        "500":
+          $ref: "#/components/responses/RunnerFailed"
+        "503":
+          $ref: "#/components/responses/ToolDisabled"
+        "504":
+          $ref: "#/components/responses/RunnerTimeout"
+  /pipeline:
+    post:
+      tags: [Pipeline, Experimental]
+      operationId: runPipeline
+      summary: Energy, assessment and inverse model in one background run
+      description: |
+        Chains several DT Prototype steps in one run: input checks, then the energy
+        calculation (or reuse of an earlier energy run), then optional assessment
+        totals, then an optional inverse model fitted to the simulated energy. With
+        `mode: inverse` it runs the inverse model only. The `pipeline` part follows the
+        DT Prototype pipeline format; the API fills in its file paths from the other parts.
+        Engine names inside it use DT Prototype's spelling: `Dynamic_RC`, `Monthly_SS`,
+        `Monthly_SS_simplified`, `Monthly_SS_VBDD` or `all`.
+
+        Always answers `202`; poll `GET /runs/{run_id}`.
+      requestBody:
+        $ref: "#/components/requestBodies/Pipeline"
+      responses:
+        "202":
+          $ref: "#/components/responses/Accepted"
+        "409":
+          $ref: "#/components/responses/DuplicateRun"
+        "422":
+          $ref: "#/components/responses/InvalidInput"
+        "500":
+          $ref: "#/components/responses/RunnerFailed"
+        "503":
+          $ref: "#/components/responses/ToolDisabled"
+  /runs/{run_id}:
+    get:
+      tags: [Runs]
+      operationId: getRun
+      summary: Status and result of a run
+      description: |
+        Reports where a run is (`queued`, `running`, `complete`, `failed` or
+        `interrupted`) and, once complete, the same result its endpoint returns.
+        `interrupted` means the server restarted during the run; send it again with a
+        new `run_id`.
+      parameters:
+        - $ref: "#/components/parameters/RunId"
+      responses:
+        "200":
+          description: The run exists.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RunStatus"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          description: The run completed but its output could not be read.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InputProblem"
+  /runs/{run_id}/files:
+    get:
+      tags: [Runs]
+      operationId: listRunFiles
+      summary: List a run's output files
+      description: |
+        Lists every file the calculation wrote, including those the JSON result
+        leaves out, such as hourly interval tables, charts and reports. Fetch one with
+        `GET /runs/{run_id}/files/{path}`.
+      parameters:
+        - $ref: "#/components/parameters/RunId"
+      responses:
+        "200":
+          description: The run exists.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RunFiles"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /runs/{run_id}/files/{path}:
+    get:
+      tags: [Runs]
+      operationId: getRunFile
+      summary: Download one output file
+      parameters:
+        - $ref: "#/components/parameters/RunId"
+        - name: path
+          in: path
+          required: true
+          description: File path as listed by `GET /runs/{run_id}/files`, for example `energy_annual.csv`.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The file's contents.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "404":
+          $ref: "#/components/responses/NotFound"
 components:
+  parameters:
+    RunId:
+      name: run_id
+      in: path
+      required: true
+      description: The run's ID, as returned by the endpoint that started it.
+      schema:
+        type: string
   requestBodies:
     DynamicRun:
       required: true
-      description: Typed project input plus the 8,760-hour EPW weather file.
+      description: The project as JSON plus the weather file for its location.
       content:
         multipart/form-data:
           schema:
@@ -155,7 +695,7 @@ components:
               $ref: "#/components/examples/DynamicRequest"
     MonthlyRun:
       required: true
-      description: Typed project input plus the 8,760-hour EPW weather file.
+      description: The project as JSON plus the weather file for its location.
       content:
         multipart/form-data:
           schema:
@@ -176,7 +716,7 @@ components:
               $ref: "#/components/examples/MonthlyRequest"
     SimplifiedRun:
       required: true
-      description: Typed project input plus the 8,760-hour EPW weather file.
+      description: The project as JSON plus the weather file for its location.
       content:
         multipart/form-data:
           schema:
@@ -195,21 +735,321 @@ components:
           examples:
             singleZone:
               $ref: "#/components/examples/SimplifiedRequest"
+    VbddRun:
+      required: true
+      description: Project with optional `vbdd` settings, plus the EPW weather file.
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [project, weather_epw]
+            properties:
+              project:
+                $ref: "#/components/schemas/VbddProject"
+              weather_epw:
+                $ref: "#/components/schemas/EpwFile"
+          encoding:
+            project:
+              contentType: application/json
+    EnergyRun:
+      required: true
+      description: Project, weather file and energy config. Dynamic projects need `plants`, `latent` and `pv_battery` set to `false`; simplified ones need `comparison_mode` `seasonal_ahu`.
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [project, weather_epw, energy]
+            properties:
+              project:
+                description: The project, as for `/runs/{method}`.
+                anyOf:
+                  - $ref: "#/components/schemas/DynamicProject"
+                  - $ref: "#/components/schemas/MonthlyProject"
+                  - $ref: "#/components/schemas/SimplifiedProject"
+                  - $ref: "#/components/schemas/VbddProject"
+              weather_epw:
+                $ref: "#/components/schemas/EpwFile"
+              energy:
+                $ref: "#/components/schemas/EnergyConfig"
+          encoding:
+            project:
+              contentType: application/json
+            energy:
+              contentType: application/json
+    Validate:
+      required: true
+      description: What to check (`kind`) and the parts that kind needs.
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [kind]
+            properties:
+              kind:
+                $ref: "#/components/schemas/ValidationKind"
+              run_id:
+                $ref: "#/components/schemas/OptionalRunId"
+              project:
+                $ref: "#/components/schemas/ProjectToCheck"
+              weather_epw:
+                $ref: "#/components/schemas/EpwFile"
+              energy:
+                $ref: "#/components/schemas/EnergyConfig"
+              config:
+                $ref: "#/components/schemas/InverseConfig"
+              observations:
+                $ref: "#/components/schemas/ObservationsCsv"
+              weather:
+                $ref: "#/components/schemas/WeatherCsv"
+              energy_run_id:
+                $ref: "#/components/schemas/EnergyRunReference"
+          encoding:
+            project:
+              contentType: application/json
+            energy:
+              contentType: application/json
+            config:
+              contentType: application/json
+    Footprints:
+      required: true
+      description: Building footprints and the rules that turn their attributes into inputs.
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [footprints, rules]
+            properties:
+              run_id:
+                $ref: "#/components/schemas/OptionalRunId"
+              footprints:
+                $ref: "#/components/schemas/FootprintsFile"
+              rules:
+                $ref: "#/components/schemas/FootprintRules"
+          encoding:
+            rules:
+              contentType: application/json
+    Quantities:
+      required: true
+      description: Asset quantity inputs and the asset catalogue, plus a project for `auto` quantities.
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [inputs, catalogue]
+            properties:
+              run_id:
+                $ref: "#/components/schemas/OptionalRunId"
+              inputs:
+                $ref: "#/components/schemas/QuantityInputs"
+              catalogue:
+                $ref: "#/components/schemas/AssetCatalogue"
+              project:
+                $ref: "#/components/schemas/ProjectToCheck"
+              weather_epw:
+                $ref: "#/components/schemas/EpwFile"
+          encoding:
+            catalogue:
+              contentType: application/json
+            project:
+              contentType: application/json
+    Lcc:
+      required: true
+      description: An LCC case.
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [case]
+            properties:
+              run_id:
+                $ref: "#/components/schemas/OptionalRunId"
+              case:
+                $ref: "#/components/schemas/LifeCycleCase"
+          encoding:
+            case:
+              contentType: application/json
+    Lca:
+      required: true
+      description: An LCA case, plus an optional indicator catalogue.
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [case]
+            properties:
+              run_id:
+                $ref: "#/components/schemas/OptionalRunId"
+              case:
+                $ref: "#/components/schemas/LifeCycleCase"
+              indicator_catalog:
+                $ref: "#/components/schemas/IndicatorCatalog"
+          encoding:
+            case:
+              contentType: application/json
+            indicator_catalog:
+              contentType: application/json
+    Circularity:
+      required: true
+      description: A circularity case and the `mode` it uses.
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [case, mode]
+            properties:
+              run_id:
+                $ref: "#/components/schemas/OptionalRunId"
+              case:
+                $ref: "#/components/schemas/LifeCycleCase"
+              mode:
+                $ref: "#/components/schemas/CircularityMode"
+          encoding:
+            case:
+              contentType: application/json
+    Assessment:
+      required: true
+      description: Per-asset results, plus optional references to energy and quantity runs.
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [asset_results]
+            properties:
+              run_id:
+                $ref: "#/components/schemas/OptionalRunId"
+              asset_results:
+                $ref: "#/components/schemas/AssetResultsCsv"
+              energy_run_id:
+                $ref: "#/components/schemas/EnergyRunReference"
+              asset_quantities:
+                $ref: "#/components/schemas/AssetQuantitiesCsv"
+              quantities_run_id:
+                $ref: "#/components/schemas/QuantitiesRunReference"
+    Inverse:
+      required: true
+      description: Inverse-model config and the readings it uses.
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [config]
+            properties:
+              run_id:
+                $ref: "#/components/schemas/OptionalRunId"
+              config:
+                $ref: "#/components/schemas/InverseConfig"
+              observations:
+                $ref: "#/components/schemas/ObservationsCsv"
+              weather:
+                $ref: "#/components/schemas/WeatherCsv"
+              energy_run_id:
+                $ref: "#/components/schemas/EnergyRunReference"
+              thermal_run_id:
+                $ref: "#/components/schemas/ThermalRunReference"
+              model_run_id:
+                $ref: "#/components/schemas/ModelRunReference"
+          encoding:
+            config:
+              contentType: application/json
+    Acceptance:
+      required: true
+      description: The inverse run to check and the acceptance thresholds.
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [inverse_run_id, policy]
+            properties:
+              run_id:
+                $ref: "#/components/schemas/OptionalRunId"
+              inverse_run_id:
+                $ref: "#/components/schemas/InverseRunReference"
+              policy:
+                $ref: "#/components/schemas/AcceptancePolicy"
+          encoding:
+            policy:
+              contentType: application/json
+    Pipeline:
+      required: true
+      description: Pipeline settings and the parts its enabled steps need.
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [pipeline]
+            properties:
+              run_id:
+                $ref: "#/components/schemas/OptionalRunId"
+              pipeline:
+                $ref: "#/components/schemas/PipelineConfig"
+              project:
+                $ref: "#/components/schemas/ProjectToCheck"
+              weather_epw:
+                $ref: "#/components/schemas/EpwFile"
+              energy:
+                $ref: "#/components/schemas/EnergyConfig"
+              energy_run_id:
+                $ref: "#/components/schemas/EnergyRunReference"
+              asset_results:
+                $ref: "#/components/schemas/AssetResultsCsv"
+              asset_quantities:
+                $ref: "#/components/schemas/AssetQuantitiesCsv"
+              inverse_config:
+                $ref: "#/components/schemas/InverseConfig"
+              observations:
+                $ref: "#/components/schemas/ObservationsCsv"
+              weather:
+                $ref: "#/components/schemas/WeatherCsv"
+          encoding:
+            pipeline:
+              contentType: application/json
+            project:
+              contentType: application/json
+            energy:
+              contentType: application/json
+            inverse_config:
+              contentType: application/json
   responses:
     InvalidInput:
-      description: Project settings, source data, or weather failed pre-run checks.
+      description: A part is missing or invalid; `field` names it and `message` says what to fix.
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/InputProblem"
     DuplicateRun:
-      description: The supplied run ID has already been used.
+      description: The `run_id` was used before; send the request again with a new one.
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/InputProblem"
     RunnerFailed:
-      description: The runner failed without a completed manifest or usable result.
+      description: The calculation stopped without a usable result; `message` carries its last error line.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/InputProblem"
+    Accepted:
+      description: The run was queued and continues in the background. Poll `status_url`.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RunAccepted"
+    ToolDisabled:
+      description: |
+        This endpoint is switched off on this server (`DT_API_DISABLED_TOOLS`), or a
+        component it needs, such as OpenDSM, is not installed (`opendsm_unavailable`).
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/InputProblem"
+    RunnerTimeout:
+      description: The calculation ran longer than this endpoint allows and was stopped.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/InputProblem"
+    NotFound:
+      description: No run, or no output file, has that name.
       content:
         application/json:
           schema:
@@ -219,28 +1059,28 @@ components:
       type: string
       format: binary
       description: |
-        EnergyPlus Weather file. The source reader requires 8,760 ordered hourly
-        records for a non-leap year, checks consumed weather fields, and does not
-        fill missing values. The selected `calendar_year` sets schedule weekdays;
+        EPW weather file: 8,760 hourly records, in order, for a non-leap year. Missing
+        values are not filled in. The selected `calendar_year` sets schedule weekdays;
         EPW source-year fields may vary in a typical meteorological year.
     CommonProject:
       type: object
       description: |
-        Shared data for one run. The CLI reads these values from a configuration
-        file and separate input files. `run_id` names a unique output directory.
+        Everything one run needs: the buildings, their constructions, how they are
+        used, their systems and the operating settings. `run_id` names the run and can
+        be used only once.
       required: [run_id, schema_version, inputs, operating]
       properties:
         run_id:
           type: string
           minLength: 1
           maxLength: 64
-          pattern: '^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$'
+          pattern: "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
           description: Unique run identifier. Windows device names are reserved.
           example: campus_a_baseline
         schema_version:
           type: string
           const: "1.0"
-          description: Version required by `ProjectInputs.load` for the source configuration.
+          description: Version of the project format; always `1.0`.
         inputs:
           $ref: "#/components/schemas/ProjectInputs"
         operating:
@@ -253,11 +1093,11 @@ components:
           properties:
             dynamic:
               $ref: "#/components/schemas/DynamicOptions"
-      description: Shared project data and dynamic-only options.
+      description: The shared project data plus settings for the dynamic method.
     MonthlyProject:
       allOf:
         - $ref: "#/components/schemas/CommonProject"
-      description: Shared project data; the monthly runner has no extra CLI option.
+      description: The shared project data; the monthly method has no extra settings.
     SimplifiedProject:
       allOf:
         - $ref: "#/components/schemas/CommonProject"
@@ -266,13 +1106,56 @@ components:
           properties:
             simplified:
               $ref: "#/components/schemas/SimplifiedOptions"
-      description: Shared project data and simplified-only options.
+      description: The shared project data plus settings for the simplified method.
+    VbddProject:
+      allOf:
+        - $ref: "#/components/schemas/CommonProject"
+        - type: object
+          properties:
+            vbdd:
+              $ref: "#/components/schemas/VbddOptions"
+      description: Shared project data plus optional degree-day settings.
+    VbddOptions:
+      type: object
+      additionalProperties: false
+      description: Optional settings for the degree-day method. Leave them out to use the method's defaults.
+      properties:
+        utilisation:
+          type: string
+          enum: [monthly_balance, fixed]
+          default: monthly_balance
+          description: |
+            How much of the free heat from people, equipment and sun counts against heating.
+            `monthly_balance` works it out each month from the ratio of gains to losses;
+            `fixed` uses the constant `eta_heating` and `eta_cooling` values below.
+        solar:
+          type: string
+          enum: [direct, temperature_linear]
+          default: direct
+          description: "`direct` uses the solar gain calculated for each month; `temperature_linear` fits solar gain as a straight line against outdoor temperature."
+        eta_heating:
+          type: number
+          default: 1.0
+          description: Share of free heat that reduces heating, usually between 0 and 1. Used only when `utilisation` is `fixed`.
+        eta_cooling:
+          type: number
+          default: 1.0
+          description: Share of heat loss that reduces cooling, usually between 0 and 1 and never 0. Used only when `utilisation` is `fixed`.
+        attenuation_heating:
+          type: number
+          default: 0.0
+          description: Fraction by which the building's heat-loss rate is reduced in the heating calculation, from 0 (no reduction) up to but not including 1.
+        attenuation_cooling:
+          type: number
+          default: 0.0
+          description: Fraction by which the building's heat-loss rate is reduced in the cooling calculation, from 0 (no reduction) up to but not including 1.
     ProjectInputs:
       type: object
       description: |
-        The source `inputs` section, with file paths replaced by typed geometry
-        and library data. Building references to envelopes, schedules, and systems
-        must match keys in the corresponding libraries.
+        The building data: geometry (tables or map footprints) and three libraries
+        of constructions (`envelopes`), occupancy patterns (`schedules`) and
+        heating and cooling systems (`systems`). Names that buildings and zones use
+        must match keys in those libraries.
       required:
         [
           geometry,
@@ -288,7 +1171,7 @@ components:
           oneOf:
             - $ref: "#/components/schemas/TabularGeometry"
             - $ref: "#/components/schemas/GeoJsonGeometry"
-          description: Simulation-ready tables or a projected GeoJSON footprint collection.
+          description: Buildings as tables (buildings, zones, surfaces) or as GeoJSON footprints in metres.
         envelopes:
           $ref: "#/components/schemas/EnvelopeLibrary"
         schedules:
@@ -304,13 +1187,13 @@ components:
         time_steps_per_hour:
           type: integer
           enum: [1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60]
-          description: Dynamic steps per hour. Weather is interpolated; schedules hold within each hour.
+          description: Time steps per hour for the dynamic method; 1 means hourly. Weather is interpolated between hours; schedules stay constant within each hour.
           example: 1
         azimuth_subdivisions:
           type: integer
           minimum: 1
           maximum: 360
-          description: Number of compass bins used for solar calculations.
+          description: Number of compass directions walls are grouped into for sunlight calculations; 8 means N, NE, E, and so on.
           example: 8
     OperatingOptions:
       type: object
@@ -330,16 +1213,16 @@ components:
         ahu_mode:
           type: string
           enum: [basic, extended]
-          description: Basic uses outdoor air; extended allows recirculation and fuller coil accounting.
+          description: Ventilation unit model. `basic` treats outdoor air only; `extended` also allows mixing in return air and tracks the heating and cooling coils in more detail.
           example: extended
         initial_temperature:
           type: number
-          description: Initial indoor thermal state in degrees Celsius.
+          description: Indoor temperature at the start of the year, °C.
           example: 15.0
         initial_specific_humidity:
           type: number
           minimum: 0
-          description: Initial water-vapour mass per dry-air mass, in kg/kg.
+          description: Indoor humidity at the start of the year, as kg of water vapour per kg of dry air.
           example: 0.0105
     Season:
       type: array
@@ -358,21 +1241,21 @@ components:
         model:
           type: string
           enum: [5R1C, 7R2C, 1C, 2C]
-          description: RC thermal network. `1C` and `2C` are legacy config aliases; the CLI `--model` flag accepts only `5R1C` and `7R2C`.
+          description: Building heat model; see 5R1C and 7R2C in the glossary. `1C` and `2C` are older names for the same two models.
           example: 5R1C
         latent:
           type: boolean
           default: true
-          description: Calculate humidity balance and latent loads.
+          description: Also calculate indoor humidity and the energy to control it. Must be `false` for the energy endpoints.
         plants:
           type: boolean
           default: false
-          description: Calculate named heating/cooling equipment and purchased energy; false uses ideal loads.
+          description: Simulate the named heating and cooling equipment and the energy it buys. `false` assumes ideal equipment that always meets demand. Must be `false` for the energy endpoints, which model equipment themselves.
         sizing:
           type: string
           enum: [design_day, static]
           default: design_day
-          description: Plant capacity estimate when plants are enabled and no explicit power limit is supplied.
+          description: How equipment size is estimated when `plants` is on and no power limit is given, either from a design day or from a fixed rule.
         dhw_tank:
           type: boolean
           default: true
@@ -380,12 +1263,12 @@ components:
         pv_battery:
           type: boolean
           default: false
-          description: Add battery dispatch for a building with photovoltaic generation when plants are enabled.
+          description: Add a battery to a building with PV panels when `plants` is on. Must be `false` for the energy endpoints.
         heating_max_power:
           type: [number, "null"]
           minimum: 0
           default: null
-          description: Heating capacity limit in W; null lets sizing or ideal-load logic choose it.
+          description: Largest heating power, W. Null lets the sizing rule or ideal equipment decide.
         cooling_max_power:
           type: [number, "null"]
           maximum: 0
@@ -398,12 +1281,12 @@ components:
         comparison_mode:
           type: string
           enum: [legacy, seasonal_ahu]
-          description: "`seasonal_ahu` maps seasonal availability and separate sensible air-handling demand; `legacy` retains the earlier Model 3 comparison boundary."
+          description: "`seasonal_ahu` switches heating and cooling on by season and reports the ventilation unit separately, like the other methods. `legacy` keeps the older way of comparing, kept for reproducing earlier results. The energy endpoints need `seasonal_ahu`."
           example: seasonal_ahu
         zone_mode:
           type: string
           enum: [sum, collapsed, both]
-          description: "`sum` solves zones separately; `collapsed` combines two-zone inputs before one solve; `both` keeps both details and reports the sum in headline tables."
+          description: "`sum` calculates each zone on its own and adds them up; `collapsed` merges two zones into one before calculating; `both` does both and uses the sum for headline totals."
           example: sum
     TabularGeometry:
       type: object
@@ -417,7 +1300,7 @@ components:
         format:
           type: string
           const: tabular
-          description: Selects the normalized-table input route.
+          description: Marks this geometry as tables.
         buildings:
           type: array
           minItems: 1
@@ -454,7 +1337,7 @@ components:
         building_id:
           type: string
           minLength: 1
-          description: Stable ID used to join zones, surfaces, and results; source CSV values are strings.
+          description: Building ID that links its zones, surfaces and results; always text.
         building_name:
           type: string
           minLength: 1
@@ -567,6 +1450,15 @@ components:
         tilt_deg:
           type: number
           description: Angle from horizontal; 0 is horizontal and 90 is vertical.
+        boundary_condition:
+          type: string
+          enum: [auto, adiabatic]
+          default: auto
+          description: |
+            Whether heat crosses this surface. `auto` (the default) follows the surface
+            type: outside walls, roofs and ground floors lose or gain heat. `adiabatic`
+            means no heat crosses it, for example a wall shared with a heated neighbour.
+            An adiabatic roof still counts for rooftop solar panels.
     GeoJsonGeometry:
       type: object
       description: |
@@ -580,7 +1472,7 @@ components:
         format:
           type: string
           const: geojson
-          description: Selects the GeoJSON footprint input route.
+          description: Marks this geometry as GeoJSON footprints.
         feature_collection:
           $ref: "#/components/schemas/BuildingFeatureCollection"
     BuildingFeatureCollection:
@@ -614,11 +1506,12 @@ components:
         geometry:
           type: object
           required: [type, coordinates]
+          description: The building's outline on the ground.
           properties:
             type:
               type: string
               enum: [Polygon, MultiPolygon]
-              description: Footprint geometry kind; the loader accepts no other GeoJSON geometry kind.
+              description: Outline shape; no other GeoJSON geometry type is accepted.
             coordinates:
               type: array
               items: {}
@@ -1042,20 +1935,24 @@ components:
       type: string
       enum: [gas, electric, district_heat, other_fuel]
       description: Energy carrier recorded by a plant model; only dynamic plant details expose carrier use.
+    RunId:
+      type: string
+      pattern: "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+      description: Name of the run; use it with `GET /runs/{run_id}` to fetch status, results and files later.
     InputProblem:
       type: object
       required: [code, message]
       properties:
         code:
           type: string
-          description: Adapter error category, such as invalid_project or invalid_weather.
+          description: Error category, such as `invalid_project`, `invalid_weather`, `invalid_input`, `run_exists`, `runner_failed` or `runner_timeout`.
         message:
           type: string
-          description: Specific source validation or preprocessing error.
+          description: What went wrong, in the calculation's own words where it raised the error.
         field:
           type: string
-          description: JSON path or input part involved, when known.
-      description: HTTP adapter error. The source CLI itself prints errors and does not return JSON.
+          description: Request part or JSON path involved, when known.
+      description: An error the API returns instead of a result.
     RunManifest:
       type: object
       required:
@@ -1073,14 +1970,14 @@ components:
         name:
           type: string
           const: DT-Prototype
-          description: Source package name.
+          description: Calculation package name.
         version:
           type: string
-          description: Source package version recorded by the runner.
+          description: Calculation package version.
         engine:
           type: string
           enum: [dynamic, monthly, simplified]
-          description: Calculation path that ran.
+          description: Heat-demand method that ran.
         status:
           type: string
           enum: [complete, failed]
@@ -1088,35 +1985,35 @@ components:
         timestamp_utc:
           type: string
           format: date-time
-          description: Runner start time in UTC.
+          description: When the calculation started, in UTC.
         input_hashes:
           type: object
           additionalProperties:
             type: string
-          description: SHA-256 hashes of source inputs; `weather_epw` also forms weather_id.
+          description: Fingerprints (SHA-256) of each input file, to tell runs on identical inputs apart; the weather fingerprint also forms `weather_id`.
         building_outputs:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/BuildingOutput"
-          description: Building ID to detail-file record. The source adds an entry before solving each building.
+          description: For each building ID, the file its detail rows came from.
         failed_buildings:
           type: array
           items:
             $ref: "#/components/schemas/FailedBuilding"
-          description: Buildings that raised an exception during calculation.
+          description: Buildings whose calculation failed, with the error.
         resolved_engine_config:
           type: object
           additionalProperties: true
-          description: Runner's resolved simulation settings, including operating values and engine options.
+          description: The settings the calculation used, after defaults were filled in.
         zone_mode:
           type: string
           enum: [sum, collapsed, both]
-          description: Simplified path only; selected zone representation.
+          description: Simplified method only; the `zone_mode` used.
         comparison_mode:
           type: string
           enum: [legacy, seasonal_ahu]
-          description: Simplified path only; Model 3 comparison boundary.
-      description: JSON view of manifest.json. The source also records full configuration, Python/dependency versions, and code hashes.
+          description: Simplified method only; the `comparison_mode` used.
+      description: The calculation's own record of the run. The full record, with configuration and software versions, is `manifest.json` in `GET /runs/{run_id}/files`.
     BuildingOutput:
       type: object
       required: [building_name, details_file]
@@ -1136,7 +2033,7 @@ components:
           description: Input building ID that failed.
         error:
           type: string
-          description: Exception message recorded by the source runner.
+          description: The error the calculation raised.
     MonthlyTotal:
       type: object
       required:
@@ -1160,11 +2057,11 @@ components:
       properties:
         run_id:
           type: string
-          description: Run output directory name.
+          description: Run ID.
         engine_id:
           type: string
           enum: [dynamic, monthly, simplified]
-          description: Calculation path.
+          description: Heat-demand method.
         building_id:
           type: string
           description: Building ID from geometry.
@@ -1174,7 +2071,7 @@ components:
         scenario_id:
           type: string
           const: baseline
-          description: Fixed scenario label in the current runner.
+          description: Scenario label; always `baseline` for now.
         weather_id:
           type: string
           description: "`weather_` followed by the first 16 characters of the EPW SHA-256 hash."
@@ -1198,11 +2095,11 @@ components:
         zone_heating_kWh:
           type: number
           minimum: 0
-          description: Useful sensible room-heating energy, excluding air treatment, kWh.
+          description: Heat the rooms need, not counting the ventilation unit, kWh.
         zone_cooling_kWh:
           type: number
           minimum: 0
-          description: Useful sensible room-cooling energy, excluding air treatment, kWh.
+          description: Heat removed from the rooms, not counting the ventilation unit, kWh.
         ahu_heating_kWh:
           type: number
           minimum: 0
@@ -1219,7 +2116,7 @@ components:
           type: number
           minimum: 0
           description: Sum of zone_cooling_kWh and ahu_cooling_kWh.
-      description: One row of monthly.csv. Positive values are useful sensible energy, not purchased energy.
+      description: One building's heating and cooling demand for one month. These are heat amounts the building needs, not energy bought; see the energy endpoints for that.
     AnnualTotal:
       type: object
       required:
@@ -1258,79 +2155,88 @@ components:
         cooling_kWh:
           type: number
           description: Annual zone plus air-unit cooling, kWh.
-      description: One row of annual.csv. A failed building has no annual row.
+      description: One building's heating and cooling demand for the year. A failed building has no row.
     DynamicRunResult:
       type: object
-      required: [manifest, monthly, annual, details_by_building]
+      required: [run_id, manifest, monthly, annual, details_by_building]
       properties:
+        run_id:
+          $ref: "#/components/schemas/RunId"
         manifest:
           $ref: "#/components/schemas/RunManifest"
         monthly:
           type: array
           items:
             $ref: "#/components/schemas/MonthlyTotal"
-          description: Successful buildings' monthly.csv rows; 12 per building.
+          description: Monthly totals of the buildings that finished; 12 rows per building.
         annual:
           type: array
           items:
             $ref: "#/components/schemas/AnnualTotal"
-          description: Successful buildings' annual.csv rows.
+          description: Yearly totals of the buildings that finished; one row per building.
         details_by_building:
           type: object
           additionalProperties:
             type: array
             items:
               $ref: "#/components/schemas/DynamicStep"
-          description: Building ID to time-step detail rows from its `_hourly.csv` file.
+          description: For each building ID, one detail row per time step.
     MonthlyRunResult:
       type: object
-      required: [manifest, monthly, annual, details_by_building]
+      required: [run_id, manifest, monthly, annual, details_by_building]
       properties:
+        run_id:
+          $ref: "#/components/schemas/RunId"
         manifest:
           $ref: "#/components/schemas/RunManifest"
         monthly:
           type: array
           items:
             $ref: "#/components/schemas/MonthlyTotal"
+          description: Monthly totals of the buildings that finished; 12 rows per building.
         annual:
           type: array
           items:
             $ref: "#/components/schemas/AnnualTotal"
+          description: Yearly totals of the buildings that finished; one row per building.
         details_by_building:
           type: object
           additionalProperties:
             type: array
             items:
               $ref: "#/components/schemas/MonthlyDetail"
-          description: Building ID to 12 detail rows from its `_details.csv` file.
+          description: For each building ID, 12 monthly detail rows.
     SimplifiedRunResult:
       type: object
-      required: [manifest, monthly, annual, details_by_building]
+      required: [run_id, manifest, monthly, annual, details_by_building]
       properties:
+        run_id:
+          $ref: "#/components/schemas/RunId"
         manifest:
           $ref: "#/components/schemas/RunManifest"
         monthly:
           type: array
           items:
             $ref: "#/components/schemas/MonthlyTotal"
+          description: Monthly totals of the buildings that finished; 12 rows per building.
         annual:
           type: array
           items:
             $ref: "#/components/schemas/AnnualTotal"
+          description: Yearly totals of the buildings that finished; one row per building.
         details_by_building:
           type: object
           additionalProperties:
             type: array
             items:
               $ref: "#/components/schemas/SimplifiedDetail"
-          description: Building ID to Model 3 monthly physics rows; `both` can include aggregate and zone rows.
+          description: For each building ID, the simplified method's monthly rows; with `zone_mode` `both` there are merged-zone and per-zone rows.
     DynamicStep:
       type: object
       description: |
-        One row of the dynamic detail CSV. `time` is an adapter name for the
-        CSV index. Loads are signed W: heating positive, cooling negative.
-        With two zones, many source columns have `zone_{label}_` prefixes;
-        `zone_values` groups those prefixed values by label for this API view.
+        One time step of the dynamic method. Loads are in W, heating positive and
+        cooling negative. For two-zone buildings, per-zone values are grouped by zone
+        label in `zone_values`.
         Optional carrier and storage fields appear only when their models run.
       required:
         [
@@ -1454,7 +2360,7 @@ components:
         month:
           type: string
           format: date
-          description: First day of the month; adapter name for the source CSV index.
+          description: First day of the month.
         heating_demand_kWh:
           type: number
           description: Useful room-heating energy for the month, kWh.
@@ -1492,10 +2398,10 @@ components:
             additionalProperties:
               type: number
           description: Zone label to equivalent zone-prefixed source detail columns for a two-zone building.
-      description: One row of the monthly solver's 12-row `_details.csv` file.
+      description: The monthly method's losses, gains and demand for one month.
     SimplifiedDetail:
       type: object
-      description: One Model 3 MonthlyPhysicsRecord; nullable diagnostics can be absent when calculation fails.
+      description: The simplified method's working for one month. Diagnostic values can be null when that month's calculation failed.
       required:
         [
           run_id,
@@ -1512,10 +2418,10 @@ components:
       properties:
         run_id:
           type: string
-          description: Run output directory name.
+          description: Run ID.
         engine_id:
           type: string
-          description: Model 3 engine identifier recorded by the calculation.
+          description: Heat-demand method; always `simplified`.
         building_id:
           type: string
           description: Source building ID.
@@ -1532,11 +2438,11 @@ components:
           description: Calendar month as YYYY-MM.
         calculation_boundary_id:
           type: string
-          description: Model 3 boundary definition used for this calculation.
+          description: Which heat flows the calculation includes.
         calculation_status:
           type: string
           enum: [OK, WARNING, FAILED]
-          description: Model 3 status value; check warning_codes for qualification.
+          description: Outcome for this month; read `warning_codes` for any caveats.
         zone_id:
           type: [string, "null"]
           description: Input zone label, or null for the aggregate/collapsed calculation.
@@ -1620,6 +2526,672 @@ components:
           items:
             type: string
           description: Machine-readable calculation warnings; empty means none.
+    OptionalRunId:
+      type: string
+      pattern: "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+      description: Name for this run. Leave it out to get a generated one, returned as `run_id`.
+    EnergyRunReference:
+      type: string
+      description: "`run_id` of a completed `/runs/{method}/energy` run on this server."
+    ThermalRunReference:
+      type: string
+      description: "`run_id` of a completed `/runs/dynamic`, `/runs/monthly` or `/runs/simplified` run on this server."
+    QuantitiesRunReference:
+      type: string
+      description: "`run_id` of a completed `/assets/quantities` run; its quantities are used instead of `asset_quantities`."
+    ModelRunReference:
+      type: string
+      description: "`run_id` of a completed `/inverse` fit whose saved models `evaluate` or `predict` should use."
+    InverseRunReference:
+      type: string
+      description: "`run_id` of a completed `/inverse` run to check."
+    ValidationKind:
+      type: string
+      enum: [project, energy, inverse]
+      description: |
+        What to check. `project` needs `project` and `weather_epw`; `energy` needs
+        `energy`; `inverse` needs `config` plus `observations` and `weather`, or
+        `energy_run_id`.
+    ProjectToCheck:
+      type: object
+      description: |
+        A project as sent to `/runs/monthly`, without `run_id`; the run's own ID is
+        used. It may include `dynamic` and `simplified` sections.
+      additionalProperties: true
+    EnergyConfig:
+      type: object
+      additionalProperties: true
+      description: |
+        The DT Prototype energy config, version 1.0, passed through unchanged:
+
+        - `carriers`: for each carrier (`electricity`, `natural_gas`, `district_heat`,
+          `other_fuel`), its primary-energy factors, CO2 per kWh, import price and
+          export price. Each value is one number or 12 monthly numbers.
+        - `technologies`: equipment such as a gas boiler or heat pump: its carrier, an
+          efficiency or COP curve against outdoor temperature, and distribution and
+          emission losses.
+        - `buildings`: for each building ID in the project, which technology covers
+          each service (`zone_heating`, `ahu_heating`, `zone_cooling`, `ahu_cooling`,
+          `dhw` for hot water), plus fans, rooftop PV and solar-thermal settings.
+      required: [schema_version, currency, carriers, technologies, buildings]
+      properties:
+        schema_version:
+          type: string
+          const: "1.0"
+          description: Version of the DT Prototype energy config format.
+        scenario_id:
+          type: string
+          description: Label for this set of factors and prices, copied into the results.
+        description:
+          type: string
+          description: Free-text note on where the factors come from.
+        currency:
+          type: string
+          description: Currency of every price and cost, for example `EUR`.
+        carriers:
+          type: object
+          additionalProperties: true
+          description: Factors and prices per energy carrier.
+        technologies:
+          type: object
+          additionalProperties: true
+          description: Equipment definitions, keyed by an ID that `buildings` refers to.
+        buildings:
+          type: object
+          additionalProperties: true
+          description: Settings per building, keyed by the project's building IDs.
+    InverseConfig:
+      type: object
+      additionalProperties: true
+      description: |
+        The DT Prototype inverse-model config, version 1.0. The API fills in the file
+        paths (`source.observations`, `source.weather`, `source.results`,
+        `source.project_config`, `model_dir`, `opendsm_python`) and replaces any you send.
+      required: [schema_version, source]
+      properties:
+        schema_version:
+          type: string
+          const: "1.0"
+          description: Version of the DT Prototype inverse config format.
+        operation:
+          type: string
+          enum: [fit, predict, evaluate]
+          default: fit
+          description: "`fit` learns models and scores them; `evaluate` scores saved models on new readings; `predict` applies saved models."
+        clock:
+          type: object
+          additionalProperties: true
+          description: How timestamps in the CSV files are meant, for example `{"convention":"standard","timezone":"Etc/GMT-1"}`.
+        source:
+          type: object
+          additionalProperties: true
+          description: |
+            Where readings come from. `type: csv` uses the uploaded files and needs a
+            `series` map that describes each meter series (building, carrier, meter).
+            `type: energy_run` or `thermal_monthly` uses an earlier run's results.
+        models:
+          type: array
+          default: [5p_monthly]
+          items: {}
+          description: Models to fit, such as `5p_monthly`, `opendsm_billing` or `{"backend":"opendsm_hourly","options":{"variant":"solar"}}`.
+        worker_timeout_s:
+          type: integer
+          description: Longest time, in seconds, one OpenDSM fit may run.
+    ObservationsCsv:
+      type: string
+      format: binary
+      description: |
+        Meter readings, one row per interval, with columns `series_id`,
+        `interval_start`, `interval_end`, `energy_kWh`, `split` (`train`, `validation`
+        or `test`) and `quality` (`valid` or another flag). Energy is per interval,
+        from start up to but not including end.
+    WeatherCsv:
+      type: string
+      format: binary
+      description: |
+        Hourly weather without gaps, with columns `time` and `temperature_C`, plus
+        optional `weather_id` and `ghi_Wm2` (sunlight on a horizontal surface, needed
+        by the hourly solar model).
+    AcceptancePolicy:
+      type: object
+      additionalProperties: true
+      description: |
+        Thresholds a learned model must meet, such as the largest allowed NMBE and
+        CV(RMSE) and the least training and test data.
+    PipelineConfig:
+      type: object
+      additionalProperties: true
+      description: |
+        The DT Prototype pipeline config, version 1.0. In forward mode, `energy.mode`
+        is `run` or `reuse` (send `energy_run_id`), `assessment.enabled` needs
+        `asset_results`, and `analysis.enabled` needs `inverse_config`. File-path
+        fields are filled in by the API.
+      properties:
+        schema_version:
+          type: string
+          const: "1.0"
+          description: Version of the DT Prototype pipeline config format.
+        mode:
+          type: string
+          enum: [forward, inverse]
+          default: forward
+          description: "`forward` runs energy and the optional later steps; `inverse` runs only an inverse model."
+    FootprintsFile:
+      type: string
+      format: binary
+      description: |
+        GeoJSON FeatureCollection of building footprints (Polygon or MultiPolygon) in
+        a projected coordinate system in metres. Feature properties give use, floors,
+        height and other attributes the rules read.
+    FootprintRules:
+      type: object
+      additionalProperties: true
+      description: |
+        Rules that map footprint attributes to construction types, systems and uses,
+        including accepted attribute names in several languages.
+    QuantityInputs:
+      type: string
+      format: binary
+      description: |
+        Asset quantity inputs as JSON, or as the fillable Excel workbook that ships with DT Prototype
+        (sheet `Quantities`, values only, no formulas).
+    AssetCatalogue:
+      type: object
+      additionalProperties: true
+      description: |
+        Asset definitions (insulation, heat pumps, tanks) with the unit each is
+        counted in.
+    AssetResultsCsv:
+      type: string
+      format: binary
+      description: |
+        One row per asset, metric and life-cycle stage, with 24 columns such as
+        `building_id`, `asset_id`, `module` (`LCC`, `LCA` or `MCI`), `metric_id`,
+        `value`, `unit`, `currency` and `mass_kg`.
+    AssetQuantitiesCsv:
+      type: string
+      format: binary
+      description: Resolved asset quantities, as `/assets/quantities` returns them, used to check that results match the declared amounts.
+    LifeCycleCase:
+      type: object
+      additionalProperties: true
+      description: |
+        The calculator's input case: assumptions (study period, interest and
+        inflation rates), technologies with sizes, costs, lifetimes and impact
+        factors, and yearly energy.
+    IndicatorCatalog:
+      type: object
+      additionalProperties: true
+      description: Optional list of LCA indicators that replaces the case's own `indicator_definitions`.
+    CircularityMode:
+      type: string
+      enum: [component, building]
+      description: "`component` scores the materials of one component; `building` combines component scores by mass."
+    CalculationManifest:
+      type: object
+      additionalProperties: true
+      description: |
+        The calculation's own record of the run: status, versions, input hashes,
+        settings and checks. Source-code hashes and the echoed input configuration are
+        left out, and server paths are made relative to the run storage.
+      properties:
+        status:
+          type: string
+          description: The calculation's own status, such as `complete`, `failed` or `incomplete`.
+        version:
+          type: string
+          description: Version of the DT Prototype component that ran.
+        timestamp_utc:
+          type: string
+          description: When the run started, in UTC.
+    Row:
+      type: object
+      additionalProperties:
+        type: [number, string, boolean, "null"]
+      description: |
+        One row of an output table. Columns ending in `_id` are text; numbers and
+        `true`/`false` are typed; empty cells are `null`. Energy columns are in kWh.
+    Table:
+      type: array
+      items:
+        $ref: "#/components/schemas/Row"
+      description: Rows of one output table.
+    VbddRunResult:
+      type: object
+      required: [run_id, manifest, monthly, annual, zone_sum_monthly]
+      properties:
+        run_id:
+          $ref: "#/components/schemas/RunId"
+        manifest:
+          $ref: "#/components/schemas/CalculationManifest"
+        monthly:
+          $ref: "#/components/schemas/Table"
+        annual:
+          $ref: "#/components/schemas/Table"
+        zone_sum_monthly:
+          $ref: "#/components/schemas/Table"
+      description: |
+        `monthly` has one row per case and month with the degree-day working:
+        `case_id` (`<building>__<zone>` or `<building>__collapsed`), `representation`,
+        balance temperatures (`balance_heating_C`), degree days
+        (`heating_degree_days_K_day`), and demand (`zone_heating_kWh`,
+        `ahu_heating_kWh`, `heating_kWh` and the cooling equivalents). `annual` sums
+        each case over the year. `zone_sum_monthly` adds a building's separate zones per
+        month, comparable with the other methods' `monthly` totals.
+    EnergyRunResult:
+      type: object
+      required:
+        [
+          run_id,
+          method,
+          manifest,
+          energy_monthly,
+          energy_annual,
+          service_monthly,
+          service_annual,
+        ]
+      properties:
+        run_id:
+          $ref: "#/components/schemas/RunId"
+        method:
+          type: string
+          enum: [dynamic, monthly, simplified, vbdd]
+          description: Heat-demand method the run used.
+        manifest:
+          $ref: "#/components/schemas/CalculationManifest"
+        energy_monthly:
+          type: array
+          items:
+            $ref: "#/components/schemas/EnergyRow"
+          description: One row per building, case and month (`period_id`).
+        energy_annual:
+          type: array
+          items:
+            $ref: "#/components/schemas/EnergyRow"
+          description: One row per building, case and year (`year`).
+        service_monthly:
+          type: array
+          items:
+            $ref: "#/components/schemas/ServiceRow"
+          description: One row per building, month and service.
+        service_annual:
+          type: array
+          items:
+            $ref: "#/components/schemas/ServiceRow"
+          description: One row per building, year and service.
+      description: |
+        Heat demand turned into delivered energy, CO2 and cost. All `.csv` outputs
+        (hourly intervals, zone splits, sensitivity tables, a report) stay available
+        through `GET /runs/{run_id}/files`.
+    EnergyRow:
+      type: object
+      additionalProperties:
+        type: [number, string, boolean, "null"]
+      description: |
+        One building's energy balance for a month or a year. Besides the columns
+        below, each carrier `<c>` in the energy config (`electricity`, `natural_gas`,
+        `district_heat`, `other_fuel`) has `gross_<c>_kWh` (used), `imported_<c>_kWh`
+        (bought), `<c>_import_carbon_kgCO2e`, `<c>_import_energy_cost`,
+        `<c>_import_primary_nonrenewable_kWh`, `<c>_import_primary_renewable_kWh`, and the
+        same four with `export` for energy sold. For example,
+        `natural_gas_import_carbon_kgCO2e` is the CO2 from the gas bought. Each service
+        `<s>` (`zone_heating`, `ahu_heating`, `zone_cooling`, `ahu_cooling`, `dhw`) has
+        `<s>_delivered_kWh` (energy bought for it) and `<s>_auxiliary_kWh` (electricity
+        for its pumps and controls). Columns ending in `_residual_kWh` are balance
+        checks and should be close to 0.
+      properties:
+        building_id:
+          type: string
+          description: Building ID from the project.
+        building_name:
+          type: string
+          description: Building name from the project.
+        model:
+          type: string
+          description: DT Prototype label of the heat-demand method that ran, such as `Monthly_SS` or `Dynamic_RC 5R1C`.
+        representation:
+          type: string
+          description: How zones were combined, such as `sum_of_independent_zones` or `native_single_zone`.
+        resolution:
+          type: string
+          enum: [monthly, dynamic]
+          description: Whether the energy balance ran month by month or step by step.
+        period_id:
+          type: string
+          description: Month as `YYYY-MM`; monthly rows only.
+        year:
+          type: [integer, string]
+          description: Calendar year; annual rows only.
+        zone_heating_kWh:
+          type: number
+          description: Heat the rooms need.
+        ahu_heating_kWh:
+          type: number
+          description: Heat the ventilation unit needs to warm fresh air.
+        zone_cooling_kWh:
+          type: number
+          description: Heat removed from the rooms.
+        ahu_cooling_kWh:
+          type: number
+          description: Heat removed from fresh air by the ventilation unit.
+        dhw_kWh:
+          type: number
+          description: Hot water heat need.
+        appliances_kWh:
+          type: number
+          description: Electricity for appliances and lighting.
+        fans_kWh:
+          type: number
+          description: Electricity for ventilation fans.
+        pv_generation_kWh:
+          type: number
+          description: Electricity the rooftop PV panels produced.
+        pv_self_consumed_kWh:
+          type: number
+          description: Part of the PV electricity used in the building at once.
+        gross_electricity_kWh:
+          type: number
+          description: All electricity the building used, before subtracting PV.
+        grid_import_kWh:
+          type: number
+          description: Electricity bought from the grid.
+        grid_export_kWh:
+          type: number
+          description: PV electricity sold to the grid.
+        solar_thermal_used_kWh:
+          type: number
+          description: Hot-water heat supplied by solar collectors.
+        import_primary_total_kWh:
+          type: number
+          description: Primary energy of everything bought, renewable plus non-renewable.
+        net_primary_total_kWh:
+          type: number
+          description: Primary energy bought minus the primary energy credited for exports.
+        import_carbon_kgCO2e:
+          type: number
+          description: CO2 from all energy bought.
+        net_carbon_kgCO2e:
+          type: number
+          description: CO2 from energy bought minus the CO2 credited for exports.
+        import_energy_cost:
+          type: number
+          description: Cost of all energy bought, in the config's currency.
+        export_energy_credit:
+          type: number
+          description: Money earned for energy sold.
+        net_energy_cost:
+          type: number
+          description: Cost of energy bought minus credit for energy sold.
+    ServiceRow:
+      type: object
+      additionalProperties:
+        type: [number, string, boolean, "null"]
+      description: How one service was supplied in a month or a year.
+      properties:
+        building_id:
+          type: string
+          description: Building ID from the project.
+        service:
+          type: string
+          enum: [zone_heating, ahu_heating, zone_cooling, ahu_cooling, dhw]
+          description: Room heating, ventilation heating, room cooling, ventilation cooling or hot water.
+        technology:
+          type: string
+          description: Equipment ID from the energy config that covered the service.
+        carrier:
+          type: string
+          description: Energy carrier that equipment uses.
+        useful_demand_kWh:
+          type: number
+          description: Heat the service needed.
+        delivered_kWh:
+          type: number
+          description: Energy bought to cover it.
+        auxiliary_kWh:
+          type: number
+          description: Extra electricity for pumps and controls.
+        downstream_losses_kWh:
+          type: number
+          description: Heat lost in pipes, ducts and emitters between the equipment and the rooms.
+        effective_performance:
+          type: [number, "null"]
+          description: Equipment output divided by energy bought; the effective efficiency or COP. Null when nothing was bought.
+    ValidationReport:
+      type: object
+      required: [run_id, kind, status, failed_checks, checks]
+      properties:
+        run_id:
+          $ref: "#/components/schemas/RunId"
+        schema_version:
+          type: string
+          description: Version of the report format.
+        created_utc:
+          type: string
+          description: When the checks ran, in UTC.
+        kind:
+          $ref: "#/components/schemas/ValidationKind"
+        status:
+          type: string
+          enum: [passed, failed]
+          description: "`failed` if any check failed."
+        failed_checks:
+          type: integer
+          description: Number of failed checks.
+        scope:
+          type: string
+          description: What the checks cover. They confirm inputs can be read and prepared, not that results are right.
+        checks:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValidationCheck"
+          description: Every check that ran, in order.
+      description: Result of DT Prototype's input checks.
+    ValidationCheck:
+      type: object
+      additionalProperties: true
+      properties:
+        check:
+          type: string
+          description: What was checked.
+        status:
+          type: string
+          description: "`passed` or `failed`."
+        message:
+          type: string
+          description: Explanation, including the reason for a failure.
+      description: One input check.
+    FootprintsResult:
+      type: object
+      required: [run_id, manifest, geometry, report]
+      properties:
+        run_id:
+          $ref: "#/components/schemas/RunId"
+        manifest:
+          type: object
+          additionalProperties: true
+          description: Counts of buildings and zones, the rules applied and the known limitations of the conversion.
+        geometry:
+          $ref: "#/components/schemas/TabularGeometry"
+        report:
+          allOf:
+            - $ref: "#/components/schemas/Table"
+          description: One row per building explaining what was assigned and why, with a `confidence` level.
+      description: Building tables to paste into a project's `inputs.geometry`, plus how each building was interpreted.
+    QuantitiesResult:
+      type: object
+      required: [run_id, manifest, quantities]
+      properties:
+        run_id:
+          $ref: "#/components/schemas/RunId"
+        manifest:
+          $ref: "#/components/schemas/CalculationManifest"
+        quantities:
+          allOf:
+            - $ref: "#/components/schemas/Table"
+          description: |
+            One row per building and asset: `quantity_mode` (`auto` or `direct`),
+            `estimated_quantity` or `direct_quantity`, `sizing_factor`,
+            `assessed_quantity` (the amount to value) with `quantity_unit`, and
+            `status` with a `diagnostic` when something is missing.
+      description: Resolved asset amounts per building.
+    AssessmentResult:
+      type: object
+      required:
+        [run_id, manifest, asset_results, building_assets, building_operation]
+      properties:
+        run_id:
+          $ref: "#/components/schemas/RunId"
+        manifest:
+          $ref: "#/components/schemas/CalculationManifest"
+        asset_results:
+          allOf:
+            - $ref: "#/components/schemas/Table"
+          description: The submitted per-asset rows after checking.
+        building_assets:
+          allOf:
+            - $ref: "#/components/schemas/Table"
+          description: |
+            Totals per building, module, metric and life-cycle stage, with asset
+            counts and a `status`: `complete`, `missing` or `not_applicable`.
+        building_operation:
+          allOf:
+            - $ref: "#/components/schemas/Table"
+          description: Yearly energy, CO2 and cost per building from `energy_run_id`; empty without it.
+      description: Life-cycle totals per building, next to yearly operation.
+    CalculatorResult:
+      type: object
+      required: [run_id, manifest, results, details]
+      properties:
+        run_id:
+          $ref: "#/components/schemas/RunId"
+        manifest:
+          $ref: "#/components/schemas/CalculationManifest"
+        results:
+          type: object
+          additionalProperties: true
+          description: |
+            The calculator's full result. LCC and LCA put headline values in `outputs`
+            (keys named after spreadsheet cells, such as `T560_global_cost_eur`) and
+            working values in `intermediates`; circularity puts the score in
+            `building.mci` (building mode) or per component and material.
+        details:
+          allOf:
+            - $ref: "#/components/schemas/Table"
+          description: Per-technology (LCC, LCA) or per-component or per-material (circularity) rows.
+      description: Result of one life-cycle calculator.
+    InverseResult:
+      type: object
+      required:
+        [
+          run_id,
+          manifest,
+          model_index,
+          models,
+          metrics,
+          comparison_metrics,
+          monthly_predictions,
+          predictions,
+        ]
+      properties:
+        run_id:
+          $ref: "#/components/schemas/RunId"
+        manifest:
+          $ref: "#/components/schemas/CalculationManifest"
+        model_index:
+          type: object
+          additionalProperties: true
+          description: The saved models; a later `evaluate` or `predict` refers to this run by `model_run_id`.
+        models:
+          allOf:
+            - $ref: "#/components/schemas/Table"
+          description: One row per series and model with its `status` and any warnings.
+        metrics:
+          allOf:
+            - $ref: "#/components/schemas/Table"
+          description: Accuracy per series, model and data split, including `NMBE_pct`, `CV_RMSE_pct` and `R2`.
+        comparison_metrics:
+          allOf:
+            - $ref: "#/components/schemas/Table"
+          description: The same accuracy measures on a common monthly basis, so models can be compared.
+        monthly_predictions:
+          allOf:
+            - $ref: "#/components/schemas/Table"
+          description: Observed and predicted energy per month.
+        predictions:
+          allOf:
+            - $ref: "#/components/schemas/Table"
+          description: Observed and predicted energy per original interval; can be large for hourly data.
+      description: Fitted or applied inverse models with their accuracy and predictions.
+    AcceptanceReport:
+      type: object
+      required: [run_id, status]
+      additionalProperties: true
+      properties:
+        run_id:
+          $ref: "#/components/schemas/RunId"
+        status:
+          type: string
+          enum: [accepted, review_required]
+          description: "`accepted` when every model meets the policy; otherwise `review_required`."
+        scope:
+          type: string
+          description: What the check covers.
+      description: Whether a learned model meets the policy, with reasons per model.
+    RunAccepted:
+      type: object
+      required: [run_id, status, status_url]
+      properties:
+        run_id:
+          $ref: "#/components/schemas/RunId"
+        status:
+          type: string
+          const: queued
+          description: The run is waiting for a free worker.
+        status_url:
+          type: string
+          description: Where to poll for progress and the result.
+      description: A background run was accepted.
+    RunStatus:
+      type: object
+      required: [run_id, tool, status]
+      properties:
+        run_id:
+          $ref: "#/components/schemas/RunId"
+        tool:
+          type: string
+          description: Tool that ran, such as `thermal`, `energy`, `inverse` or `pipeline`.
+        status:
+          type: string
+          enum: [staging, queued, running, complete, failed, interrupted]
+          description: Where the run is now.
+        created_utc:
+          type: string
+          description: When the request arrived, in UTC.
+        started_utc:
+          type: string
+          description: When the calculation started.
+        finished_utc:
+          type: string
+          description: When the run completed or failed.
+        error:
+          $ref: "#/components/schemas/InputProblem"
+        result:
+          type: object
+          additionalProperties: true
+          description: The endpoint's normal result; present when `status` is `complete`.
+      description: Progress and result of one run.
+    RunFiles:
+      type: object
+      required: [run_id, files]
+      properties:
+        run_id:
+          $ref: "#/components/schemas/RunId"
+        files:
+          type: array
+          items:
+            type: string
+          description: Output file paths relative to the run's output folder.
+      description: Files a run wrote.
   examples:
     DynamicRequest:
       summary: One-zone dynamic run
@@ -1723,7 +3295,7 @@ components:
             }
         weather_epw: example-city.epw
     MonthlyRequest:
-      summary: Same inputs through the monthly solver
+      summary: Same inputs through the monthly method
       value:
         project:
           run_id: example_monthly
@@ -1732,7 +3304,7 @@ components:
           operating: *sample_operating
         weather_epw: example-city.epw
     SimplifiedRequest:
-      summary: Same inputs through mapped Model 3
+      summary: Same inputs through the simplified method
       value:
         project:
           run_id: example_simplified
@@ -1917,3 +3489,123 @@ components:
                     MODEL3_GROUND_DIRECT_STEADY_INPUT,
                   ],
               }
+    EnergyConfigExample:
+      summary: Energy config for the one-building examples (illustrative factors and prices)
+      value:
+        schema_version: '1.0'
+        scenario_id: api_example
+        description: 'Illustrative example for the API docs: gas boiler, electric chiller and rooftop solar; factors and prices are not official values'
+        currency: EUR
+        carriers:
+          electricity:
+            primary_nonrenewable: 2.0
+            primary_renewable: 0.4
+            carbon_kgCO2e_per_kWh: 0.25
+            import_price_per_kWh: 0.25
+            export_primary_nonrenewable: 0
+            export_primary_renewable: 0
+            export_carbon_kgCO2e_per_kWh: 0
+            export_price_per_kWh: 0.06
+            source: Illustrative test factors/prices, not national factors, tariffs or ISO validation
+          natural_gas:
+            primary_nonrenewable: 1.1
+            primary_renewable: 0
+            carbon_kgCO2e_per_kWh: 0.2
+            import_price_per_kWh: 0.09
+            export_primary_nonrenewable: 0
+            export_primary_renewable: 0
+            export_carbon_kgCO2e_per_kWh: 0
+            export_price_per_kWh: 0
+            source: Illustrative test factors/prices, not national factors, tariffs or ISO validation
+        technologies:
+          ahu_cooling_s1:
+            carrier: electricity
+            performance:
+              coefficients: [2.27]
+              temperature_min_C: -30
+              temperature_max_C: 50
+              out_of_range: clip
+              source: supplied systems_templates.json / s1 / ahu_cooling
+            distribution_efficiency: 1.0
+            emission_efficiency: 1.0
+            regulation_efficiency: 1.0
+            auxiliary_kWh_per_kWh_generated: 0.0
+            description: 'A-A split; AHU coil: generation/distribution only'
+          ahu_heating_s8:
+            carrier: natural_gas
+            performance:
+              coefficients: [0.912156819]
+              temperature_min_C: -30
+              temperature_max_C: 50
+              out_of_range: clip
+              source: supplied systems_templates.json / s8 / ahu_heating
+            distribution_efficiency: 0.92
+            emission_efficiency: 1.0
+            regulation_efficiency: 1.0
+            auxiliary_kWh_per_kWh_generated: 0.0
+            description: 'Traditional Gas Boiler, Centralized, Low Temp Radiator; AHU coil: generation/distribution only'
+          dhw_s8:
+            carrier: natural_gas
+            performance:
+              coefficients: [0.912156819]
+              temperature_min_C: -30
+              temperature_max_C: 50
+              out_of_range: clip
+              source: supplied systems_templates.json / s8 / dhw
+            distribution_efficiency: 0.92
+            emission_efficiency: 1.0
+            regulation_efficiency: 0.882
+            auxiliary_kWh_per_kWh_generated: 0.0
+            description: Traditional Gas Boiler, Centralized, Low Temp Radiator
+          zone_cooling_s1:
+            carrier: electricity
+            performance:
+              coefficients: [2.27]
+              temperature_min_C: -30
+              temperature_max_C: 50
+              out_of_range: clip
+              source: supplied systems_templates.json / s1 / zone_cooling
+            distribution_efficiency: 1.0
+            emission_efficiency: 1.0
+            regulation_efficiency: 1.0
+            auxiliary_kWh_per_kWh_generated: 0.0
+            description: A-A split
+          zone_heating_s8:
+            carrier: natural_gas
+            performance:
+              coefficients: [0.912156819]
+              temperature_min_C: -30
+              temperature_max_C: 50
+              out_of_range: clip
+              source: supplied systems_templates.json / s8 / zone_heating
+            distribution_efficiency: 0.92
+            emission_efficiency: 1.0
+            regulation_efficiency: 0.882
+            auxiliary_kWh_per_kWh_generated: 0.0
+            description: Traditional Gas Boiler, Centralized, Low Temp Radiator
+        buildings:
+          B1:
+            services:
+              zone_heating: zone_heating_s8
+              ahu_heating: ahu_heating_s8
+              zone_cooling: zone_cooling_s1
+              ahu_cooling: ahu_cooling_s1
+              dhw: dhw_s8
+            fan_W_per_m3_h: 0.4434
+            base_auxiliary_W: 0.0
+            source: Supplied geometry/system templates. Fan coefficient from existing AHU model. No unspecified pump/standby load.
+            pv:
+              roof_coverage: 0.45
+              module_kWp_per_m2: 0.23529411764705885
+              performance_ratio: 0.85
+              factor_basis: overlap
+              monthly_factor: [0.65, 0.65, 0.65, 0.65, 0.65, 0.65, 0.65, 0.65, 0.65, 0.65, 0.65, 0.65]
+              source: PV tags and 45% roof coverage/module density from existing PV model; PR=.85 and overlap factor=.65 are illustrative assumptions
+            solar_thermal:
+              roof_coverage: 0.05
+              eta0: 0.8
+              a1_W_m2K: 3.5
+              a2_W_m2K2: 0.015
+              mean_fluid_temperature_C: 50
+              monthly_utilisation: [0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6]
+              source: Supplied ST tags; illustrative 5% roof collector area, loss coefficients, fluid temperature and monthly utilisation=.6; no tank model

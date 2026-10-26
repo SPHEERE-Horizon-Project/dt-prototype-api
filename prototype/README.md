@@ -1,64 +1,174 @@
-# DT-Prototype
+# DT-Prototype 0.5.1
 
-Three independently runnable building-energy tools, one shared input contract:
+This is the lean GitHub publication copy. Start with [upload and setup instructions](UPLOAD_TO_GITHUB.md). Monthly reference fixtures and validation summaries are included; full hourly/Excel evidence is in the [optional validation archive](docs/validation_archive.md).
 
-| Tool | Calculation | Independent launcher |
+Start with the [forward/inverse run guide](docs/running_forward_and_inverse.md)
+for setup, model selection, measured inputs, assessment settings and verification.
+The [reliability improvements](docs/reliability_improvements_20261023.md), completed
+24 October 2026, implement the agreed actions from the earlier review. See also
+[preflight input checks](docs/input_preflight.md), [measured-data validation](docs/measured_data_validation.md)
+and [version control, CI and releases](docs/release_and_ci.md).
+
+DT-Prototype is organized around five named software components. Four calculate
+thermal demand; `Energy_carriers` applies systems and renewables downstream.
+
+| Component | Calculation | Launcher |
 |---|---|---|
-| Dynamic RC | Hourly 5R1C or 7R2C; optional latent loads and technical systems | `runners/run_dynamic.py` |
-| Monthly semi-stationary | Monthly sensible zone and AHU demand | `runners/run_monthly.py` |
-| Simplified | Independent Model 3 balance; native single-zone, Simplified single-zone collapsed, or zone-sum calculation | `runners/run_simplified.py` |
+| `Dynamic_RC` | Dynamic_RC 5R1C or 7R2C | `runners/run_dynamic_rc.py` |
+| `Monthly_SS` | Monthly semi-stationary/steady-state balance | `runners/run_monthly_ss.py` |
+| `Monthly_SS_simplified` | Simplified semi-stationary monthly model, historically called Model 3, with integrated energy-signature inverse modelling | `runners/run_monthly_ss_simplified.py` |
+| `Monthly_SS_VBDD` | Variable-base degree-day model from simplified semi-stationary equations | `runners/run_monthly_ss_vbdd.py` |
+| `Energy_carriers` | Technical systems, carriers, renewables, grid exchange and impacts | `runners/run_energy_carriers.py` |
+
+The supporting `Assessment` runner consumes externally aggregated LCC, LCA and
+MCI results for physical assets, validates explicit sizing, and reports them
+beside solver-specific annual outputs without changing the five components.
+
+The supporting `run_asset_quantities.py` prepares a shared inventory using
+`auto` (estimate × factor) or `direct` (unchanged input), with m2, kW, kWh and
+litres as defined in the [asset quantity guide](docs/asset_quantities.md).
+It accepts JSON or the new fillable Excel input and does not resize the solvers.
+
+The optional [pipeline runner](docs/pipeline.md) runs the existing energy chain
+with external LCC/LCA/MCI aggregation enabled or disabled by a setting (default
+disabled). It can also reuse a compatible completed energy run. Standalone
+calculators are not invoked, and annual operation stays separate from lifetime
+asset totals.
+
+The supporting [inverse-model layer](docs/inverse_models.md) fits monthly 5P,
+OpenDSM billing and OpenDSM hourly (solar/nonsolar) models to simulated or
+measured energy. It supports saved-model prediction, held-out evaluation,
+inverse-only execution and optional analysis after forward simulation.
+OpenDSM runs in a separate pinned environment; the thermal solvers are unchanged.
+
+The authoritative five-building result is the
+[shared-energy comparison report](reports/shared_energy/comparison_report.md).
+The three current formula workbooks are indexed by the
+[workbook instructions](docs/workbook_instructions.md), with independent
+[native Excel validation evidence](reports/workbooks/workbook_validation.md).
 
 ## Install and run
 
-Use Python 3.10 or later from the project root. The September 2026 audit used Python 3.12.14. Create an environment on each machine; virtual environments are not part of the delivered software.
+Use Python 3.12 to reproduce the verified environment:
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements-verified.txt -e '.[dev]'
-python runners/run_dynamic.py --config configs/example_tabular.json --output outputs/my_dynamic --model 5R1C
-python runners/run_monthly.py --config configs/example_tabular.json --output outputs/my_monthly
-python runners/run_simplified.py --config configs/example_tabular.json --output outputs/my_simplified --zone-mode sum
-python -m dt_prototype.integration.model3 --outputs outputs/my_model3_standalone
+
+python runners/run_energy_carriers.py `
+  --config configs/example.json `
+  --energy-config configs/energy_example.json `
+  --engine all `
+  --output outputs/my_energy_comparison
 ```
 
-Each command runs independently. Use a fresh output directory every time. Alternatively use `python -m dt_prototype dynamic|monthly|simplified` with the same flags. The launchers are collected in one [runners folder](runners/README.md) and select separate engines from the installed package.
+Each thermal solver can also run independently:
 
-The pinned verification environment requires a Python version supported by those dependency releases. The package's Python 3.10 minimum is not a claim that this exact pinned set runs on 3.10. Use Python 3.12 to reproduce the audit.
+```powershell
+python runners/run_dynamic_rc.py --config configs/example_tabular.json --output outputs/my_Dynamic_RC --model 5R1C
+python runners/run_monthly_ss.py --config configs/example_tabular.json --output outputs/my_monthly
+python runners/run_monthly_ss_simplified.py --config configs/example_tabular.json --output outputs/my_simplified --zone-mode both
+python runners/run_monthly_ss_vbdd.py --config configs/example_tabular.json --output outputs/my_vbdd
+```
 
-All tools accept the same configuration. [example_tabular.json](configs/example_tabular.json) uses normalized CSV geometry; [example.json](configs/example.json) uses the equivalent GeoJSON. Input paths resolve relative to the configuration file. The authoritative physical data are in `data/examples/`; do not maintain separate copies per engine. Each run writes `monthly.csv`, `annual.csv`, detailed results, input hashes, resolved options and a manifest. A failed building is reported while other buildings continue; a failed run returns a nonzero exit code.
+External asset results can then be validated and aggregated independently:
 
-The tabular adapter joins [buildings.csv](data/examples/tabular_geometry/buildings.csv), [zones.csv](data/examples/tabular_geometry/zones.csv), and [surfaces.csv](data/examples/tabular_geometry/surfaces.csv) through stable IDs. These tables contain the exact simulation-ready geometry derived from the example GeoJSON, including one or two zones and every heat-exchange surface. They avoid polygon processing while preserving the same engine inputs. The GeoJSON route remains available when footprint geometry is the source. See [input contracts](docs/data_contracts.md).
+```powershell
+python runners/run_assessment.py --asset-results configs/asset_results_example.csv --energy-results outputs/my_energy_comparison --output outputs/my_assessment
+```
 
-For a worked procedure covering a new dataset, reuse of stored weather and libraries, versioned portfolio growth, validation and GeoJSON conversion, see [creating and extending a building dataset](docs/input_dataset_tutorial.md).
+To orchestrate energy and optional external assessment together:
 
-For simplified calculations, `--zone-mode collapsed` is the **Simplified single-zone collapsed** representation: it combines the full two-zone inputs before one solve. `sum` solves each zone then adds demands. `both` saves both in detailed results and reports the zone sum in the headline monthly/annual files. A native single-zone input requires no second-zone fields.
+```powershell
+python runners/run_pipeline.py --config configs/pipeline_example.json --output outputs/pl_off
+python runners/run_pipeline.py --config configs/pipeline_reuse_example.json --output outputs/pl_join
+```
 
-## Current results
+Output directories must be new. Thermal and energy runners use versioned inputs under
+`configs/` and `data/examples/`. GeoJSON and normalized CSV geometry routes are
+equivalent examples. The [input and result contracts](docs/data_contracts.md)
+define units, identifiers, calendars, representations and missing-value rules.
 
-- [September 2026 code audit and verification](docs/audit_20260919.md), including fixes, tests, workbook reconciliation and measured fit timings.
-- [Development and web integration guide](docs/development.md), including responsibilities, checks and current deployment limits.
-- [Refactor verification and process](docs/refactor_verification.md).
-- [Historical annual comparison, relabelled](annual_side_by_side_outputs.md).
-- [Simplified spreadsheet](spreadsheets/DT_Prototype_Simplified.xlsx). Its inputs are the mapped monthly representation; it does not directly read the common geometry or EPW sources.
-- [Zone terminology and one-zone verification](docs/zone_representation.md).
-- [Architecture and removed duplication](docs/architecture.md), [input contracts](docs/data_contracts.md), [scientific decisions](docs/decision_log.md), [source inventory](docs/source_inventory.md).
-- [Code-lineage comparison with the imported EUReCA snapshot](docs/code_lineage_comparison.md).
+Selected surfaces can now specify optional `boundary_condition=adiabatic` in
+the shared geometry tables. Missing/blank values retain existing behaviour.
+The [adiabatic surface guide](docs/adiabatic_boundaries.md) covers examples,
+retained construction/mass, renewable separation and fully enclosed-zone limits.
 
-The five case names are Test building 1–5. Stable IDs remain 1, 18, 19, 20 and 21 so joins and deterministic system calculations are preserved. Buildings 1–4 have two independent zones; building 5 has one.
+The comparable shared-energy run uses useful sensible zone demand plus separate
+net sensible AHU demand. Dynamic configuration must set `plants=false`,
+`latent=false` and `pv_battery=false`; the common downstream layer then performs
+conversion and renewable accounting once.
 
-Historical reports, archived sources and `.venv-comparison` mentioned in retained documents are not included in this folder. Reproduce evidence with the commands below. This distribution supplies Python engines and command-line tools; it does not yet include an HTTP service or web interface.
+## Current release contents
+
+- `src/dt_prototype/`: production package.
+- `configs/`, `data/examples/`: reproducible example inputs.
+- `runners/`: thin executable launchers.
+- `tests/` and the standalone module test folders: 503 automated unit, regression and integration tests, plus three unittest subtests.
+- `spreadsheets/`: the three final monthly verification workbooks.
+- `reports/shared_energy/`: compact monthly/annual reference fixtures, comparison text and historical manifest.
+- `reports/workbooks/`: native Excel summaries, workbook hashes and preservation evidence; full cell comparisons are archived separately.
+- `reports/inverse_models_20261021/`: inverse-model implementation and validation evidence.
+- `reports/reliability_review_20261022/`: current forward/inverse reliability review and reproducible evidence.
+- `docs/`: current architecture, methods, contracts and extension guidance.
+- `scripts/`: release/result verification utilities.
+- `to_be_integrated/`: standalone LCC, LCA and Circularity code and verification workbooks.
+
+The root [comparison_report.md](comparison_report.md) is the supplied historical
+thermal comparison used as a regression fixture. The current full result is the
+report under `reports/shared_energy/`.
 
 ## Verification
 
 ```powershell
-python -m pytest -q -p no:cacheprovider --basetemp outputs/test_temp_new
-python scripts/compare_tools.py --run-id NEW_COMPARISON
-python scripts/compare_tools.py --worker dynamic --diagnostic --output outputs/NEW_DIAGNOSTICS
+python -m pytest -q -p no:cacheprovider --junitxml=outputs/my_checks/tests.xml
+python -m dt_prototype.monthly_ss_simplified.model3.test_model3
+# After a new all-engine pipeline run; 506 JUnit records include 3 subtests:
+python scripts/audit_shared_energy_delivery.py --output outputs/pl_off/energy --config configs/example.json --pytest-xml outputs/my_checks/tests.xml
+python scripts/verify_release.py --energy-results outputs/pl_off/energy --expected-tests 506 --output outputs/my_checks/release.json
+python scripts/verify_assessments.py
+
+# Optional: extract the validation archive first, then regenerate and compare all 318 tables:
+python runners/run_energy_carriers.py --config configs/example.json --energy-config configs/energy_example.json --engine all --output outputs/reproduction_check
+python scripts/verify_reproduction.py --reference validation_archive/reports/shared_energy --candidate outputs/reproduction_check --allow-code-changes
 ```
 
-The reproduction sequence and workbook requirements are in the [development guide](docs/development.md). The independent Model 3 source, standalone pipeline and golden reference CSVs are together in `src/dt_prototype/integration/model3/`; its common-output adapter is `src/dt_prototype/integration/engines/model3.py`. Earlier sources and superseded reports may be retained separately under `archive/`; active execution does not import them. Required attribution remains in LICENSE and THIRD_PARTY_NOTICES.md.
+The current implementation passes 503 tests and three subtests, including the
+standalone LCC, LCA and Circularity suites. See the
+[implementation report](docs/reliability_improvements_20261023.md) for scope and evidence.
+The earlier [22 October review](docs/reliability_review_20261022.md) records its
+473-test baseline; its proposed reliability improvements are now implemented.
+Earlier source states are recorded by the
+[asset quantity implementation report](reports/asset_quantities_20261021/implementation_report.md)
+for mode, Excel and five-building regression evidence. The earlier
+[adiabatic boundary implementation report](reports/adiabatic_boundaries_20261015/implementation_report.md)
+records the 25 new boundary checks and a fresh comparison of all 318 result
+tables with zero numeric difference. The earlier
+[15 October code audit](docs/code_audit_20261015.md) records the preceding
+322-test source state. The frozen shared-energy release evidence retains
+its original 273-test record. Native Excel passed 66,748
+numeric comparisons and 530 identity, scenario, perturbation and save/reopen
+checks, with zero failures or formula errors. The release verifier also checks
+source/input hashes, result row counts, workbook hashes, cached PASS states and
+local documentation links. The retained machine-readable
+[release audit — full archive](docs/validation_archive.md#reports-release-verification-json) and
+[fresh-run comparison — full archive](docs/validation_archive.md#reports-reproduction-verification-json) record historical
+checks; that run compared 318 CSV/CSV.GZ files with zero numeric difference.
 
-For a compact GitHub repository, keep `src/`, `configs/`, `data/examples/`, `runners/`, `tests/`, the relevant `docs/` and verification scripts, plus the root package, licence and notice files. Generated `outputs/`, `archive/`, virtual environments, caches, `scripts/node_modules/` and installed-package metadata are not required for execution. Keep `src/dt_prototype/integration/model3/reference_outputs/` because those immutable files protect the Model 3 baseline. Keep the spreadsheet only if workbook delivery is part of the repository scope. The detailed keep/omit list is in [repository contents](docs/repository_contents.md).
+The release verifier defaults to the frozen historical run and deliberately
+rejects different source hashes. Use `--energy-results` for a newly regenerated
+baseline and declare its exact `--expected-tests` JUnit count. This preserves
+historical evidence rather than relabelling it as a test of changed source.
 
-These runs verify software preservation and compare models. They do not establish measured-data accuracy or normative compliance.
+Start with [architecture](docs/architecture.md),
+[shared energy](docs/shared_energy_layer.md),
+[asset assessment integration](docs/assessment_integration.md),
+[Monthly_SS_VBDD methodology](docs/vbdd_methodology.md),
+[workbook instructions](docs/workbook_instructions.md) and
+[development guidance](docs/development.md).
+
+These results establish software consistency and model-to-model comparisons.
+They do not establish measured-building accuracy or ISO conformity. Required
+licensing and attribution are in [LICENSE](LICENSE) and
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

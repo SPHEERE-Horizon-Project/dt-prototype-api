@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "description": "Demonstration inventory only: one 42 kW HP group per building, not inferred or applied to simulation plant.",
+  "default_mode": "direct",
+  "buildings": [
+    {"assessment_id":"pipeline-demo","building_id":"1","assets":[{"asset_id":"heat_pump_system","catalogue_id":"heat_pump_system","direct_quantity":42,"scope_action":"installed","source":"Illustrative direct quantity; no plant feedback"}]},
+    {"assessment_id":"pipeline-demo","building_id":"18","assets":[{"asset_id":"heat_pump_system","catalogue_id":"heat_pump_system","direct_quantity":42,"scope_action":"installed","source":"Illustrative direct quantity; no plant feedback"}]},
+    {"assessment_id":"pipeline-demo","building_id":"19","assets":[{"asset_id":"heat_pump_system","catalogue_id":"heat_pump_system","direct_quantity":42,"scope_action":"installed","source":"Illustrative direct quantity; no plant feedback"}]},
+    {"assessment_id":"pipeline-demo","building_id":"20","assets":[{"asset_id":"heat_pump_system","catalogue_id":"heat_pump_system","direct_quantity":42,"scope_action":"installed","source":"Illustrative direct quantity; no plant feedback"}]},
+    {"assessment_id":"pipeline-demo","building_id":"21","assets":[{"asset_id":"heat_pump_system","catalogue_id":"heat_pump_system","direct_quantity":42,"scope_action":"installed","source":"Illustrative direct quantity; no plant feedback"}]}
+  ]
+}

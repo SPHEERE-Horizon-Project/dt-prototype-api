@@ -26,10 +26,13 @@ behaviour.
 from __future__ import annotations
 
 import json
+from ..json_io import load_json
 import math
 import warnings
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
+
+from dt_prototype.common.surface_boundaries import validate_boundary_condition
 
 
 @dataclass
@@ -49,12 +52,19 @@ class SurfaceSpec:
         meaningful for vertical surfaces only.
     tilt : float
         Tilt from horizontal [deg]: 90 vertical, 0 horizontal.
+    boundary_condition : str
+        ``auto`` (default) retains the surface-type convention. ``adiabatic``
+        disables external heat exchange while retaining the physical surface.
     """
 
     surface_type: str
     area: float
     azimuth: float = 0.0
     tilt: float = 90.0
+    boundary_condition: str = "auto"
+
+    def __post_init__(self) -> None:
+        validate_boundary_condition(self.boundary_condition)
 
 
 @dataclass
@@ -558,7 +568,7 @@ def load_district_geojson(path: str | Path) -> list[BuildingGeometry]:
     -------
     list of BuildingGeometry
     """
-    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    data = load_json(path)
     if data.get("type") != "FeatureCollection":
         raise ValueError(f"{path}: expected a GeoJSON FeatureCollection")
     return [building_geometry_from_feature(f) for f in data.get("features", [])]

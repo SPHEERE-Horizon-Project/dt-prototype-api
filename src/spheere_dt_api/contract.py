@@ -13,6 +13,7 @@ PROJECT_SCHEMAS = {
     "dynamic": "DynamicProject",
     "monthly": "MonthlyProject",
     "simplified": "SimplifiedProject",
+    "vbdd": "VbddProject",
 }
 
 
@@ -22,7 +23,7 @@ def openapi_spec() -> dict:
     return yaml.safe_load(SPEC_PATH.read_text(encoding="utf-8"))
 
 
-@lru_cache(maxsize=3)
+@lru_cache(maxsize=None)
 def project_validator(engine: str) -> jsonschema.Draft202012Validator:
     """Build the project schema validator for one engine."""
     schema = {

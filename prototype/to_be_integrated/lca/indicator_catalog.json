@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "source": {
+    "title": "Level(s) indicator 1.2 user manual, Table 6",
+    "url": "https://susproc.jrc.ec.europa.eu/product-bureau/sites/default/files/2021-01/UM3_Indicator_1.2_v1.1_37pp.pdf",
+    "note": "The local file named 'LCA indicators Levels selected' was not present when this catalog was created. This catalog follows the full Level(s)/EN 15804 core impact-category table and retains the legacy primary-energy metric."
+  },
+  "indicator_definitions": [
+    {"id": "primary_energy", "name": "Embodied primary energy", "unit": "kWh", "factor_unit": "kWh per declared quantity unit", "legacy_factor_key": "embodied_energy_kwh_per_unit", "legacy_renovation_key": "embodied_energy_kwh_per_m2_inferred_from_formula"},
+    {"id": "gwp_total", "name": "Global warming potential - total", "unit": "kg CO2e", "factor_unit": "kg CO2e per declared quantity unit", "legacy_factor_key": "embodied_carbon_kg_per_unit", "legacy_renovation_key": "embodied_carbon_kg_per_m2"},
+    {"id": "gwp_fossil", "name": "Global warming potential - fossil", "unit": "kg CO2e", "factor_unit": "kg CO2e per declared quantity unit"},
+    {"id": "gwp_biogenic", "name": "Global warming potential - biogenic", "unit": "kg CO2e", "factor_unit": "kg CO2e per declared quantity unit"},
+    {"id": "gwp_luluc", "name": "Global warming potential - land use and land-use change", "unit": "kg CO2e", "factor_unit": "kg CO2e per declared quantity unit"},
+    {"id": "odp", "name": "Stratospheric ozone depletion potential", "unit": "kg CFC-11e", "factor_unit": "kg CFC-11e per declared quantity unit"},
+    {"id": "ap", "name": "Acidification potential, accumulated exceedance", "unit": "mol H+e", "factor_unit": "mol H+e per declared quantity unit"},
+    {"id": "ep_freshwater", "name": "Eutrophication potential - freshwater", "unit": "kg PO4e", "factor_unit": "kg PO4e per declared quantity unit"},
+    {"id": "ep_marine", "name": "Eutrophication potential - marine", "unit": "kg Ne", "factor_unit": "kg Ne per declared quantity unit"},
+    {"id": "ep_terrestrial", "name": "Eutrophication potential - terrestrial", "unit": "mol Ne", "factor_unit": "mol Ne per declared quantity unit"},
+    {"id": "pocp", "name": "Photochemical ozone formation potential", "unit": "kg NMVOCe", "factor_unit": "kg NMVOCe per declared quantity unit"},
+    {"id": "adp_minerals_metals", "name": "Abiotic depletion potential - minerals and metals", "unit": "kg Sbe", "factor_unit": "kg Sbe per declared quantity unit"},
+    {"id": "adp_fossil", "name": "Abiotic depletion potential - fossil resources", "unit": "MJ net calorific value", "factor_unit": "MJ net calorific value per declared quantity unit"},
+    {"id": "wdp", "name": "Water deprivation potential", "unit": "m3 world-e deprived", "factor_unit": "m3 world-e deprived per declared quantity unit"}
+  ]
+}

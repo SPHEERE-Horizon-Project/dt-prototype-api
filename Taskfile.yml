@@ -52,7 +52,12 @@ tasks:
     desc: Run API and copied prototype tests
     cmds:
       - uv run --extra dev pytest -q tests
-      - uv run --extra dev pytest -q -c prototype/pyproject.toml prototype/tests
+      # OpenDSM tests need the separate worker environment (see setup:opendsm).
+      - >-
+        uv run --extra dev pytest -q -p no:cacheprovider -c prototype/pyproject.toml
+        prototype/tests prototype/to_be_integrated/lcc/tests prototype/to_be_integrated/lca/tests
+        prototype/to_be_integrated/circularity/tests
+        {{if not .DT_OPENDSM_PYTHON}}-m "not opendsm"{{end}}
 
   lint:
     desc: Lint the API, helper scripts, and API tests
@@ -92,6 +97,26 @@ tasks:
     silent: true
     cmds:
       - uv run --extra dev python scripts/example_call.py simplified
+
+  example:vbdd:
+    desc: Run the one-zone degree-day example against the local server
+    silent: true
+    cmds:
+      - uv run --extra dev python scripts/example_call.py vbdd
+
+  example:energy:
+    desc: Run the one-zone energy example (monthly method) against the local server
+    silent: true
+    cmds:
+      - uv run --extra dev python scripts/example_call.py monthly --energy
+
+  setup:opendsm:
+    desc: Create the separate OpenDSM environment in .venv-opendsm for inverse-model tests
+    cmds:
+      # Copies, not symlinks: DT Prototype resolves the interpreter path before running it.
+      - uv run --no-project --python 3.12 python -m venv --copies --without-pip .venv-opendsm
+      - uv pip install --python .venv-opendsm/bin/python -r prototype/requirements-opendsm-verified.txt
+      - echo "Set DT_OPENDSM_PYTHON=$PWD/.venv-opendsm/bin/python to use it"
 
   compose:up:
     desc: Build and start the Compose stack at http://127.0.0.1:8000

@@ -1,0 +1,425 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dt-prototype:input:v1:inverse",
+  "title": "DT Prototype inverse contract v1",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "operation": {
+      "enum": [
+        "fit",
+        "predict",
+        "evaluate"
+      ]
+    },
+    "source": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "csv"
+            },
+            "observations": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "weather": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "series": {
+              "type": "object",
+              "minProperties": 1,
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "source_type": {
+                    "enum": [
+                      "measured",
+                      "simulated"
+                    ]
+                  },
+                  "source_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "building_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "scenario_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "carrier": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "meter_boundary_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "weather_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "zone_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "model": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "representation": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  }
+                },
+                "required": [
+                  "source_type",
+                  "source_id",
+                  "building_id",
+                  "scenario_id",
+                  "carrier",
+                  "meter_boundary_id",
+                  "weather_id"
+                ],
+                "additionalProperties": false
+              },
+              "propertyNames": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            },
+            "train_end": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "validation_end": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          },
+          "required": [
+            "type",
+            "observations",
+            "weather",
+            "series"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "energy_run",
+                "thermal_monthly"
+              ]
+            },
+            "results": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "project_config": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "resolution": {
+              "enum": [
+                "monthly",
+                "hourly"
+              ]
+            },
+            "target": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "buildings": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "models": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "carrier": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "meter_boundary_id": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "train_end": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "validation_end": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          },
+          "required": [
+            "type",
+            "results",
+            "project_config"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "clock": {
+      "type": "object",
+      "properties": {
+        "convention": {
+          "enum": [
+            "standard",
+            "civil",
+            "utc"
+          ]
+        },
+        "timezone": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "convention",
+        "timezone"
+      ],
+      "additionalProperties": false
+    },
+    "models": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "enum": [
+              "5p_monthly",
+              "opendsm_billing",
+              "opendsm_hourly"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "backend": {
+                "const": "5p_monthly"
+              },
+              "options": {
+                "type": "object",
+                "properties": {
+                  "fit": {
+                    "type": "object",
+                    "properties": {
+                      "heating_change_point_min_C": {
+                        "type": "number"
+                      },
+                      "heating_change_point_max_C": {
+                        "type": "number"
+                      },
+                      "cooling_change_point_min_C": {
+                        "type": "number"
+                      },
+                      "cooling_change_point_max_C": {
+                        "type": "number"
+                      },
+                      "change_point_step_C": {
+                        "type": "number"
+                      },
+                      "minimum_observations": {
+                        "type": "number"
+                      },
+                      "minimum_regime_observations": {
+                        "type": "number"
+                      },
+                      "minimum_temperature_span_C": {
+                        "type": "number"
+                      },
+                      "coefficient_lower_bound": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "backend"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "backend": {
+                "const": "opendsm_billing"
+              },
+              "options": {
+                "type": "object",
+                "properties": {
+                  "seed": {
+                    "type": "integer"
+                  },
+                  "allow_disqualified": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "backend"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "backend": {
+                "const": "opendsm_hourly"
+              },
+              "options": {
+                "type": "object",
+                "properties": {
+                  "seed": {
+                    "type": "integer"
+                  },
+                  "allow_disqualified": {
+                    "type": "boolean"
+                  },
+                  "variant": {
+                    "enum": [
+                      "solar",
+                      "nonsolar"
+                    ]
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "backend"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "minItems": 1
+    },
+    "model_dir": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "opendsm_python": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "worker_timeout_s": {
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "source"
+  ],
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "source": {
+            "properties": {
+              "type": {
+                "const": "csv"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "clock"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {
+            "enum": [
+              "predict",
+              "evaluate"
+            ]
+          }
+        },
+        "required": [
+          "operation"
+        ]
+      },
+      "then": {
+        "required": [
+          "model_dir"
+        ]
+      }
+    }
+  ]
+}

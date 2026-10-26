@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import dataclasses
 import json
+from ..json_io import load_json
 import zlib
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -139,7 +140,7 @@ class BuildingInput:
     @classmethod
     def from_json(cls, path: str | Path) -> "BuildingInput":
         """Load canonical zoned or legacy flat CURRENT serialisation."""
-        payload = json.loads(Path(path).read_text(encoding="utf-8"))
+        payload = load_json(path)
         geometry = BuildingGeometry.from_dict(payload["geometry"])
         envelope = EnvelopeArchetype.from_dict(payload["envelope"])
         schedule_payloads = payload.get("schedules")
@@ -166,7 +167,7 @@ class DistrictInput:
     Returned by :func:`preprocess_geometries`, :func:`preprocess_district` or
     :func:`preprocess_tabular_district`.
     Run a pre-flight reference check with
-    ``dt_prototype.dynamic.validation.validate_district`` before simulating.
+    ``dt_prototype.dynamic_rc.validation.validate_district`` before simulating.
     """
 
     weather: WeatherData

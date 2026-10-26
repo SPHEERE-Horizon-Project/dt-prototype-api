@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "description": "First run pipeline_example.json to outputs/pl_off; then reuse its energy without rerunning solvers. Demonstration asset coverage only.",
+  "project_config": "example.json",
+  "energy_config": "energy_example.json",
+  "energy": {"mode": "reuse", "results": "../outputs/pl_off/energy"},
+  "assessment": {
+    "enabled": true,
+    "assessment_id": "pipeline-demo",
+    "modules": ["LCC", "LCA", "MCI"],
+    "asset_results": "pipeline_assets_example.csv",
+    "resolved_quantities": "pipeline_quantities_example.csv",
+    "design_note": "Demonstration 42 kW assessed HP group only; not reconciled to installed simulation equipment. No whole-building valuation or quantity-to-plant feedback."
+  }
+}

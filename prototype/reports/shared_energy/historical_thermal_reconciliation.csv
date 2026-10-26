@@ -1,0 +1,51 @@
+building_name,model,quantity,historical_MWh,fresh_MWh,difference_MWh,within_display_rounding
+Test building 1,Dynamic_RC 5R1C,heating,304.4,304.40001422083003,1.422083005309105e-05,True
+Test building 1,Dynamic_RC 7R2C,heating,318.32,318.31518736636906,-0.00481263363093376,True
+Test building 1,Monthly_SS,heating,320.08,320.0809423646359,0.0009423646359323357,True
+Test building 1,Monthly_SS_simplified collapsed,heating,296.79,296.78546723588244,-0.00453276411758452,True
+Test building 1,Monthly_SS_simplified zone sum,heating,315.68,315.683191767771,0.0031917677709998316,True
+Test building 2,Dynamic_RC 5R1C,heating,128.68,128.67716032572335,-0.0028396742766574334,True
+Test building 2,Dynamic_RC 7R2C,heating,138.92,138.91919194020778,-0.0008080597922059951,True
+Test building 2,Monthly_SS,heating,138.05,138.05439022627903,0.004390226279014087,True
+Test building 2,Monthly_SS_simplified collapsed,heating,128.19,128.19117820977985,0.0011782097798516133,True
+Test building 2,Monthly_SS_simplified zone sum,heating,137.66,137.6557605115078,-0.004239488492203236,True
+Test building 3,Dynamic_RC 5R1C,heating,300.03,300.02892513718473,-0.0010748628152441597,True
+Test building 3,Dynamic_RC 7R2C,heating,314.57,314.57118042519477,0.0011804251947751254,True
+Test building 3,Monthly_SS,heating,304.31,304.3135401661039,0.003540166103903175,True
+Test building 3,Monthly_SS_simplified collapsed,heating,290.53,290.5348982783884,0.004898278388452582,True
+Test building 3,Monthly_SS_simplified zone sum,heating,301.33,301.32985116324147,-0.0001488367585125161,True
+Test building 4,Dynamic_RC 5R1C,heating,1181.83,1181.8266447872104,-0.003355212789529105,True
+Test building 4,Dynamic_RC 7R2C,heating,1224.84,1224.842060082211,0.002060082211073677,True
+Test building 4,Monthly_SS,heating,1159.57,1159.574989227716,0.004989227716123423,True
+Test building 4,Monthly_SS_simplified collapsed,heating,1145.2,1145.2021048355643,0.0021048355642960814,True
+Test building 4,Monthly_SS_simplified zone sum,heating,1150.35,1150.350431073607,0.00043107360716021503,True
+Test building 5,Dynamic_RC 5R1C,heating,3022.51,3022.512920062312,0.0029200623116594215,True
+Test building 5,Dynamic_RC 7R2C,heating,3093.02,3093.017858696914,-0.0021413030858639104,True
+Test building 5,Monthly_SS,heating,2931.19,2931.1876036937238,-0.0023963062762959453,True
+Test building 5,Monthly_SS_simplified collapsed,heating,2908.48,2908.4779029754022,-0.002097024597787822,True
+Test building 5,Monthly_SS_simplified zone sum,heating,2908.48,2908.4779029754022,-0.002097024597787822,True
+Test building 1,Dynamic_RC 5R1C,cooling,63.8,63.800648703107576,0.0006487031075792515,True
+Test building 1,Dynamic_RC 7R2C,cooling,62.88,62.87987431242127,-0.00012568757873054892,True
+Test building 1,Monthly_SS,cooling,72.1,72.10416712646662,0.004167126466626314,True
+Test building 1,Monthly_SS_simplified collapsed,cooling,66.93,66.9319798838273,0.001979883827289086,True
+Test building 1,Monthly_SS_simplified zone sum,cooling,69.2,69.19643856213855,-0.00356143786144969,True
+Test building 2,Dynamic_RC 5R1C,cooling,30.34,30.342020843340165,0.0020208433401656123,True
+Test building 2,Dynamic_RC 7R2C,cooling,29.81,29.808706032802075,-0.001293967197923962,True
+Test building 2,Monthly_SS,cooling,34.29,34.28946526826629,-0.0005347317337083268,True
+Test building 2,Monthly_SS_simplified collapsed,cooling,32.42,32.42226500485733,0.002265004857328279,True
+Test building 2,Monthly_SS_simplified zone sum,cooling,34.27,34.27055035490047,0.0005503549004686192,True
+Test building 3,Dynamic_RC 5R1C,cooling,35.15,35.15367837423712,0.0036783742371184758,True
+Test building 3,Dynamic_RC 7R2C,cooling,34.18,34.178489156975154,-0.0015108430248460536,True
+Test building 3,Monthly_SS,cooling,37.86,37.86294813146074,0.0029481314607409104,True
+Test building 3,Monthly_SS_simplified collapsed,cooling,35.71,35.713565565743394,0.003565565743393506,True
+Test building 3,Monthly_SS_simplified zone sum,cooling,37.47,37.47367676566605,0.0036767656660501302,True
+Test building 4,Dynamic_RC 5R1C,cooling,72.8,72.79621207807475,-0.0037879219252516805,True
+Test building 4,Dynamic_RC 7R2C,cooling,68.98,68.97791557226488,-0.002084427735127292,True
+Test building 4,Monthly_SS,cooling,84.64,84.63712517990382,-0.002874820096181452,True
+Test building 4,Monthly_SS_simplified collapsed,cooling,79.26,79.25658845352329,-0.0034115464767126014,True
+Test building 4,Monthly_SS_simplified zone sum,cooling,79.06,79.06386683266982,0.0038668326698143574,True
+Test building 5,Dynamic_RC 5R1C,cooling,216.78,216.7774101861933,-0.0025898138067077525,True
+Test building 5,Dynamic_RC 7R2C,cooling,206.17,206.16516274437507,-0.0048372556249205445,True
+Test building 5,Monthly_SS,cooling,269.09,269.08910759650377,-0.0008924034962092264,True
+Test building 5,Monthly_SS_simplified collapsed,cooling,254.32,254.31501598519634,-0.004984014803653736,True
+Test building 5,Monthly_SS_simplified zone sum,cooling,254.32,254.31501598519634,-0.004984014803653736,True

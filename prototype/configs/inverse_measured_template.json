@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "description": "UNFILLED TEMPLATE: supply real interval energy and hourly weather before running.",
+  "operation": "fit",
+  "clock": {"convention": "civil", "timezone": "Europe/Rome"},
+  "source": {
+    "type": "csv",
+    "observations": "../data/private/observations.csv",
+    "weather": "../data/private/weather.csv",
+    "series": {
+      "building-001/import": {
+        "source_type": "measured",
+        "source_id": "REPLACE_WITH_METER_DATASET_ID",
+        "building_id": "001",
+        "scenario_id": "operation-baseline",
+        "carrier": "electricity",
+        "meter_boundary_id": "electricity_grid_import",
+        "weather_id": "local-station"
+      }
+    }
+  },
+  "models": ["5p_monthly"]
+}

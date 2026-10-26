@@ -1,0 +1,623 @@
+{
+  "schema_version": "1.0",
+  "case_id": "workbook_cached_design_1_lyon",
+  "source": {
+    "workbook": "energy_model/outputs/revised_energy_model.xlsx",
+    "sha256": "379531a7c90bffe7818db93393cf7333fefdad780146833de98a0cd4a490d3da",
+    "worksheet": "ENERGY MODEL-DSS",
+    "selected_rows": "506-564",
+    "selection": "Design option 1; Lyon; cached benchmark values"
+  },
+  "assumptions": {
+    "project_lifetime_years": 30,
+    "market_interest_rate_nominal": 0.05,
+    "market_inflation_rate": 0.02,
+    "product_inflation_rate": 0.02,
+    "electricity_inflation_rate": 0.05,
+    "fuel_inflation_rate_source_input_unused_in_selected_formula_block": 0.04,
+    "maintenance_inflation_rate": 0.04,
+    "export_price_eur_per_kwh": 0.07,
+    "import_price_eur_per_kwh": 0.21,
+    "demolition_cost_fraction": 0.06,
+    "facade_surface_multiplier": 1,
+    "roof_surface_multiplier": 1,
+    "basement_surface_multiplier": 1
+  },
+  "renovation": {
+    "other_installation_cost_eur_per_m2": 0,
+    "area_m2": 1112.8,
+    "net_floor_area_m2": 1112.8
+  },
+  "annual_energy": {
+    "exported_electricity_kwh": 0,
+    "imported_electricity_kwh": 36973.5636644548,
+    "baseline_electricity_bill_eur": 26707.2,
+    "baseline_fuel_bill_eur": 0
+  },
+  "technologies": [
+    {
+      "code": "A81",
+      "name": "Façade insulation",
+      "cost_per_unit": 95.25,
+      "cost_unit": "€/m2",
+      "size": 1027.42,
+      "size_unit": "m2",
+      "lifetime_years": 40,
+      "replacement_cost_fraction": 1,
+      "maintenance_rate_per_year": 0,
+      "source_cost_cell": "ENERGY MODEL-DSS!T523",
+      "source_size_cell": "ENERGY MODEL-DSS!T524",
+      "source_lifetime_cell": "ENERGY MODEL-DSS!T525",
+      "source_replacement_fraction_cell": "ENERGY MODEL-DSS!T526",
+      "source_maintenance_rate_cell": "ENERGY MODEL-DSS!T527",
+      "asset_id": "facade_insulation",
+      "category_id": "envelope.wall.insulation",
+      "building_layer": "envelope",
+      "scope_action": "installed",
+      "base_size": 1027.42,
+      "sizing_factor": 1.0,
+      "sizing_basis": "retrofitted façade area"
+    },
+    {
+      "code": "A82",
+      "name": "Roof insulation",
+      "cost_per_unit": 23.83,
+      "cost_unit": "€/m2",
+      "size": 616,
+      "size_unit": "m2",
+      "lifetime_years": 40,
+      "replacement_cost_fraction": 1,
+      "maintenance_rate_per_year": 0,
+      "source_cost_cell": "ENERGY MODEL-DSS!U523",
+      "source_size_cell": "ENERGY MODEL-DSS!U524",
+      "source_lifetime_cell": "ENERGY MODEL-DSS!U525",
+      "source_replacement_fraction_cell": "ENERGY MODEL-DSS!U526",
+      "source_maintenance_rate_cell": "ENERGY MODEL-DSS!U527",
+      "asset_id": "roof_insulation",
+      "category_id": "envelope.roof.insulation",
+      "building_layer": "envelope",
+      "scope_action": "installed",
+      "base_size": 616,
+      "sizing_factor": 1.0,
+      "sizing_basis": "retrofitted roof area"
+    },
+    {
+      "code": "A83",
+      "name": "Basement insulation",
+      "cost_per_unit": 95.25,
+      "cost_unit": "€/m2",
+      "size": 629,
+      "size_unit": "m2",
+      "lifetime_years": 40,
+      "replacement_cost_fraction": 1,
+      "maintenance_rate_per_year": 0,
+      "source_cost_cell": "ENERGY MODEL-DSS!V523",
+      "source_size_cell": "ENERGY MODEL-DSS!V524",
+      "source_lifetime_cell": "ENERGY MODEL-DSS!V525",
+      "source_replacement_fraction_cell": "ENERGY MODEL-DSS!V526",
+      "source_maintenance_rate_cell": "ENERGY MODEL-DSS!V527",
+      "asset_id": "basement_insulation",
+      "category_id": "envelope.ground.insulation",
+      "building_layer": "envelope",
+      "scope_action": "installed",
+      "base_size": 629,
+      "sizing_factor": 1.0,
+      "sizing_basis": "retrofitted basement area"
+    },
+    {
+      "code": "A84",
+      "name": "Glazing system",
+      "cost_per_unit": 293.95,
+      "cost_unit": "€/m2",
+      "size": 182.57999999999998,
+      "size_unit": "m2",
+      "lifetime_years": 30,
+      "replacement_cost_fraction": 1,
+      "maintenance_rate_per_year": 0,
+      "source_cost_cell": "ENERGY MODEL-DSS!W523",
+      "source_size_cell": "ENERGY MODEL-DSS!W524",
+      "source_lifetime_cell": "ENERGY MODEL-DSS!W525",
+      "source_replacement_fraction_cell": "ENERGY MODEL-DSS!W526",
+      "source_maintenance_rate_cell": "ENERGY MODEL-DSS!W527",
+      "asset_id": "glazing_system",
+      "category_id": "envelope.window.glazing",
+      "building_layer": "envelope",
+      "scope_action": "installed",
+      "base_size": 182.57999999999998,
+      "sizing_factor": 1.0,
+      "sizing_basis": "replaced glazed area"
+    },
+    {
+      "code": "A85",
+      "name": "Heat pump system",
+      "cost_per_unit": 10000,
+      "cost_unit": "€/unit",
+      "size": 3,
+      "size_unit": "unit",
+      "lifetime_years": 15,
+      "replacement_cost_fraction": 1,
+      "maintenance_rate_per_year": 0,
+      "source_cost_cell": "ENERGY MODEL-DSS!X523",
+      "source_size_cell": "ENERGY MODEL-DSS!X524",
+      "source_lifetime_cell": "ENERGY MODEL-DSS!X525",
+      "source_replacement_fraction_cell": "ENERGY MODEL-DSS!X526",
+      "source_maintenance_rate_cell": "ENERGY MODEL-DSS!X527",
+      "asset_id": "heat_pump_system",
+      "category_id": "technical_system.heat_pump_group",
+      "building_layer": "technical_system",
+      "scope_action": "installed",
+      "base_size": 3,
+      "sizing_factor": 1.0,
+      "sizing_basis": "three heat pumps in the system"
+    },
+    {
+      "code": "A86",
+      "name": "Water tank",
+      "cost_per_unit": 1300,
+      "cost_unit": "€/unit",
+      "size": 0,
+      "size_unit": "unit",
+      "lifetime_years": 30,
+      "replacement_cost_fraction": 1,
+      "maintenance_rate_per_year": 0,
+      "source_cost_cell": "ENERGY MODEL-DSS!Y523",
+      "source_size_cell": "ENERGY MODEL-DSS!Y524",
+      "source_lifetime_cell": "ENERGY MODEL-DSS!Y525",
+      "source_replacement_fraction_cell": "ENERGY MODEL-DSS!Y526",
+      "source_maintenance_rate_cell": "ENERGY MODEL-DSS!Y527",
+      "asset_id": "water_tank",
+      "category_id": "technical_system.water_tank",
+      "building_layer": "technical_system",
+      "scope_action": "installed",
+      "base_size": 0,
+      "sizing_factor": 1.0,
+      "sizing_basis": "installed water tanks"
+    },
+    {
+      "code": "A87",
+      "name": "BACS (Building Automation and Control Systems)",
+      "cost_per_unit": 5000,
+      "cost_unit": "€/unit",
+      "size": 3,
+      "size_unit": "unit",
+      "lifetime_years": 30,
+      "replacement_cost_fraction": 1,
+      "maintenance_rate_per_year": 0,
+      "source_cost_cell": "ENERGY MODEL-DSS!Z523",
+      "source_size_cell": "ENERGY MODEL-DSS!Z524",
+      "source_lifetime_cell": "ENERGY MODEL-DSS!Z525",
+      "source_replacement_fraction_cell": "ENERGY MODEL-DSS!Z526",
+      "source_maintenance_rate_cell": "ENERGY MODEL-DSS!Z527",
+      "asset_id": "bacs",
+      "category_id": "control.bacs",
+      "building_layer": "control",
+      "scope_action": "installed",
+      "base_size": 3,
+      "sizing_factor": 1.0,
+      "sizing_basis": "BACS installation quantity"
+    },
+    {
+      "code": "A88",
+      "name": "Fan coils HVAC",
+      "cost_per_unit": 1000,
+      "cost_unit": "€/unit",
+      "size": 20,
+      "size_unit": "unit",
+      "lifetime_years": 12,
+      "replacement_cost_fraction": 1,
+      "maintenance_rate_per_year": 0,
+      "source_cost_cell": "ENERGY MODEL-DSS!AA523",
+      "source_size_cell": "ENERGY MODEL-DSS!AA524",
+      "source_lifetime_cell": "ENERGY MODEL-DSS!AA525",
+      "source_replacement_fraction_cell": "ENERGY MODEL-DSS!AA526",
+      "source_maintenance_rate_cell": "ENERGY MODEL-DSS!AA527",
+      "asset_id": "fan_coils_hvac",
+      "category_id": "technical_system.terminal.fan_coil",
+      "building_layer": "technical_system",
+      "scope_action": "installed",
+      "base_size": 20,
+      "sizing_factor": 1.0,
+      "sizing_basis": "installed HVAC fan-coil terminals"
+    },
+    {
+      "code": "A88.1",
+      "name": "DHW heat pump",
+      "cost_per_unit": 1000,
+      "cost_unit": "€/unit",
+      "size": 26,
+      "size_unit": "unit",
+      "lifetime_years": 12,
+      "replacement_cost_fraction": 1,
+      "maintenance_rate_per_year": 0,
+      "source_cost_cell": "ENERGY MODEL-DSS!AB523",
+      "source_size_cell": "ENERGY MODEL-DSS!AB524",
+      "source_lifetime_cell": "ENERGY MODEL-DSS!AB525",
+      "source_replacement_fraction_cell": "ENERGY MODEL-DSS!AB526",
+      "source_maintenance_rate_cell": "ENERGY MODEL-DSS!AB527",
+      "asset_id": "dhw_heat_pump",
+      "category_id": "technical_system.heat_pump.dhw",
+      "building_layer": "technical_system",
+      "scope_action": "installed",
+      "base_size": 26,
+      "sizing_factor": 1.0,
+      "sizing_basis": "dedicated DHW heat pumps; source quantity"
+    },
+    {
+      "code": "A89",
+      "name": "Batteries",
+      "cost_per_unit": 571.4285714285714,
+      "cost_unit": "€/unit",
+      "size": 0,
+      "size_unit": "unit",
+      "lifetime_years": 8,
+      "replacement_cost_fraction": 1,
+      "maintenance_rate_per_year": 0,
+      "source_cost_cell": "ENERGY MODEL-DSS!AC523",
+      "source_size_cell": "ENERGY MODEL-DSS!AC524",
+      "source_lifetime_cell": "ENERGY MODEL-DSS!AC525",
+      "source_replacement_fraction_cell": "ENERGY MODEL-DSS!AC526",
+      "source_maintenance_rate_cell": "ENERGY MODEL-DSS!AC527",
+      "asset_id": "battery_system",
+      "category_id": "energy_storage.battery",
+      "building_layer": "energy_storage",
+      "scope_action": "installed",
+      "base_size": 0,
+      "sizing_factor": 1.0,
+      "sizing_basis": "installed battery capacity"
+    },
+    {
+      "code": "A90",
+      "name": "PV system",
+      "cost_per_unit": 1000,
+      "cost_unit": "€/kW",
+      "size": 0,
+      "size_unit": "kW",
+      "lifetime_years": 25,
+      "replacement_cost_fraction": 1,
+      "maintenance_rate_per_year": 0,
+      "source_cost_cell": "ENERGY MODEL-DSS!AD523",
+      "source_size_cell": "ENERGY MODEL-DSS!AD524",
+      "source_lifetime_cell": "ENERGY MODEL-DSS!AD525",
+      "source_replacement_fraction_cell": "ENERGY MODEL-DSS!AD526",
+      "source_maintenance_rate_cell": "ENERGY MODEL-DSS!AD527",
+      "asset_id": "pv_system",
+      "category_id": "renewable.pv",
+      "building_layer": "renewable",
+      "scope_action": "installed",
+      "base_size": 0,
+      "sizing_factor": 1.0,
+      "sizing_basis": "total installed PV capacity"
+    }
+  ],
+  "expected_cells": {
+    "506": {
+      "T506": 30
+    },
+    "507": {
+      "T507": 0.05
+    },
+    "508": {
+      "T508": 0.02
+    },
+    "509": {
+      "T509": 0.029411764705882356
+    },
+    "510": {
+      "T510": 0.02
+    },
+    "511": {
+      "T511": 0.05
+    },
+    "512": {
+      "T512": 0.04
+    },
+    "513": {
+      "T513": 0.04
+    },
+    "514": {
+      "T514": 0.07
+    },
+    "515": {
+      "T515": 0.21
+    },
+    "516": {
+      "T516": 0.06
+    },
+    "517": {
+      "T517": 0.990857142857143
+    },
+    "518": {
+      "T518": 1
+    },
+    "519": {
+      "T519": 1
+    },
+    "520": {
+      "T520": 1
+    },
+    "523": {
+      "T523": 95.25,
+      "U523": 23.83,
+      "V523": 95.25,
+      "W523": 293.95,
+      "X523": 10000,
+      "Y523": 1300,
+      "Z523": 5000,
+      "AA523": 1000,
+      "AB523": 1000,
+      "AC523": 571.4285714285714,
+      "AD523": 1000
+    },
+    "524": {
+      "T524": 1027.42,
+      "U524": 616,
+      "V524": 629,
+      "W524": 182.57999999999998,
+      "X524": 3,
+      "Y524": 0,
+      "Z524": 3,
+      "AA524": 20,
+      "AB524": 26,
+      "AC524": 0,
+      "AD524": 0
+    },
+    "525": {
+      "T525": 40,
+      "U525": 40,
+      "V525": 40,
+      "W525": 30,
+      "X525": 15,
+      "Y525": 30,
+      "Z525": 30,
+      "AA525": 12,
+      "AB525": 12,
+      "AC525": 8,
+      "AD525": 25
+    },
+    "526": {
+      "T526": 1,
+      "U526": 1,
+      "V526": 1,
+      "W526": 1,
+      "X526": 1,
+      "Y526": 1,
+      "Z526": 1,
+      "AA526": 1,
+      "AB526": 1,
+      "AC526": 1,
+      "AD526": 1
+    },
+    "527": {
+      "T527": 0,
+      "U527": 0,
+      "V527": 0,
+      "W527": 0,
+      "X527": 0,
+      "Y527": 0,
+      "Z527": 0,
+      "AA527": 0,
+      "AB527": 0,
+      "AC527": 0,
+      "AD527": 0
+    },
+    "528": {
+      "T528": 97861.755,
+      "U528": 14679.279999999999,
+      "V528": 59912.25,
+      "W528": 53669.390999999996,
+      "X528": 30000,
+      "Y528": 0,
+      "Z528": 15000,
+      "AA528": 20000,
+      "AB528": 26000,
+      "AC528": 0,
+      "AD528": 0
+    },
+    "529": {
+      "T529": 97861.755,
+      "U529": 14679.279999999999,
+      "V529": 59912.25,
+      "W529": 53669.390999999996,
+      "X529": 30000,
+      "Y529": 0,
+      "Z529": 15000,
+      "AA529": 20000,
+      "AB529": 26000,
+      "AC529": 0,
+      "AD529": 0
+    },
+    "530": {
+      "T530": 0,
+      "U530": 0,
+      "V530": 0,
+      "W530": 0,
+      "X530": 1,
+      "Y530": 0,
+      "Z530": 0,
+      "AA530": 2,
+      "AB530": 2,
+      "AC530": 3,
+      "AD530": 1
+    },
+    "531": {
+      "T531": 0,
+      "U531": 0,
+      "V531": 0,
+      "W531": 0,
+      "X531": 15,
+      "Y531": 0,
+      "Z531": 0,
+      "AA531": 24,
+      "AB531": 24,
+      "AC531": 24,
+      "AD531": 25
+    },
+    "532": {
+      "T532": 10,
+      "U532": 10,
+      "V532": 10,
+      "W532": 0,
+      "X532": 0,
+      "Y532": 0,
+      "Z532": 0,
+      "AA532": 6,
+      "AB532": 6,
+      "AC532": 2,
+      "AD532": 20
+    },
+    "533": {
+      "T533": 0,
+      "U533": 0,
+      "V533": 0,
+      "W533": 0,
+      "X533": 26138.876783365795,
+      "Y533": 0,
+      "Z533": 0,
+      "AA533": 33956.11106968685,
+      "AB533": 44142.94439059291,
+      "AC533": 0,
+      "AD533": 0
+    },
+    "534": {
+      "T534": 10253.66653308025,
+      "U534": 1538.0517349777167,
+      "V534": 6277.4291422275965,
+      "W534": 0,
+      "X534": 0,
+      "Y534": 0,
+      "Z534": 0,
+      "AA534": 6741.092757023931,
+      "AB534": 8763.42058413111,
+      "AC534": 0,
+      "AD534": 0
+    },
+    "535": {
+      "T535": 5871.7053,
+      "U535": 880.7567999999999,
+      "V535": 3594.7349999999997,
+      "W535": 3220.1634599999998,
+      "X535": 1800,
+      "Y535": 0,
+      "Z535": 900,
+      "AA535": 1200,
+      "AB535": 1560,
+      "AC535": 0,
+      "AD535": 0
+    },
+    "536": {
+      "T536": 0,
+      "U536": 0,
+      "V536": 0,
+      "W536": 0,
+      "X536": 0,
+      "Y536": 0,
+      "Z536": 0,
+      "AA536": 0,
+      "AB536": 0,
+      "AC536": 0,
+      "AD536": 0
+    },
+    "537": {
+      "T537": 0
+    },
+    "538": {
+      "T538": 1112.8
+    },
+    "539": {
+      "T539": 0
+    },
+    "540": {
+      "T540": 317122.676
+    },
+    "541": {
+      "T541": 406814.3080522049
+    },
+    "542": {
+      "T542": 0
+    },
+    "543": {
+      "T543": 0
+    },
+    "544": {
+      "T544": 36973.5636644548
+    },
+    "545": {
+      "T545": 0
+    },
+    "546": {
+      "T546": 7764.4483695355075
+    },
+    "547": {
+      "T547": 7764.4483695355075
+    },
+    "548": {
+      "T548": 41.379440789271335
+    },
+    "549": {
+      "T549": 39.40899122787746
+    },
+    "550": {
+      "T550": 0
+    },
+    "551": {
+      "T551": 35.294639340104396
+    },
+    "552": {
+      "T552": 33.937153211638844
+    },
+    "553": {
+      "T553": 321288.5315685489
+    },
+    "554": {
+      "T554": 305989.07768433227
+    },
+    "555": {
+      "T555": 0
+    },
+    "556": {
+      "T556": 0
+    },
+    "557": {
+      "T557": 18942.751630464492
+    },
+    "558": {
+      "T558": 406814.3080522049
+    },
+    "559": {
+      "T559": 321288.5315685489
+    },
+    "560": {
+      "T560": 728102.8396207538
+    },
+    "561": {
+      "T561": 284.9772429906542
+    },
+    "562": {
+      "T562": 365.57719990313166
+    },
+    "563": {
+      "T563": 288.7208227610971
+    },
+    "564": {
+      "T564": 654.2980226642287
+    }
+  },
+  "expected_outputs": {
+    "T540": 317122.676,
+    "T541": 406814.3080522049,
+    "T542": 0,
+    "T547": 7764.4483695355075,
+    "T557": 18942.751630464492,
+    "T558": 406814.3080522049,
+    "T559": 321288.5315685489,
+    "T560": 728102.8396207538,
+    "T561": 284.9772429906542,
+    "T562": 365.57719990313166,
+    "T563": 288.7208227610971,
+    "T564": 654.2980226642287
+  },
+  "notes": [
+    "The selected block prices only electricity imports/exports in annual operating cost (rows 543-547). Fuel inflation is included as a source input row 512 but is not referenced by formulas in rows 506-564.",
+    "DHW heat pump is a separate hot-water device. The source quantity and per-unit factors are preserved; the historical quantity 26 is a benchmark input, not an automatically validated design or an inferred kW capacity."
+  ]
+}

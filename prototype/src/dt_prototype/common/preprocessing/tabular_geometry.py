@@ -14,6 +14,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from .geometry import BuildingGeometry, SurfaceSpec, ZoneGeometry
+from dt_prototype.common.surface_boundaries import validate_boundary_condition
 
 
 TABLE_FILENAMES = ("buildings.csv", "zones.csv", "surfaces.csv")
@@ -47,6 +48,8 @@ SURFACE_FIELDS = (
     "azimuth_deg",
     "tilt_deg",
 )
+# Optional on read so all existing seven-column files remain valid.
+OPTIONAL_SURFACE_FIELDS = ("boundary_condition",)
 
 
 def _read_rows(path: Path, required_fields: tuple[str, ...]) -> list[dict[str, str]]:
@@ -92,6 +95,16 @@ def _integer(
     if not value.is_integer() or value < minimum:
         raise ValueError(f"{source}:{row_number}: {field} must be an integer >= {minimum}")
     return int(value)
+
+
+def _boundary_condition(row: dict[str, str], source: Path, row_number: int) -> str:
+    """Omitted/blank optional cells retain the original surface treatment."""
+    value = (row.get("boundary_condition") or "").strip() or "auto"
+    try:
+        validate_boundary_condition(value)
+    except ValueError as exc:
+        raise ValueError(f"{source}:{row_number}: {exc}") from exc
+    return value
 
 
 def load_district_tables(directory: str | Path) -> list[BuildingGeometry]:
@@ -146,6 +159,7 @@ def load_district_tables(directory: str | Path) -> list[BuildingGeometry]:
                     area=_number(row, "area_m2", surface_path, row_number, positive=True),
                     azimuth=_number(row, "azimuth_deg", surface_path, row_number),
                     tilt=_number(row, "tilt_deg", surface_path, row_number),
+                    boundary_condition=_boundary_condition(row, surface_path, row_number),
                 ),
             )
         )
@@ -250,7 +264,9 @@ def write_district_tables(
         2
     ].open("w", encoding="utf-8", newline="") as surface_stream:
         zone_writer = csv.DictWriter(zone_stream, fieldnames=ZONE_FIELDS)
-        surface_writer = csv.DictWriter(surface_stream, fieldnames=SURFACE_FIELDS)
+        surface_writer = csv.DictWriter(
+            surface_stream, fieldnames=SURFACE_FIELDS + OPTIONAL_SURFACE_FIELDS
+        )
         zone_writer.writeheader()
         surface_writer.writeheader()
         for geometry in geometries:
@@ -276,5 +292,6 @@ def write_district_tables(
                             "area_m2": repr(surface.area),
                             "azimuth_deg": repr(surface.azimuth),
                             "tilt_deg": repr(surface.tilt),
+                            "boundary_condition": surface.boundary_condition,
                         }
                     )

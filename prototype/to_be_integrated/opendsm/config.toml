@@ -1,0 +1,82 @@
+# ======================================================================================
+# OpenDSM benchmark - configuration
+# ======================================================================================
+# Paths are relative to this folder (benchmarks/opendsm/). Read by src/opendsm_benchmark/settings.py, which stops
+# at once, with a list of the problems, if a value is missing or inconsistent.
+#
+#     [inputs]           where the data come from (inputs.py)
+#     [time]             clocks of the input timestamps and the model time (preprocess.py)
+#     [preprocessing]    weather columns, short gaps (preprocess.py)
+#     [opendsm]          the OpenDSM models (opendsm_runner.py)
+#     [cross_validation] the out-of-sample folds (folds.py)
+#     [output]           results folder (pipeline.py)
+
+[inputs]
+# "energy_insight": the cleaned interim datasets of the energy_insight project (columns in its
+#                   docs/data_contracts.md); create them with `python run_pipeline.py --stages 1 2` there.
+# "csv":            stand-alone use: one plain CSV per period, no other program needed (see README, "Stand-alone use").
+source = "energy_insight"
+periods = [1, 2, 3]
+
+# --- source = "energy_insight" ---
+energy_insight_root = "../.."          # its project folder
+energy_hourly = "data/1_interim/1_energy_cleaning/energy_hourly_period_{period}.csv"
+climate_hourly = "data/1_interim/2_climate_preprocessing/climate_hourly_period_{period}.csv"
+model_dataset = "data/1_interim/model_dataset_daily.csv"
+
+# --- source = "csv": one file per period; the file name must contain {period} ---
+csv_file = "data/hourly_period_{period}.csv"
+csv_timestamp = "timestamp"            # hour-BEGINNING, local clock time of the site, on the hour, no time zone suffix
+csv_energy = "energy_kWh"              # energy of the hour [kWh] (= mean power [kW]); empty = day not used
+csv_temperature = "temperature_C"      # [degC], complete
+csv_ghi = "ghi_Wm2"                    # global horizontal irradiance [W/m2], complete; "" = none (variants = ["nonsolar"])
+csv_use = "use"                        # optional column: 0 = leave the day out of the models
+
+[time]
+# Clocks of the input timestamps.
+#   energy: local clock time of the site (with daylight saving time), timestamp = start of the hour
+#   weather: energy_insight data: UTC, timestamp = END of the hour
+#            csv data: usually the local clock, timestamp = start of the hour (weather_label_marks = "start",
+#            weather_clock = "local"), or whatever the weather file uses
+site_timezone = "Europe/Rome"          # IANA name of the local clock of the energy data
+weather_label_marks = "end"            # "end" or "start" of the hour
+weather_clock = "UTC"                  # "UTC", or "local" = the clock of the site
+# OpenDSM works on days of 24 hours: the models run in local STANDARD time (no daylight saving time), where energy and
+# weather are aligned and no day has 23/25 hours. "auto" = the standard time of site_timezone (UTC+1 for
+# Europe/Rome, i.e. the POSIX zone Etc/GMT-1, whose sign is the opposite of the usual one); or give a zone name.
+model_timezone = "auto"
+
+[preprocessing]
+# Weather inputs of OpenDSM (columns of the energy_insight climate dataset; for source = "csv" these are the names the
+# csv_temperature and csv_ghi columns are given).
+# Irradiance of the solar variant. "ghi_Wm2" is the analysis series of energy_insight (measured where available,
+# ERA5 corrected towards the measurements elsewhere): the same weather as the energy_insight models, so the
+# comparison isolates the model structure. "GHI_era5_raw_Wm2" (ERA5 as downloaded) was used by the previous
+# version of this benchmark; "GHI_era5_corrected_Wm2" is the corrected ERA5 alone.
+ghi_column = "ghi_Wm2"
+temperature_column = "temperature_C"  # analysis temperature: local data, gaps filled with corrected ERA5
+# Days used: those selected by energy_insight for its models (no reconstructed profiles, no metering gaps,
+# complete energy and weather); with csv data, the days with 24 hours of energy and use != 0. Single missing hours
+# created by the time conversion (the repeated autumn hour) are filled linearly.
+max_filled_hours_per_day = 1
+
+[opendsm]
+seed = 42                             # fixed random state (clustering, elastic net) for reproducible runs
+# Net import is often exactly 0 at midday (PV); with is_electricity_data = true OpenDSM would turn every 0 into
+# a missing value, so genuine zeros are kept with false. Use true for plain consumption data with no zeros.
+is_electricity_data = false
+# The periods do not meet OpenDSM's baseline sufficiency rules (329-366 days, >= 90 % coverage); the models are
+# fitted anyway and every disqualification is listed in results/summary/benchmark_fits.csv.
+ignore_disqualification = true
+# Model variants: "solar" = temperature + GHI (OpenDSM solar hourly model), "nonsolar" = temperature only.
+variants = ["solar", "nonsolar"]
+
+[cross_validation]
+# Out-of-sample load prediction: the model days of a period are cut into blocks of `block_days` consecutive
+# days, assigned round-robin to `n_folds` folds; each fold is predicted by a model fitted on the other folds.
+# The fold of every day is exported for reuse (energy_insight uses the same split: keep its [evaluation] equal).
+n_folds = 5
+block_days = 7
+
+[output]
+results_dir = "results"

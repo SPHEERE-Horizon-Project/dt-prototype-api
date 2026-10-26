@@ -79,8 +79,8 @@ def test_portable_output_names_do_not_collapse_different_identities():
     assert all(len(name) <= 49 and not any(c in name for c in '/\\:') for name in names)
 
 
-@pytest.mark.parametrize('engine,flag,value', [('monthly', '--model', '5R1C'),
-    ('dynamic', '--zone-mode', 'sum')])
+@pytest.mark.parametrize('engine,flag,value', [('Monthly_SS', '--model', '5R1C'),
+    ('Dynamic_RC', '--zone-mode', 'sum')])
 def test_cli_rejects_ignored_engine_options(tmp_path, engine, flag, value):
     with pytest.raises(SystemExit) as error:
         main([engine, '--config', str(ROOT / 'configs/example.json'),
@@ -90,7 +90,7 @@ def test_cli_rejects_ignored_engine_options(tmp_path, engine, flag, value):
 
 
 def test_cli_safe_paths_hash_identity_and_failed_building_isolation(tmp_path, monkeypatch):
-    import dt_prototype.monthly.run as monthly
+    import dt_prototype.monthly_ss.run as monthly
     project = ProjectInputs.load(ROOT / 'configs/example.json')
     district = project.preprocess()
     district.buildings[0].geometry.name = '../outside'
@@ -105,7 +105,7 @@ def test_cli_safe_paths_hash_identity_and_failed_building_isolation(tmp_path, mo
     monkeypatch.setattr(monthly, 'run_building', run)
     output = tmp_path / 'run'
     with pytest.raises(SystemExit) as error:
-        main(['monthly', '--config', str(ROOT / 'configs/example.json'), '--output', str(output)])
+        main(['Monthly_SS', '--config', str(ROOT / 'configs/example.json'), '--output', str(output)])
     assert error.value.code == 1
     manifest = json.loads((output / 'manifest.json').read_text())
     assert manifest['status'] == 'failed'

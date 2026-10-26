@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "description": "Illustrative external totals for one declared asset per supplied building; not whole-building valuation or simulated installed sizing.",
+  "project_config": "example.json",
+  "energy_config": "energy_example.json",
+  "energy": {"mode": "run", "engine": "Monthly_SS"},
+  "assessment": {
+    "enabled": true,
+    "assessment_id": "pipeline-demo",
+    "modules": ["LCC", "LCA", "MCI"],
+    "asset_results": "pipeline_assets_example.csv",
+    "resolved_quantities": "pipeline_quantities_example.csv",
+    "design_note": "Illustrative 42 kW assessed HP group per building; external demonstration totals. Not reconciled to the installed plant in the energy example. Only declared HP assets are assessed."
+  }
+}

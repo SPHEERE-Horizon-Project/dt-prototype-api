@@ -4,5 +4,19 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 scripts/node_modules/
+tools/vbdd_workbook/node_modules/
 outputs/
 archive/
+build/
+tmp/
+node_modules/
+dist/
+.coverage
+htmlcov/
+data/private/
+.env
+.env.*
+
+# Optional complete validation evidence is distributed as a release asset.
+validation_archive/
+DT_Prototype_validation_archive.zip

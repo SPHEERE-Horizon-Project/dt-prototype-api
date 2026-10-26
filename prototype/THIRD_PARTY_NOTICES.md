@@ -3,7 +3,7 @@
 ## EUReCA — MIT Licence
 
 This distribution contains portions derived from and adapted from EUReCA,
-including retained or adapted Dynamic RC thermal-balance,
+including retained or adapted Dynamic_RC thermal-balance,
 construction-parameter, photovoltaic, and solar-thermal calculation code.
 
 DT-Prototype substantially reorganises and extends that material. It uses a
@@ -41,3 +41,12 @@ SOFTWARE.
 
 The EUReCA attribution and MIT Licence impose no research-only or
 non-commercial-use restriction.
+
+## OpenDSM inverse-model worker
+
+The optional inverse worker installs OpenDSM 1.2.7 separately from PyPI. OpenDSM
+is distributed under Apache-2.0; retain its installed licence and notices when
+redistributing a packaged runtime. See [upstream OpenDSM](https://github.com/opendsm/opendsm)
+and [the pinned release](https://pypi.org/project/opendsm/1.2.7/).
+Dependencies retain their own licences. The supplied `to_be_integrated/opendsm`
+benchmark files are preserved, and the new adapter does not modify upstream code.

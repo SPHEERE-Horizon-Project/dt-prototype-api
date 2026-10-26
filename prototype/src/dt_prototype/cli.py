@@ -14,16 +14,22 @@ from dt_prototype.common.output_paths import output_component
 
 def main(argv=None):
     parser=argparse.ArgumentParser(prog='DT-Prototype')
-    parser.add_argument('engine',choices=['dynamic','monthly','simplified'])
+    parser.add_argument('engine',choices=['Dynamic_RC','Monthly_SS','Monthly_SS_simplified'])
     parser.add_argument('--config',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--model',choices=['5R1C','7R2C'])
     parser.add_argument('--zone-mode',choices=['sum','collapsed','both'])
+    parser.add_argument('--energy-config',type=Path,help='Apply the shared system/carrier and renewable layer')
     args=parser.parse_args(argv)
-    if args.model and args.engine != 'dynamic':
-        parser.error('--model applies only to the dynamic engine')
-    if args.zone_mode and args.engine != 'simplified':
-        parser.error('--zone-mode applies only to the simplified engine')
+    if args.model and args.engine != 'Dynamic_RC':
+        parser.error('--model applies only to Dynamic_RC')
+    if args.zone_mode and args.engine != 'Monthly_SS_simplified':
+        parser.error('--zone-mode applies only to Monthly_SS_simplified')
+    if args.energy_config:
+        from dt_prototype.energy_carriers.workflow import run_project
+        zone_mode=args.zone_mode or ProjectInputs.load(args.config).configuration['simplified']['zone_mode']
+        run_project(args.config,args.energy_config,args.output,engine=args.engine,model=args.model,zone_mode=zone_mode)
+        return
     project=ProjectInputs.load(args.config);out=args.output.resolve()
     if out.exists():raise FileExistsError(f'Refusing to overwrite {out}')
     district=project.preprocess()
@@ -33,17 +39,17 @@ def main(argv=None):
     weather_id='weather_'+input_hashes['weather_epw'][:16]
     manifest=dict(name='DT-Prototype',version=__version__,engine=args.engine,status='running',timestamp_utc=datetime.now(timezone.utc).isoformat(),input_hashes=input_hashes,configuration=project.configuration,python=sys.version,dependencies={n:importlib.metadata.version(n) for n in ['numpy','pandas','matplotlib']},failed_buildings=[], building_outputs={})
     records=[]
-    if args.engine=='dynamic':
-        from dt_prototype.dynamic.simulation.config import SimulationConfig
-        from dt_prototype.dynamic.simulation.runner import run_building
+    if args.engine=='Dynamic_RC':
+        from dt_prototype.dynamic_rc.simulation.config import SimulationConfig
+        from dt_prototype.dynamic_rc.simulation.runner import run_building
         options=dict(project.configuration['dynamic'])
         if args.model:options['model']=args.model
         config=SimulationConfig(**operation,**options)
     else:
-        from dt_prototype.monthly.simulation.config import SimulationConfig
+        from dt_prototype.monthly_ss.simulation.config import SimulationConfig
         config=SimulationConfig(**operation)
-        if args.engine=='monthly':
-            from dt_prototype.monthly.run import run_building
+        if args.engine=='Monthly_SS':
+            from dt_prototype.monthly_ss.run import run_building
     manifest['resolved_engine_config']=asdict(config)
     out.mkdir(parents=True)
     (out/'manifest.json').write_text(json.dumps(manifest,indent=2),encoding='utf-8')
@@ -52,9 +58,9 @@ def main(argv=None):
             stem = output_component(building.geometry.building_id)
             manifest['building_outputs'][str(building.geometry.building_id)] = {
                 'building_name': building.name,
-                'details_file': f"{stem}_{'hourly' if args.engine == 'dynamic' else 'details'}.csv",
+                'details_file': f"{stem}_{'hourly' if args.engine == 'Dynamic_RC' else 'details'}.csv",
             }
-            if args.engine=='dynamic':
+            if args.engine=='Dynamic_RC':
                 result=run_building(building,district.weather,config,system_templates=district.system_templates)
                 result.to_csv(out/f'{stem}_hourly.csv',index_label='time')
                 dt=district.weather.timestep_seconds/3600
@@ -65,7 +71,7 @@ def main(argv=None):
                     'ahu_heating_kWh':result[coils].clip(lower=0).sum(axis=1)*dt/1000,
                     'ahu_cooling_kWh':-result[coils].clip(upper=0).sum(axis=1)*dt/1000})
                 monthly=energies.groupby(energies.index.to_period('M').astype(str)).sum()
-            elif args.engine=='monthly':
+            elif args.engine=='Monthly_SS':
                 result=run_building(building,district.weather,config)
                 result.to_csv(out/f'{stem}_details.csv',index_label='month')
                 monthly=pd.DataFrame({
@@ -75,9 +81,9 @@ def main(argv=None):
                     'ahu_cooling_kWh':result.ahu_cooling_demand_kWh.to_numpy()},
                     index=[f"{project.configuration['inputs']['calendar_year']}-{m:02d}" for m in range(1,13)])
             else:
-                from dt_prototype.integration.mapping.prepared_inputs import prepare_mapping_inputs
-                from dt_prototype.integration.mapping import write_reference_case_as_model3_inputs
-                from dt_prototype.integration.engines.model3 import Model3Engine
+                from dt_prototype.monthly_ss_simplified.mapping.prepared_inputs import prepare_mapping_inputs
+                from dt_prototype.monthly_ss_simplified.mapping import write_reference_case_as_model3_inputs
+                from dt_prototype.monthly_ss_simplified.engines.model3 import Model3Engine
                 inputs=prepare_mapping_inputs(building,district.weather,config)
                 mode=project.configuration['simplified']['comparison_mode']
                 zone_mode=args.zone_mode or project.configuration['simplified']['zone_mode']
@@ -99,7 +105,7 @@ def main(argv=None):
             monthly['cooling_kWh']=monthly.zone_cooling_kWh+monthly.ahu_cooling_kWh
             monthly['building_id']=str(building.geometry.building_id);monthly['building_name']=building.name
             monthly['zone_count']=len(building.zones)
-            monthly['representation']='native_single_zone' if len(building.zones)==1 else ('single_zone_collapsed_from_two_zones' if args.engine=='simplified' and zone_mode=='collapsed' else 'sum_of_independent_zones')
+            monthly['representation']='native_single_zone' if len(building.zones)==1 else ('single_zone_collapsed_from_two_zones' if args.engine=='Monthly_SS_simplified' and zone_mode=='collapsed' else 'sum_of_independent_zones')
             monthly.index.name='period_id';records.append(monthly.reset_index())
         except Exception as exc:
             manifest['failed_buildings'].append({'building_id':str(building.geometry.building_id),'error':str(exc)})
@@ -113,5 +119,14 @@ def main(argv=None):
     (out/'manifest.json').write_text(json.dumps(manifest,indent=2),encoding='utf-8')
     print(f'{args.engine}: {len(records)} buildings completed; {out}')
     if manifest['failed_buildings']:raise SystemExit(1)
+
+def dynamic_rc_main(argv=None):
+    main(["Dynamic_RC", *(sys.argv[1:] if argv is None else argv)])
+
+def monthly_ss_main(argv=None):
+    main(["Monthly_SS", *(sys.argv[1:] if argv is None else argv)])
+
+def monthly_ss_simplified_main(argv=None):
+    main(["Monthly_SS_simplified", *(sys.argv[1:] if argv is None else argv)])
 
 if __name__=='__main__':main()

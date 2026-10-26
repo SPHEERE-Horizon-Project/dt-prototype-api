@@ -6,9 +6,9 @@ import pandas as pd
 import pytest
 from dt_prototype.common.project import ProjectInputs
 from dt_prototype.cli import main
-from dt_prototype.integration.engines.semi_stationary import SemiStationaryEngine, SemiStationaryRequest
-from dt_prototype.integration.mapping.prepared_inputs import prepare_mapping_inputs
-from dt_prototype.monthly.simulation.config import SimulationConfig
+from dt_prototype.monthly_ss_simplified.engines.semi_stationary import SemiStationaryEngine, SemiStationaryRequest
+from dt_prototype.monthly_ss_simplified.mapping.prepared_inputs import prepare_mapping_inputs
+from dt_prototype.monthly_ss.simulation.config import SimulationConfig
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -30,22 +30,22 @@ def test_prepared_mapping_inputs_match_existing_reference_components(shared_dist
             np.testing.assert_allclose([getattr(row,k) for k in fields],[getattr(expected,k) for k in fields],rtol=1e-12,atol=1e-7)
 
 def test_simplified_runs_without_other_forward_solvers(tmp_path,monkeypatch):
-    import dt_prototype.monthly.simulation.quasi_steady_state as monthly
-    import dt_prototype.dynamic.simulation.runner as dynamic
+    import dt_prototype.monthly_ss.simulation.quasi_steady_state as monthly
+    import dt_prototype.dynamic_rc.simulation.runner as dynamic
     def forbidden(*args,**kwargs):raise AssertionError('Another forward solver was executed')
     monkeypatch.setattr(monthly,'run_quasi_steady_state',forbidden)
     monkeypatch.setattr(dynamic,'run_building',forbidden)
-    main(['simplified','--config',str(ROOT/'configs/example.json'),'--output',str(tmp_path/'simplified')])
+    main(['Monthly_SS_simplified','--config',str(ROOT/'configs/example.json'),'--output',str(tmp_path/'simplified')])
     result=pd.read_csv(tmp_path/'simplified/monthly.csv')
     assert len(result)==60
     assert result.building_name.nunique()==5
     assert json.loads((tmp_path/'simplified/manifest.json').read_text())['status']=='complete'
 
 def test_monthly_runs_without_dynamic_solver(tmp_path,monkeypatch):
-    import dt_prototype.dynamic.simulation.runner as dynamic
+    import dt_prototype.dynamic_rc.simulation.runner as dynamic
     def forbidden(*args,**kwargs):raise AssertionError('Dynamic solver was executed')
     monkeypatch.setattr(dynamic,'run_building',forbidden)
-    main(['monthly','--config',str(ROOT/'configs/example.json'),'--output',str(tmp_path/'monthly')])
+    main(['Monthly_SS','--config',str(ROOT/'configs/example.json'),'--output',str(tmp_path/'monthly')])
     assert len(pd.read_csv(tmp_path/'monthly/monthly.csv'))==60
 
 def test_single_zone_input_has_no_second_zone(shared_district):
@@ -61,4 +61,4 @@ def test_shared_config_requires_explicit_scientific_settings(tmp_path):
     with pytest.raises(ValueError,match='heating_season'):ProjectInputs.load(p)
 
 def test_cli_refuses_to_overwrite_completed_directory(tmp_path):
-    with pytest.raises(FileExistsError):main(['monthly','--config',str(ROOT/'configs/example.json'),'--output',str(tmp_path)])
+    with pytest.raises(FileExistsError):main(['Monthly_SS','--config',str(ROOT/'configs/example.json'),'--output',str(tmp_path)])

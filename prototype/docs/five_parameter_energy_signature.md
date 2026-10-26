@@ -1,5 +1,9 @@
 # Retained methodology (DT-Prototype terminology)
 
+The retained fitter is also exposed through the new [inverse-model layer](inverse_models.md),
+with separate measured/simulated input, saved-model prediction and common comparison
+against OpenDSM billing/hourly. Its numerical fitting algorithm is unchanged.
+
 Historical run paths below refer to archived evidence. Current commands are in the root README.
 
 # Five-parameter energy-signature post-processing
@@ -157,7 +161,7 @@ and hashed, and the plot distinguishes source type, source ID and source run.
 Post-process a completed supplied-reference simulation:
 
 ```powershell
-python -m dt_prototype.integration build-5p-report `
+python -m dt_prototype.monthly_ss_simplified build-5p-report `
   --source-run-dir outputs/standalone_smoke_20260811_001 `
   --outputs-root outputs `
   --run-id five_parameter_reference_001
@@ -166,7 +170,7 @@ python -m dt_prototype.integration build-5p-report `
 Process a canonical CSV containing simulated and/or measured data:
 
 ```powershell
-python -m dt_prototype.integration build-5p-report `
+python -m dt_prototype.monthly_ss_simplified build-5p-report `
   --input-csv data/processed/five_parameter_monthly_input.csv `
   --outputs-root outputs `
   --run-id five_parameter_measured_comparison_001

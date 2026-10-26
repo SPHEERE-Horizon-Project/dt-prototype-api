@@ -2,6 +2,11 @@
 
 Historical run paths below refer to archived evidence. Current commands are in the root README.
 
+The October extension preserves these thermal decisions and adds the optional
+[shared energy architecture](architecture.md), [energy data contracts](data_contracts.md)
+and [monthly workbook editions](workbook_instructions.md). Legacy Model 3
+technical-system functions are not combined with shared-layer conversion.
+
 # Scientific and integration decision log
 
 ## 1. Status vocabulary
@@ -26,7 +31,7 @@ either physics engine.
   Preserve Model 3 `reference_outputs/` and the semi-stationary tests/output
   fixtures unchanged.
 - **Evidence:** Both original suites pass; every imported CSV fixture
-  regenerates byte-for-byte. Hashes are recorded in `source_inventory.md`.
+  regenerates byte-for-byte. Current hashes are checked by `scripts/verify_release.py`.
 - **Consequence:** Future equation or adapter changes require new regression
   tests and must not rewrite these fixtures.
 

@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "description": "Simulation regression fixture, building 1 Dynamic_RC 5R1C, not measured data",
+  "operation": "fit",
+  "clock": {
+    "convention": "standard",
+    "timezone": "Etc/GMT-1"
+  },
+  "source": {
+    "type": "csv",
+    "observations": "observations.csv",
+    "weather": "weather.csv",
+    "series": {
+      "1/Dynamic_RC 5R1C/sum_of_independent_zones/grid_import_kWh": {
+        "source_type": "simulated",
+        "source_id": "energy",
+        "building_id": "1",
+        "scenario_id": "supplied_templates_factor_demo",
+        "carrier": "electricity",
+        "meter_boundary_id": "electricity_grid_import",
+        "weather_id": "simulation_weather",
+        "model": "Dynamic_RC 5R1C",
+        "representation": "sum_of_independent_zones"
+      }
+    }
+  },
+  "models": [
+    {
+      "backend": "opendsm_hourly",
+      "options": {
+        "allow_disqualified": true
+      }
+    }
+  ]
+}

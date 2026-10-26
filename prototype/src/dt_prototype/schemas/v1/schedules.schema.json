@@ -1,0 +1,1524 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dt-prototype:input:v1:schedules",
+  "title": "DT Prototype schedules contract v1",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "end_uses": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "people": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "weekday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "weekend": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "saturday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "sunday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "radiant_fraction": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": [
+                      "weekday"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "appliances": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "weekday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "weekend": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "saturday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "sunday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "radiant_fraction": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": [
+                      "weekday"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "lighting": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "weekday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "weekend": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "saturday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "sunday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "radiant_fraction": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": [
+                      "weekday"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "people_latent": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "weekday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "weekend": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "saturday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "sunday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "radiant_fraction": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": [
+                      "weekday"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "heating_setpoint": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "weekday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "weekend": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "saturday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "sunday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "radiant_fraction": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": [
+                      "weekday"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "cooling_setpoint": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "weekday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "weekend": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "saturday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "sunday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "radiant_fraction": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": [
+                      "weekday"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "humidity_setpoint_low": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "weekday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "weekend": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "saturday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "sunday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "radiant_fraction": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": [
+                      "weekday"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "humidity_setpoint_high": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "weekday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "weekend": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "saturday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "sunday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "radiant_fraction": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": [
+                      "weekday"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "ventilation_ach": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "weekday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "weekend": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "saturday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "sunday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "radiant_fraction": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": [
+                      "weekday"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "infiltration_ach": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "weekday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "weekend": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "saturday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "sunday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "radiant_fraction": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": [
+                      "weekday"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "ventilation_flow_per_area": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "weekday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "weekend": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "saturday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "sunday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "radiant_fraction": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": [
+                      "weekday"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "dhw": {
+                "type": "object",
+                "properties": {
+                  "method": {
+                    "enum": [
+                      "profile",
+                      "stochastic"
+                    ]
+                  },
+                  "profile": {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "volume_per_m2_day": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "flow_l_per_m2_h": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "weekday": {
+                            "type": "array",
+                            "items": {
+                              "type": "number"
+                            },
+                            "minItems": 24,
+                            "maxItems": 24
+                          },
+                          "weekend": {
+                            "type": "array",
+                            "items": {
+                              "type": "number"
+                            },
+                            "minItems": 24,
+                            "maxItems": 24
+                          },
+                          "saturday": {
+                            "type": "array",
+                            "items": {
+                              "type": "number"
+                            },
+                            "minItems": 24,
+                            "maxItems": 24
+                          },
+                          "sunday": {
+                            "type": "array",
+                            "items": {
+                              "type": "number"
+                            },
+                            "minItems": 24,
+                            "maxItems": 24
+                          },
+                          "radiant_fraction": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          }
+                        },
+                        "required": [
+                          "weekday"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              },
+              "ahu": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "sensible_recovery_eff": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "latent_recovery_eff": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "supply_temperature_heating": {
+                        "type": "number"
+                      },
+                      "supply_temperature_cooling": {
+                        "type": "number"
+                      },
+                      "supply_specific_humidity": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "humidity_control": {
+                        "type": "boolean"
+                      },
+                      "outdoor_air_ratio": {
+                        "type": "number",
+                        "exclusiveMinimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": [],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "natural_ventilation": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "ach_max": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "zone_temperature_threshold": {
+                        "type": "number"
+                      },
+                      "min_outdoor_temperature": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": [],
+            "additionalProperties": false,
+            "patternProperties": {
+              "^_": {}
+            }
+          },
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "patternProperties": {
+            "^_": {}
+          }
+        }
+      },
+      "required": [
+        "end_uses"
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^_": {}
+      }
+    },
+    {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "people": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "weekday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "weekend": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "saturday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "sunday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "radiant_fraction": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [
+                  "weekday"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "appliances": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "weekday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "weekend": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "saturday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "sunday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "radiant_fraction": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [
+                  "weekday"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "lighting": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "weekday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "weekend": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "saturday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "sunday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "radiant_fraction": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [
+                  "weekday"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "people_latent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "weekday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "weekend": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "saturday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "sunday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "radiant_fraction": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [
+                  "weekday"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "heating_setpoint": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "weekday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "weekend": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "saturday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "sunday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "radiant_fraction": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [
+                  "weekday"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "cooling_setpoint": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "weekday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "weekend": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "saturday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "sunday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "radiant_fraction": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [
+                  "weekday"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "humidity_setpoint_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "weekday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "weekend": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "saturday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "sunday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "radiant_fraction": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [
+                  "weekday"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "humidity_setpoint_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "weekday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "weekend": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "saturday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "sunday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "radiant_fraction": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [
+                  "weekday"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "ventilation_ach": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "weekday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "weekend": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "saturday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "sunday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "radiant_fraction": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [
+                  "weekday"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "infiltration_ach": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "weekday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "weekend": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "saturday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "sunday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "radiant_fraction": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [
+                  "weekday"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "ventilation_flow_per_area": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "weekday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "weekend": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "saturday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "sunday": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 24,
+                    "maxItems": 24
+                  },
+                  "radiant_fraction": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [
+                  "weekday"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "dhw": {
+            "type": "object",
+            "properties": {
+              "method": {
+                "enum": [
+                  "profile",
+                  "stochastic"
+                ]
+              },
+              "profile": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "minItems": 24,
+                "maxItems": 24
+              },
+              "volume_per_m2_day": {
+                "type": "number",
+                "minimum": 0
+              },
+              "flow_l_per_m2_h": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "weekday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "weekend": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "saturday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "sunday": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 24,
+                        "maxItems": 24
+                      },
+                      "radiant_fraction": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": [
+                      "weekday"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "ahu": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "sensible_recovery_eff": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "latent_recovery_eff": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "supply_temperature_heating": {
+                    "type": "number"
+                  },
+                  "supply_temperature_cooling": {
+                    "type": "number"
+                  },
+                  "supply_specific_humidity": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "humidity_control": {
+                    "type": "boolean"
+                  },
+                  "outdoor_air_ratio": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "natural_ventilation": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "ach_max": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "zone_temperature_threshold": {
+                    "type": "number"
+                  },
+                  "min_outdoor_temperature": {
+                    "type": "number"
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": [],
+        "additionalProperties": false,
+        "patternProperties": {
+          "^_": {}
+        }
+      },
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "\\S"
+      },
+      "patternProperties": {
+        "^_": {}
+      },
+      "not": {
+        "required": [
+          "end_uses"
+        ]
+      }
+    }
+  ]
+}

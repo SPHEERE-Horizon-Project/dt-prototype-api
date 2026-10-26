@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dt-prototype:input:v1:observations-row",
+  "title": "DT Prototype observations-row contract v1",
+  "type": "object",
+  "properties": {
+    "series_id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "interval_start": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "interval_end": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "energy_kWh": {
+      "anyOf": [
+        {
+          "type": "number",
+          "minimum": 0
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "duration_h": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "split": {
+      "enum": [
+        "train",
+        "validation",
+        "test",
+        "excluded",
+        "predict"
+      ]
+    },
+    "quality": {
+      "enum": [
+        "valid",
+        "missing",
+        "excluded"
+      ]
+    }
+  },
+  "required": [
+    "series_id",
+    "interval_start",
+    "interval_end"
+  ],
+  "additionalProperties": false
+}

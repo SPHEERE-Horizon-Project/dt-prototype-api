@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "description": "ILLUSTRATIVE proposed inventory for building 1. Coverage, recovery time, storage rate and factors are editable assumptions, not verified installed equipment or normative sizing rules. Optional unselected categories are omitted.",
+  "default_mode": "auto",
+  "buildings": [
+    {
+      "assessment_id": "preliminary_example",
+      "building_id": "1",
+      "assets": [
+        {"asset_id":"facade_insulation","catalogue_id":"facade_insulation","auto_factor":1,"scope_action":"installed","source":"Illustrative: treat all opaque facades"},
+        {"asset_id":"roof_insulation","catalogue_id":"roof_insulation","auto_factor":1,"scope_action":"installed","source":"Illustrative: treat all roof area"},
+        {"asset_id":"basement_insulation","catalogue_id":"basement_insulation","auto_factor":1,"scope_action":"installed","source":"Illustrative: treat the model ground boundary"},
+        {"asset_id":"glazing_system","catalogue_id":"glazing_system","auto_factor":1,"scope_action":"replaced","source":"Illustrative: replace all derived glazing"},
+        {"asset_id":"heat_pump_system","catalogue_id":"heat_pump_system","auto_factor":1.2,"scope_action":"installed","source":"Illustrative: total thermal group capacity; separate DHW device, 20% explicit allowance"},
+        {"asset_id":"dhw_heat_pump","catalogue_id":"dhw_heat_pump","parameters":{"recovery_hours":8},"auto_factor":1.1,"scope_action":"installed","source":"Illustrative: recover maximum daily DHW energy in eight hours, 10% allowance"},
+        {"asset_id":"water_tank","catalogue_id":"water_tank","auto_factor":0.5,"scope_action":"installed","source":"Illustrative: half of maximum daily water draw volume; verify storage-temperature and draw-off basis"},
+        {"asset_id":"thermal_storage","catalogue_id":"thermal_storage","rule_id":"asset_multiple","parameters":{"asset_id":"heat_pump_system","rate":10,"rate_unit":"L/kW"},"auto_factor":1,"scope_action":"installed","source":"Illustrative distinct buffer: ten litres per resolved heating kW, not a normative rule"},
+        {"asset_id":"fan_coils_hvac","catalogue_id":"fan_coils_hvac","rule_id":"asset_multiple","parameters":{"asset_id":"heat_pump_system","rate":0.8,"rate_unit":"kW/kW"},"auto_factor":1,"scope_action":"installed","source":"Illustrative heating-rated terminal capacity: 80% of group heating capacity; verify AHU share and terminal ratings"},
+        {"asset_id":"pv_system","catalogue_id":"pv_system","parameters":{"coverage":0.45,"module_kW_m2":0.23529411764705882},"auto_factor":1,"scope_action":"installed","source":"Illustrative 45% physical roof coverage and 0.4 kW per 1.7 m2"},
+        {"asset_id":"battery_system","catalogue_id":"battery_system","rule_id":"asset_multiple","parameters":{"asset_id":"pv_system","rate":1.5,"rate_unit":"kWh/kW"},"auto_factor":1,"scope_action":"installed","source":"Illustrative usable storage ratio: 1.5 kWh per resolved PV kW"},
+        {"asset_id":"renovation_area_allowance","catalogue_id":"renovation_area_allowance","auto_factor":1,"scope_action":"installed","source":"Illustrative renovated floor-area allowance; avoid assessment overlap"}
+      ]
+    }
+  ]
+}

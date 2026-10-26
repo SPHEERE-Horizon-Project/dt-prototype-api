@@ -1,5 +1,14 @@
 # Retained methodology (DT-Prototype terminology)
 
+**Edition scope:** the detailed equations and historical checks below describe
+the retained `Monthly_SS_simplified` thermal core, historically known as Model 3. The current workbook extends that
+core with the shared energy layer, alongside `Monthly_SS` and `Monthly_SS_VBDD` companions. See
+[current workbook instructions, formulas and field map](workbook_instructions.md)
+and [current validation evidence](../reports/workbooks/workbook_validation.md).
+The thermal-only exclusions below do not mean that the new `Energy_*` sheets
+exclude systems, renewables, primary energy, carbon or energy cost. Original
+workbooks and historical verification figures have not been rewritten.
+
 Historical run paths below refer to archived evidence. Current commands are in the root README.
 
 # Integrated Seasonal/AHU Building Energy Tool — Methodology
@@ -29,9 +38,9 @@ monthly weather and operating inputs that have already been mapped by Python.
 | Tested source run | `20260810_stage4_seasonal_ahu_comparison_002` |
 | Comparison mode | `seasonal_ahu` |
 | Model 3 module SHA-256 | `d0d4add1770f3e21cb9ae178f4ce8d206554a2ec9da1b63c8e50b55373e26f9c` |
-| Python implementation | `src/dt_prototype/integration/model3/model3.py` |
-| Integration mapping | `src/dt_prototype.integration/mapping/reference_to_model3.py` |
-| Integrated engines | `src/dt_prototype.integration/engines/` |
+| Python implementation | `src/dt_prototype/monthly_ss_simplified/model3/model3.py` |
+| Monthly_SS_simplified mapping | `src/dt_prototype/monthly_ss_simplified/mapping/reference_to_model3.py` |
+| Integrated engines | `src/dt_prototype.monthly_ss_simplified/engines/` |
 | Time step | Monthly |
 | Thermal boundary | Single-zone sensible heat balance plus independent sensible AHU coil |
 | Output boundary | Useful zone load + sensible AHU coil load |
@@ -403,16 +412,16 @@ prescribed aggregate gains are deliberate approximations.
 
 The main equation anchors are:
 
-- `src/dt_prototype/integration/model3/model3.py::ventilation_htc`;
-- `src/dt_prototype/integration/model3/model3.py::utilisation_factor_heating`;
-- `src/dt_prototype/integration/model3/model3.py::utilisation_factor_cooling`;
-- `src/dt_prototype/integration/model3/model3.py::_fraction`;
-- `src/dt_prototype/integration/model3/model3.py::building_coefficients`;
-- `src/dt_prototype/integration/model3/model3.py::_ahu_sensible_demand`;
-- `src/dt_prototype/integration/model3/model3.py::monthly_demand`;
-- `src/dt_prototype.integration/mapping/reference_to_model3.py::_monthly_operation_fractions`;
-- `src/dt_prototype.integration/mapping/reference_to_model3.py::_enhanced_airflow_mapping`;
-- `src/dt_prototype.integration/mapping/reference_to_model3.py::write_reference_case_as_model3_inputs`.
+- `src/dt_prototype/monthly_ss_simplified/model3/model3.py::ventilation_htc`;
+- `src/dt_prototype/monthly_ss_simplified/model3/model3.py::utilisation_factor_heating`;
+- `src/dt_prototype/monthly_ss_simplified/model3/model3.py::utilisation_factor_cooling`;
+- `src/dt_prototype/monthly_ss_simplified/model3/model3.py::_fraction`;
+- `src/dt_prototype/monthly_ss_simplified/model3/model3.py::building_coefficients`;
+- `src/dt_prototype/monthly_ss_simplified/model3/model3.py::_ahu_sensible_demand`;
+- `src/dt_prototype/monthly_ss_simplified/model3/model3.py::monthly_demand`;
+- `src/dt_prototype.monthly_ss_simplified/mapping/reference_to_model3.py::_monthly_operation_fractions`;
+- `src/dt_prototype.monthly_ss_simplified/mapping/reference_to_model3.py::_enhanced_airflow_mapping`;
+- `src/dt_prototype.monthly_ss_simplified/mapping/reference_to_model3.py::write_reference_case_as_model3_inputs`.
 
 These anchors, the source-run identifier, and the recorded module hash form the
 minimum audit trail for the supplied workbook.

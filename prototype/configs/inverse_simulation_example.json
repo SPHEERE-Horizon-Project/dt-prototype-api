@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "description": "Fit all supplied solver/representation monthly electricity-import series; no weather or targets are invented.",
+  "operation": "fit",
+  "source": {
+    "type": "energy_run",
+    "results": "../reports/shared_energy",
+    "project_config": "example.json",
+    "resolution": "monthly",
+    "target": "grid_import_kWh"
+  },
+  "models": ["5p_monthly", {"backend":"opendsm_billing", "options":{"allow_disqualified":true}}],
+  "opendsm_python": "../.venv-opendsm/Scripts/python.exe"
+}

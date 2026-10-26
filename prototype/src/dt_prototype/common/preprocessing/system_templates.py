@@ -4,7 +4,7 @@ Migrated from ``reference_ubem.systems_templates.load_system_templates`` /
 ``Systems.xlsx``: short template names (``s1`` .. ``s39``) mapped to explicit
 EN 15316-style efficiency-chain parameters. GeoJSON ``Heating System`` /
 ``Cooling System`` attributes are matched against these templates *before*
-the descriptive catalog-name parsing of ``dt_prototype.dynamic.simulation.systems`` —
+the descriptive catalog-name parsing of ``dt_prototype.dynamic_rc.simulation.systems`` —
 only names found in neither fall back to ``IdealLoad``.
 
 This module only loads and validates the JSON database (a plain dict); the
@@ -15,6 +15,7 @@ layer dependency direction intact (NFR-01).
 from __future__ import annotations
 
 import json
+from ..json_io import load_json
 from pathlib import Path
 
 # required numeric fields per template kind (defaults applied when missing)
@@ -61,9 +62,9 @@ def load_system_templates(path: str | Path) -> dict[str, dict[str, dict]]:
     dict
         ``{"heating_systems": {name: params}, "cooling_systems": {...}}``
         with defaults applied — the plain-dict currency consumed by
-        ``dt_prototype.dynamic.simulation.systems``.
+        ``dt_prototype.dynamic_rc.simulation.systems``.
     """
-    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    data = load_json(path)
     out: dict[str, dict[str, dict]] = {"heating_systems": {}, "cooling_systems": {}}
     for kind, defaults in (
         ("heating_systems", _HEATING_DEFAULTS),

@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "case_id": "illustrative_building_mci_aggregation",
+  "source": "how_is_material_circularity_indicator_mci.md",
+  "components": [
+    {"component_id": "C01", "component_name": "Worked-example construction component", "building_layer": "Envelope", "mass_kg": 1000, "mci": 0.775},
+    {"component_id": "C02", "component_name": "Illustrative roof assembly", "building_layer": "Envelope", "mass_kg": 600, "mci": 0.62},
+    {"component_id": "C03", "component_name": "Illustrative structural component", "building_layer": "Structure", "mass_kg": 2400, "mci": 0.35}
+  ],
+  "note": "C01 follows the supplied worked example. C02 and C03 are illustrative pre-computed component inputs used only to demonstrate building aggregation."
+}

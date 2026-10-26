@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "description": "Illustrative project thresholds, to approve before observing holdout scores. Not a claim of compliance with a standard.",
+  "holdout_split": "validation",
+  "minimum_training_days": 365,
+  "minimum_holdout_days": 90,
+  "minimum_holdout_observations": 3,
+  "minimum_training_temperature_span_C": 5,
+  "minimum_prediction_coverage": 1.0,
+  "maximum_abs_NMBE_pct": 5,
+  "maximum_CV_RMSE_pct": {"5p_monthly": 20, "opendsm_billing": 20, "opendsm_hourly": 35},
+  "require_native_qualification": true
+}

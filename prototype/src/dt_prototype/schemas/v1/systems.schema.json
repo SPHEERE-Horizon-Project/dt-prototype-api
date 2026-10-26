@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dt-prototype:input:v1:systems",
+  "title": "DT Prototype systems contract v1",
+  "type": "object",
+  "properties": {
+    "heating_systems": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "emission_efficiency": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "distribution_efficiency": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "regulation_efficiency": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "generation_efficiency": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "dhw_emission_efficiency": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "dhw_distribution_efficiency": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "dhw_regulation_efficiency": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "dhw_generation_efficiency": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "convective_fraction": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "cop": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "dhw_cop": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fuel": {
+            "enum": [
+              "gas",
+              "electric",
+              "district_heat",
+              "other_fuel"
+            ]
+          },
+          "dhw_fuel": {
+            "enum": [
+              "gas",
+              "electric",
+              "district_heat",
+              "other_fuel"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "emitter": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "emission_target_temperature": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        },
+        "required": [],
+        "additionalProperties": false,
+        "patternProperties": {
+          "^_": {}
+        }
+      },
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "\\S"
+      },
+      "patternProperties": {
+        "^_": {}
+      }
+    },
+    "cooling_systems": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "convective_fraction": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "emission_efficiency": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "distribution_efficiency": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "regulation_efficiency": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "fuel": {
+            "enum": [
+              "gas",
+              "electric",
+              "district_heat",
+              "other_fuel"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "emitter": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "eer": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        },
+        "required": [],
+        "additionalProperties": false,
+        "patternProperties": {
+          "^_": {}
+        }
+      },
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "\\S"
+      },
+      "patternProperties": {
+        "^_": {}
+      }
+    }
+  },
+  "required": [],
+  "additionalProperties": false,
+  "patternProperties": {
+    "^_": {}
+  }
+}

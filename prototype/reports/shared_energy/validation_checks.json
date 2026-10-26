@@ -1,0 +1,15 @@
+{
+  "cases": 51,
+  "building_model_months": 612,
+  "buildings": 5,
+  "zone_allocation_max_abs_kWh": 8.731149137020111e-11,
+  "maximum_interval_balance_residual_kWh": 1.1641532182693481e-10,
+  "common_inputs_max_spread_kWh": 1.4551915228366852e-11,
+  "historical_values_compared": 50,
+  "historical_within_rounding": 50,
+  "historical_max_abs_difference_MWh": 0.004989227716123423,
+  "historical_source_sha256": "dabb855aa2af931eded2f3ddc148651b9b6c21347221a809ddd66c28580121f1",
+  "baseline_all_curves_constant": true,
+  "baseline_aggregation_max_abs_kWh": 1.1641532182693479e-10,
+  "vb_monthly_vs_qss_max_abs_kWh": 1.1641532182693481e-10
+}

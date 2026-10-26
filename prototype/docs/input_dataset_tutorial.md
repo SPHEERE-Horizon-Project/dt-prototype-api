@@ -1,5 +1,16 @@
 # Creating and extending a DT-Prototype building dataset
 
+This tutorial covers physical simulation inputs. Measured-energy inputs and
+the full execution sequence are described in [running forward and inverse](running_forward_and_inverse.md).
+
+For consumption as well as thermal demand, supply a separate validated
+`energy_config` with technology assignments for every building ID and explicit
+carrier/renewable assumptions. See [energy contracts](data_contracts.md) and
+[shared-energy commands](shared_energy_layer.md). Geometry/weather/schedule
+changes require fresh preprocessing and a new run; regenerate the
+[verification workbooks](workbook_instructions.md) from that run rather than
+editing frozen Python reference cells.
+
 This tutorial shows how to create a new building dataset, reuse weather and
 model libraries already stored in the project, and add buildings without
 losing the provenance of earlier runs. It uses the normalized CSV geometry
@@ -149,6 +160,7 @@ Every zone needs at least one surface. The combination
 | `area_m2` | Gross surface area in square metres, positive. Window area is derived from the envelope window-to-wall ratio and must not be added as a separate surface. |
 | `azimuth_deg` | Outward-normal compass azimuth: 0 north, 90 east, 180 south, 270 west. |
 | `tilt_deg` | Tilt from horizontal: 0 horizontal and 90 vertical. |
+| `boundary_condition` (optional) | `auto` or `adiabatic`. Missing column/blank cell means `auto`, preserving the surface-type treatment. `adiabatic` suppresses external heat transfer and outdoor solar/sky forcing while retaining construction, physical areas and thermal mass. |
 
 For the 10 m by 10 m, single-storey example:
 
@@ -174,6 +186,12 @@ For the established two-zone convention, the upper zone owns the roof and the
 lower zone owns the ground floor. Both zones have their own external walls and
 internal-mass surfaces. Do not add the interface between them as a heat-loss
 surface: it is treated as unmodelled/adiabatic by the current implementation.
+
+For a selected wall, floor or roof elsewhere, explicitly set the optional
+`boundary_condition` column to `adiabatic`; do not rename the surface type just
+to disable heat exchange. Split a partly exposed surface into separate records.
+The [adiabatic boundary guide](adiabatic_boundaries.md) explains examples,
+renewable/inventory separation and unsupported fully enclosed dynamic zones.
 
 ## 4. Check geometry consistency
 
@@ -264,9 +282,9 @@ an implausible storey height or an inappropriate library assignment.
 Run each required representation into a new output directory:
 
 ```powershell
-python runners/run_dynamic.py --config configs/campus_a_v001.json --output outputs/campus_a_v001_dynamic --model 5R1C
-python runners/run_monthly.py --config configs/campus_a_v001.json --output outputs/campus_a_v001_monthly
-python runners/run_simplified.py --config configs/campus_a_v001.json --output outputs/campus_a_v001_simplified --zone-mode sum
+python runners/run_dynamic_rc.py --config configs/campus_a_v001.json --output outputs/campus_a_v001_dynamic --model 5R1C
+python runners/run_monthly_ss.py --config configs/campus_a_v001.json --output outputs/campus_a_v001_Monthly_SS
+python runners/run_monthly_ss_simplified.py --config configs/campus_a_v001.json --output outputs/campus_a_v001_simplified --zone-mode sum
 ```
 
 Check `manifest.json` for input hashes, resolved settings, status and failed

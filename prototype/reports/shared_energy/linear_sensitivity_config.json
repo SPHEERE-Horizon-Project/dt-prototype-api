@@ -1,0 +1,696 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "model3_linear_curve_sensitivity",
+  "description": "Sensitivity: Model 3 example heat-pump/chiller curves; not fitted to case-study equipment",
+  "currency": "EUR",
+  "carriers": {
+    "electricity": {
+      "primary_nonrenewable": 2.0,
+      "primary_renewable": 0.4,
+      "carbon_kgCO2e_per_kWh": 0.25,
+      "import_price_per_kWh": 0.25,
+      "export_primary_nonrenewable": 0,
+      "export_primary_renewable": 0,
+      "export_carbon_kgCO2e_per_kWh": 0,
+      "export_price_per_kWh": 0.06,
+      "source": "Illustrative test factors/prices, not national factors, tariffs or ISO validation"
+    },
+    "natural_gas": {
+      "primary_nonrenewable": 1.1,
+      "primary_renewable": 0,
+      "carbon_kgCO2e_per_kWh": 0.2,
+      "import_price_per_kWh": 0.09,
+      "export_primary_nonrenewable": 0,
+      "export_primary_renewable": 0,
+      "export_carbon_kgCO2e_per_kWh": 0,
+      "export_price_per_kWh": 0,
+      "source": "Illustrative test factors/prices, not national factors, tariffs or ISO validation"
+    },
+    "district_heat": {
+      "primary_nonrenewable": 1.0,
+      "primary_renewable": 0,
+      "carbon_kgCO2e_per_kWh": 0.15,
+      "import_price_per_kWh": 0.1,
+      "export_primary_nonrenewable": 0,
+      "export_primary_renewable": 0,
+      "export_carbon_kgCO2e_per_kWh": 0,
+      "export_price_per_kWh": 0,
+      "source": "Illustrative test factors/prices, not national factors, tariffs or ISO validation"
+    },
+    "other_fuel": {
+      "primary_nonrenewable": 1.1,
+      "primary_renewable": 0,
+      "carbon_kgCO2e_per_kWh": 0.27,
+      "import_price_per_kWh": 0.11,
+      "export_primary_nonrenewable": 0,
+      "export_primary_renewable": 0,
+      "export_carbon_kgCO2e_per_kWh": 0,
+      "export_price_per_kWh": 0,
+      "source": "Illustrative test factors/prices, not national factors, tariffs or ISO validation"
+    }
+  },
+  "technologies": {
+    "zone_heating_s8": {
+      "carrier": "natural_gas",
+      "performance": {
+        "coefficients": [
+          0.912156819
+        ],
+        "temperature_min_C": -30,
+        "temperature_max_C": 50,
+        "out_of_range": "clip",
+        "source": "supplied systems_templates.json / s8 / zone_heating"
+      },
+      "distribution_efficiency": 0.92,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 0.882,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "Traditional Gas Boiler, Centralized, Low Temp Radiator"
+    },
+    "ahu_heating_s8": {
+      "carrier": "natural_gas",
+      "performance": {
+        "coefficients": [
+          0.912156819
+        ],
+        "temperature_min_C": -30,
+        "temperature_max_C": 50,
+        "out_of_range": "clip",
+        "source": "supplied systems_templates.json / s8 / ahu_heating"
+      },
+      "distribution_efficiency": 0.92,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 1.0,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "Traditional Gas Boiler, Centralized, Low Temp Radiator; AHU coil: generation/distribution only"
+    },
+    "zone_cooling_s1": {
+      "carrier": "electricity",
+      "performance": {
+        "coefficients": [
+          5.2,
+          -0.09
+        ],
+        "temperature_min_C": -10,
+        "temperature_max_C": 45,
+        "out_of_range": "clip",
+        "source": "Monthly_SS_simplified/model3/example_data/systems.csv configuration 2; illustrative transfer only"
+      },
+      "distribution_efficiency": 1.0,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 1.0,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "A-A split"
+    },
+    "ahu_cooling_s1": {
+      "carrier": "electricity",
+      "performance": {
+        "coefficients": [
+          5.2,
+          -0.09
+        ],
+        "temperature_min_C": -10,
+        "temperature_max_C": 45,
+        "out_of_range": "clip",
+        "source": "Monthly_SS_simplified/model3/example_data/systems.csv configuration 2; illustrative transfer only"
+      },
+      "distribution_efficiency": 1.0,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 1.0,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "A-A split; AHU coil: generation/distribution only"
+    },
+    "dhw_s8": {
+      "carrier": "natural_gas",
+      "performance": {
+        "coefficients": [
+          0.912156819
+        ],
+        "temperature_min_C": -30,
+        "temperature_max_C": 50,
+        "out_of_range": "clip",
+        "source": "supplied systems_templates.json / s8 / dhw"
+      },
+      "distribution_efficiency": 0.92,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 0.882,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "Traditional Gas Boiler, Centralized, Low Temp Radiator"
+    },
+    "zone_heating_s19": {
+      "carrier": "natural_gas",
+      "performance": {
+        "coefficients": [
+          0.994771213
+        ],
+        "temperature_min_C": -30,
+        "temperature_max_C": 50,
+        "out_of_range": "clip",
+        "source": "supplied systems_templates.json / s19 / zone_heating"
+      },
+      "distribution_efficiency": 0.97,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 0.82,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "Condensing Gas Boiler, Single, High Temp Radiator"
+    },
+    "ahu_heating_s19": {
+      "carrier": "natural_gas",
+      "performance": {
+        "coefficients": [
+          0.994771213
+        ],
+        "temperature_min_C": -30,
+        "temperature_max_C": 50,
+        "out_of_range": "clip",
+        "source": "supplied systems_templates.json / s19 / ahu_heating"
+      },
+      "distribution_efficiency": 0.97,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 1.0,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "Condensing Gas Boiler, Single, High Temp Radiator; AHU coil: generation/distribution only"
+    },
+    "zone_cooling_s4": {
+      "carrier": "electricity",
+      "performance": {
+        "coefficients": [
+          5.2,
+          -0.09
+        ],
+        "temperature_min_C": -10,
+        "temperature_max_C": 45,
+        "out_of_range": "clip",
+        "source": "Monthly_SS_simplified/model3/example_data/systems.csv configuration 2; illustrative transfer only"
+      },
+      "distribution_efficiency": 0.97,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 0.748,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "A-W chiller, Single, Fan coil"
+    },
+    "ahu_cooling_s4": {
+      "carrier": "electricity",
+      "performance": {
+        "coefficients": [
+          5.2,
+          -0.09
+        ],
+        "temperature_min_C": -10,
+        "temperature_max_C": 45,
+        "out_of_range": "clip",
+        "source": "Monthly_SS_simplified/model3/example_data/systems.csv configuration 2; illustrative transfer only"
+      },
+      "distribution_efficiency": 0.97,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 1.0,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "A-W chiller, Single, Fan coil; AHU coil: generation/distribution only"
+    },
+    "dhw_s19": {
+      "carrier": "natural_gas",
+      "performance": {
+        "coefficients": [
+          0.994771213
+        ],
+        "temperature_min_C": -30,
+        "temperature_max_C": 50,
+        "out_of_range": "clip",
+        "source": "supplied systems_templates.json / s19 / dhw"
+      },
+      "distribution_efficiency": 0.97,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 0.82,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "Condensing Gas Boiler, Single, High Temp Radiator"
+    },
+    "zone_heating_s36": {
+      "carrier": "electricity",
+      "performance": {
+        "coefficients": [
+          2.2,
+          0.09
+        ],
+        "temperature_min_C": -10,
+        "temperature_max_C": 35,
+        "out_of_range": "clip",
+        "source": "Monthly_SS_simplified/model3/example_data/systems.csv configuration 2; illustrative transfer only"
+      },
+      "distribution_efficiency": 0.97,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 0.862,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "A-W Heat Pump, Single, Fan coil"
+    },
+    "ahu_heating_s36": {
+      "carrier": "electricity",
+      "performance": {
+        "coefficients": [
+          2.2,
+          0.09
+        ],
+        "temperature_min_C": -10,
+        "temperature_max_C": 35,
+        "out_of_range": "clip",
+        "source": "Monthly_SS_simplified/model3/example_data/systems.csv configuration 2; illustrative transfer only"
+      },
+      "distribution_efficiency": 0.97,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 1.0,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "A-W Heat Pump, Single, Fan coil; AHU coil: generation/distribution only"
+    },
+    "zone_cooling_s2": {
+      "carrier": "electricity",
+      "performance": {
+        "coefficients": [
+          5.2,
+          -0.09
+        ],
+        "temperature_min_C": -10,
+        "temperature_max_C": 45,
+        "out_of_range": "clip",
+        "source": "Monthly_SS_simplified/model3/example_data/systems.csv configuration 2; illustrative transfer only"
+      },
+      "distribution_efficiency": 0.97,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 0.748,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "A-W chiller, Centralized, Fan coil"
+    },
+    "ahu_cooling_s2": {
+      "carrier": "electricity",
+      "performance": {
+        "coefficients": [
+          5.2,
+          -0.09
+        ],
+        "temperature_min_C": -10,
+        "temperature_max_C": 45,
+        "out_of_range": "clip",
+        "source": "Monthly_SS_simplified/model3/example_data/systems.csv configuration 2; illustrative transfer only"
+      },
+      "distribution_efficiency": 0.97,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 1.0,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "A-W chiller, Centralized, Fan coil; AHU coil: generation/distribution only"
+    },
+    "dhw_s36": {
+      "carrier": "electricity",
+      "performance": {
+        "coefficients": [
+          3.2
+        ],
+        "temperature_min_C": -30,
+        "temperature_max_C": 50,
+        "out_of_range": "clip",
+        "source": "supplied systems_templates.json / s36 / dhw"
+      },
+      "distribution_efficiency": 0.97,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 0.862,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "A-W Heat Pump, Single, Fan coil"
+    },
+    "zone_heating_s14": {
+      "carrier": "natural_gas",
+      "performance": {
+        "coefficients": [
+          0.912156819
+        ],
+        "temperature_min_C": -30,
+        "temperature_max_C": 50,
+        "out_of_range": "clip",
+        "source": "supplied systems_templates.json / s14 / zone_heating"
+      },
+      "distribution_efficiency": 0.92,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 0.857,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "Traditional Gas Boiler, Centralized, Radiant surface"
+    },
+    "ahu_heating_s14": {
+      "carrier": "natural_gas",
+      "performance": {
+        "coefficients": [
+          0.912156819
+        ],
+        "temperature_min_C": -30,
+        "temperature_max_C": 50,
+        "out_of_range": "clip",
+        "source": "supplied systems_templates.json / s14 / ahu_heating"
+      },
+      "distribution_efficiency": 0.92,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 1.0,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "Traditional Gas Boiler, Centralized, Radiant surface; AHU coil: generation/distribution only"
+    },
+    "dhw_s14": {
+      "carrier": "natural_gas",
+      "performance": {
+        "coefficients": [
+          0.912156819
+        ],
+        "temperature_min_C": -30,
+        "temperature_max_C": 50,
+        "out_of_range": "clip",
+        "source": "supplied systems_templates.json / s14 / dhw"
+      },
+      "distribution_efficiency": 0.92,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 0.857,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "Traditional Gas Boiler, Centralized, Radiant surface"
+    },
+    "zone_heating_s18": {
+      "carrier": "natural_gas",
+      "performance": {
+        "coefficients": [
+          0.994771213
+        ],
+        "temperature_min_C": -30,
+        "temperature_max_C": 50,
+        "out_of_range": "clip",
+        "source": "supplied systems_templates.json / s18 / zone_heating"
+      },
+      "distribution_efficiency": 0.92,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 0.82,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "Condensing Gas Boiler, Centralized, High Temp Radiator"
+    },
+    "ahu_heating_s18": {
+      "carrier": "natural_gas",
+      "performance": {
+        "coefficients": [
+          0.994771213
+        ],
+        "temperature_min_C": -30,
+        "temperature_max_C": 50,
+        "out_of_range": "clip",
+        "source": "supplied systems_templates.json / s18 / ahu_heating"
+      },
+      "distribution_efficiency": 0.92,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 1.0,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "Condensing Gas Boiler, Centralized, High Temp Radiator; AHU coil: generation/distribution only"
+    },
+    "dhw_s18": {
+      "carrier": "natural_gas",
+      "performance": {
+        "coefficients": [
+          0.994771213
+        ],
+        "temperature_min_C": -30,
+        "temperature_max_C": 50,
+        "out_of_range": "clip",
+        "source": "supplied systems_templates.json / s18 / dhw"
+      },
+      "distribution_efficiency": 0.92,
+      "emission_efficiency": 1.0,
+      "regulation_efficiency": 0.82,
+      "auxiliary_kWh_per_kWh_generated": 0.0,
+      "description": "Condensing Gas Boiler, Centralized, High Temp Radiator"
+    }
+  },
+  "buildings": {
+    "1": {
+      "services": {
+        "zone_heating": "zone_heating_s8",
+        "ahu_heating": "ahu_heating_s8",
+        "zone_cooling": "zone_cooling_s1",
+        "ahu_cooling": "ahu_cooling_s1",
+        "dhw": "dhw_s8"
+      },
+      "fan_W_per_m3_h": 0.4434,
+      "base_auxiliary_W": 0.0,
+      "source": "Supplied geometry/system templates. Fan coefficient from existing AHU model. No unspecified pump/standby load.",
+      "pv": {
+        "roof_coverage": 0,
+        "module_kWp_per_m2": 0.23529411764705885,
+        "performance_ratio": 0.85,
+        "factor_basis": "overlap",
+        "monthly_factor": [
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65
+        ],
+        "source": "PV tags and 45% roof coverage/module density from existing PV model; PR=.85 and overlap factor=.65 are illustrative assumptions"
+      },
+      "solar_thermal": {
+        "roof_coverage": 0.05,
+        "eta0": 0.8,
+        "a1_W_m2K": 3.5,
+        "a2_W_m2K2": 0.015,
+        "mean_fluid_temperature_C": 50,
+        "monthly_utilisation": [
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6
+        ],
+        "source": "Supplied ST tags; illustrative 5% roof collector area, loss coefficients, fluid temperature and monthly utilisation=.6; no tank model"
+      }
+    },
+    "18": {
+      "services": {
+        "zone_heating": "zone_heating_s19",
+        "ahu_heating": "ahu_heating_s19",
+        "zone_cooling": "zone_cooling_s4",
+        "ahu_cooling": "ahu_cooling_s4",
+        "dhw": "dhw_s19"
+      },
+      "fan_W_per_m3_h": 0.4434,
+      "base_auxiliary_W": 0.0,
+      "source": "Supplied geometry/system templates. Fan coefficient from existing AHU model. No unspecified pump/standby load.",
+      "pv": {
+        "roof_coverage": 0.45,
+        "module_kWp_per_m2": 0.23529411764705885,
+        "performance_ratio": 0.85,
+        "factor_basis": "overlap",
+        "monthly_factor": [
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65
+        ],
+        "source": "PV tags and 45% roof coverage/module density from existing PV model; PR=.85 and overlap factor=.65 are illustrative assumptions"
+      },
+      "solar_thermal": {
+        "roof_coverage": 0.05,
+        "eta0": 0.8,
+        "a1_W_m2K": 3.5,
+        "a2_W_m2K2": 0.015,
+        "mean_fluid_temperature_C": 50,
+        "monthly_utilisation": [
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6
+        ],
+        "source": "Supplied ST tags; illustrative 5% roof collector area, loss coefficients, fluid temperature and monthly utilisation=.6; no tank model"
+      }
+    },
+    "19": {
+      "services": {
+        "zone_heating": "zone_heating_s36",
+        "ahu_heating": "ahu_heating_s36",
+        "zone_cooling": "zone_cooling_s2",
+        "ahu_cooling": "ahu_cooling_s2",
+        "dhw": "dhw_s36"
+      },
+      "fan_W_per_m3_h": 0.4434,
+      "base_auxiliary_W": 0.0,
+      "source": "Supplied geometry/system templates. Fan coefficient from existing AHU model. No unspecified pump/standby load.",
+      "pv": {
+        "roof_coverage": 0,
+        "module_kWp_per_m2": 0.23529411764705885,
+        "performance_ratio": 0.85,
+        "factor_basis": "overlap",
+        "monthly_factor": [
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65
+        ],
+        "source": "PV tags and 45% roof coverage/module density from existing PV model; PR=.85 and overlap factor=.65 are illustrative assumptions"
+      },
+      "solar_thermal": {
+        "roof_coverage": 0,
+        "eta0": 0.8,
+        "a1_W_m2K": 3.5,
+        "a2_W_m2K2": 0.015,
+        "mean_fluid_temperature_C": 50,
+        "monthly_utilisation": [
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6
+        ],
+        "source": "Supplied ST tags; illustrative 5% roof collector area, loss coefficients, fluid temperature and monthly utilisation=.6; no tank model"
+      }
+    },
+    "20": {
+      "services": {
+        "zone_heating": "zone_heating_s14",
+        "ahu_heating": "ahu_heating_s14",
+        "zone_cooling": "zone_cooling_s2",
+        "ahu_cooling": "ahu_cooling_s2",
+        "dhw": "dhw_s14"
+      },
+      "fan_W_per_m3_h": 0.4434,
+      "base_auxiliary_W": 0.0,
+      "source": "Supplied geometry/system templates. Fan coefficient from existing AHU model. No unspecified pump/standby load.",
+      "pv": {
+        "roof_coverage": 0.45,
+        "module_kWp_per_m2": 0.23529411764705885,
+        "performance_ratio": 0.85,
+        "factor_basis": "overlap",
+        "monthly_factor": [
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65
+        ],
+        "source": "PV tags and 45% roof coverage/module density from existing PV model; PR=.85 and overlap factor=.65 are illustrative assumptions"
+      },
+      "solar_thermal": {
+        "roof_coverage": 0,
+        "eta0": 0.8,
+        "a1_W_m2K": 3.5,
+        "a2_W_m2K2": 0.015,
+        "mean_fluid_temperature_C": 50,
+        "monthly_utilisation": [
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6
+        ],
+        "source": "Supplied ST tags; illustrative 5% roof collector area, loss coefficients, fluid temperature and monthly utilisation=.6; no tank model"
+      }
+    },
+    "21": {
+      "services": {
+        "zone_heating": "zone_heating_s18",
+        "ahu_heating": "ahu_heating_s18",
+        "zone_cooling": "zone_cooling_s1",
+        "ahu_cooling": "ahu_cooling_s1",
+        "dhw": "dhw_s18"
+      },
+      "fan_W_per_m3_h": 0.4434,
+      "base_auxiliary_W": 0.0,
+      "source": "Supplied geometry/system templates. Fan coefficient from existing AHU model. No unspecified pump/standby load.",
+      "pv": {
+        "roof_coverage": 0,
+        "module_kWp_per_m2": 0.23529411764705885,
+        "performance_ratio": 0.85,
+        "factor_basis": "overlap",
+        "monthly_factor": [
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65,
+          0.65
+        ],
+        "source": "PV tags and 45% roof coverage/module density from existing PV model; PR=.85 and overlap factor=.65 are illustrative assumptions"
+      },
+      "solar_thermal": {
+        "roof_coverage": 0.05,
+        "eta0": 0.8,
+        "a1_W_m2K": 3.5,
+        "a2_W_m2K2": 0.015,
+        "mean_fluid_temperature_C": 50,
+        "monthly_utilisation": [
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6,
+          0.6
+        ],
+        "source": "Supplied ST tags; illustrative 5% roof collector area, loss coefficients, fluid temperature and monthly utilisation=.6; no tank model"
+      }
+    }
+  }
+}

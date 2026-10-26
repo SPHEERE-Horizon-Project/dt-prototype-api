@@ -1,0 +1,13 @@
+{
+  "schema_version":"1.0",
+  "description":"Genuine hourly Dynamic_RC 5R1C electricity import in five buildings; all backends, with explicit exploratory qualification overrides.",
+  "operation":"fit",
+  "source":{
+    "type":"energy_run","results":"../outputs/pl_off/energy","project_config":"example.json",
+    "resolution":"hourly","target":"grid_import_kWh","models":["Dynamic_RC 5R1C"]
+  },
+  "models":["5p_monthly",{"backend":"opendsm_billing","options":{"allow_disqualified":true}},
+    {"backend":"opendsm_hourly","options":{"variant":"nonsolar","allow_disqualified":true}},
+    {"backend":"opendsm_hourly","options":{"variant":"solar","allow_disqualified":true}}],
+  "opendsm_python":"../.venv-opendsm/Scripts/python.exe"
+}

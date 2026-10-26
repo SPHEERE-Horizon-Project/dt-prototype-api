@@ -1,0 +1,482 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dt-prototype:input:v1:energy",
+  "title": "DT Prototype energy contract v1",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "scenario_id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "currency": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "technologies": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "carrier": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "performance": {
+            "type": "object",
+            "properties": {
+              "coefficients": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 1,
+                "maxItems": 6
+              },
+              "temperature_min_C": {
+                "type": "number"
+              },
+              "temperature_max_C": {
+                "type": "number"
+              },
+              "out_of_range": {
+                "enum": [
+                  "clip",
+                  "error"
+                ]
+              },
+              "source": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            },
+            "required": [
+              "coefficients",
+              "temperature_min_C",
+              "temperature_max_C",
+              "out_of_range",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "distribution_efficiency": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "emission_efficiency": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "regulation_efficiency": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          },
+          "auxiliary_kWh_per_kWh_generated": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "carrier",
+          "performance",
+          "description",
+          "distribution_efficiency",
+          "emission_efficiency",
+          "regulation_efficiency",
+          "auxiliary_kWh_per_kWh_generated"
+        ],
+        "additionalProperties": false
+      },
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "\\S"
+      }
+    },
+    "carriers": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "primary_nonrenewable": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "minItems": 12,
+                "maxItems": 12
+              }
+            ]
+          },
+          "primary_renewable": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "minItems": 12,
+                "maxItems": 12
+              }
+            ]
+          },
+          "carbon_kgCO2e_per_kWh": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "minItems": 12,
+                "maxItems": 12
+              }
+            ]
+          },
+          "import_price_per_kWh": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 12,
+                "maxItems": 12
+              }
+            ]
+          },
+          "export_primary_nonrenewable": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "minItems": 12,
+                "maxItems": 12
+              }
+            ]
+          },
+          "export_primary_renewable": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "minItems": 12,
+                "maxItems": 12
+              }
+            ]
+          },
+          "export_carbon_kgCO2e_per_kWh": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "minItems": 12,
+                "maxItems": 12
+              }
+            ]
+          },
+          "export_price_per_kWh": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 12,
+                "maxItems": 12
+              }
+            ]
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          }
+        },
+        "required": [
+          "primary_nonrenewable",
+          "primary_renewable",
+          "carbon_kgCO2e_per_kWh",
+          "import_price_per_kWh",
+          "export_primary_nonrenewable",
+          "export_primary_renewable",
+          "export_carbon_kgCO2e_per_kWh",
+          "export_price_per_kWh",
+          "source"
+        ],
+        "additionalProperties": false
+      },
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "\\S"
+      }
+    },
+    "buildings": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "services": {
+            "type": "object",
+            "properties": {
+              "zone_heating": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "ahu_heating": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "zone_cooling": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "ahu_cooling": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "dhw": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            },
+            "required": [
+              "zone_heating",
+              "ahu_heating",
+              "zone_cooling",
+              "ahu_cooling",
+              "dhw"
+            ],
+            "additionalProperties": false
+          },
+          "pv": {
+            "type": "object",
+            "properties": {
+              "roof_coverage": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "module_kWp_per_m2": {
+                "type": "number",
+                "minimum": 0
+              },
+              "performance_ratio": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "monthly_factor": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "minItems": 12,
+                    "maxItems": 12
+                  }
+                ]
+              },
+              "factor_basis": {
+                "enum": [
+                  "overlap",
+                  "generation"
+                ]
+              },
+              "source": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            },
+            "required": [
+              "roof_coverage",
+              "module_kWp_per_m2",
+              "performance_ratio",
+              "monthly_factor",
+              "factor_basis",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "solar_thermal": {
+            "type": "object",
+            "properties": {
+              "roof_coverage": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "eta0": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "a1_W_m2K": {
+                "type": "number",
+                "minimum": 0
+              },
+              "a2_W_m2K2": {
+                "type": "number",
+                "minimum": 0
+              },
+              "mean_fluid_temperature_C": {
+                "type": "number"
+              },
+              "monthly_utilisation": {
+                "anyOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "minItems": 12,
+                    "maxItems": 12
+                  }
+                ]
+              },
+              "source": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            },
+            "required": [
+              "roof_coverage",
+              "eta0",
+              "a1_W_m2K",
+              "a2_W_m2K2",
+              "mean_fluid_temperature_C",
+              "monthly_utilisation",
+              "source"
+            ],
+            "additionalProperties": false
+          },
+          "fan_W_per_m3_h": {
+            "type": "number",
+            "minimum": 0
+          },
+          "base_auxiliary_W": {
+            "type": "number",
+            "minimum": 0
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          }
+        },
+        "required": [
+          "services",
+          "pv",
+          "solar_thermal",
+          "fan_W_per_m3_h",
+          "base_auxiliary_W",
+          "source"
+        ],
+        "additionalProperties": false
+      },
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "\\S"
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "scenario_id",
+    "description",
+    "currency",
+    "technologies",
+    "carriers",
+    "buildings"
+  ],
+  "additionalProperties": false
+}

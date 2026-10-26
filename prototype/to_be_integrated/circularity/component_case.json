@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "case_id": "illustrative_component_material_mci",
+  "source": "how_is_material_circularity_indicator_mci.md",
+  "materials": [
+    {
+      "component_id": "C01",
+      "component_name": "Worked-example construction component",
+      "material_id": "M01",
+      "material_name": "Illustrative composite material",
+      "mass_kg": 1000,
+      "recycled_input_fraction": 0.4,
+      "reused_input_fraction": 0.1,
+      "collected_for_recycling_fraction": 0.7,
+      "collected_for_reuse_fraction": 0.2,
+      "recycled_feedstock_efficiency": 1,
+      "end_of_use_recycling_efficiency": 1,
+      "service_life_years": 60,
+      "industry_average_life_years": 50,
+      "use_intensity": 1,
+      "industry_average_use_intensity": 1,
+      "assumption_note": "Exact worked example from the supplied MCI note; illustrative, not measured building data."
+    },
+    {
+      "component_id": "C02",
+      "component_name": "Illustrative roof assembly",
+      "material_id": "M02",
+      "material_name": "Illustrative concrete layer",
+      "mass_kg": 500,
+      "recycled_input_fraction": 0.2,
+      "reused_input_fraction": 0,
+      "collected_for_recycling_fraction": 0.8,
+      "collected_for_reuse_fraction": 0,
+      "recycled_feedstock_efficiency": 0.9,
+      "end_of_use_recycling_efficiency": 0.9,
+      "service_life_years": 50,
+      "industry_average_life_years": 50,
+      "use_intensity": 1,
+      "industry_average_use_intensity": 1,
+      "assumption_note": "Illustrative test input."
+    },
+    {
+      "component_id": "C02",
+      "component_name": "Illustrative roof assembly",
+      "material_id": "M03",
+      "material_name": "Illustrative steel layer",
+      "mass_kg": 100,
+      "recycled_input_fraction": 0.8,
+      "reused_input_fraction": 0,
+      "collected_for_recycling_fraction": 0.95,
+      "collected_for_reuse_fraction": 0,
+      "recycled_feedstock_efficiency": 0.9,
+      "end_of_use_recycling_efficiency": 0.95,
+      "service_life_years": 50,
+      "industry_average_life_years": 50,
+      "use_intensity": 1,
+      "industry_average_use_intensity": 1,
+      "assumption_note": "Illustrative test input."
+    }
+  ]
+}

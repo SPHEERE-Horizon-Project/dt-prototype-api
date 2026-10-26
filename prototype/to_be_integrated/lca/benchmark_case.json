@@ -1,0 +1,674 @@
+{
+  "schema_version": "1.0",
+  "case_id": "workbook_cached_design_1_lyon",
+  "source": {
+    "workbook": "energy_model/outputs/revised_energy_model.xlsx",
+    "sha256": "379531a7c90bffe7818db93393cf7333fefdad780146833de98a0cd4a490d3da",
+    "worksheet": "ENERGY MODEL-DSS",
+    "selected_rows": "565-600",
+    "selection": "Design option 1; Lyon; cached benchmark values"
+  },
+  "project": {
+    "lifetime_years": 30,
+    "net_floor_area_m2": 1112.8
+  },
+  "renovation": {
+    "embodied_energy_kwh_per_m2_inferred_from_formula": 9.779654654654667,
+    "source_reported_unit": "kWh (LCA settings!C2)",
+    "embodied_carbon_kg_per_m2": 2.098648648648649,
+    "source_reported_unit_carbon": "kg/m2",
+    "source_cells": {
+      "energy": "LCA settings!D2",
+      "carbon": "LCA settings!D3"
+    }
+  },
+  "electricity_factors": {
+    "primary_energy_factor": 1.95,
+    "carbon_kgco2_per_kwh": 0.43,
+    "source_cells": {
+      "primary_energy": "ENERGY MODEL-DSS!T499",
+      "carbon": "ENERGY MODEL-DSS!T504"
+    }
+  },
+  "pre_retrofit": {
+    "heating_fuel_type": "electricity-no fuel",
+    "dhw_fuel_type": "electricity-no fuel",
+    "electricity_kwh": 133536,
+    "heating_fuel_quantity": 0,
+    "dhw_fuel_quantity": 0,
+    "fuel_unit_source_label": "unit(m3;l;kg)",
+    "dhw_fuel_primary_formula_source": "ENERGY MODEL-DSS!T595"
+  },
+  "technologies": [
+    {
+      "code_energy": "A129",
+      "code_carbon": "A140",
+      "name": "Façade insulation",
+      "embodied_energy_kwh_per_unit": 192.5,
+      "embodied_energy_unit": "kWh/m2",
+      "embodied_carbon_kg_per_unit": 65,
+      "embodied_carbon_unit": "kg/m2",
+      "lifetime_years": 40,
+      "size": 1027.42,
+      "size_unit": "m2",
+      "source_cells": {
+        "energy": "ENERGY MODEL-DSS!T568",
+        "carbon": "ENERGY MODEL-DSS!T569",
+        "lifetime": "ENERGY MODEL-DSS!T570",
+        "size": "ENERGY MODEL-DSS!T571"
+      },
+      "asset_id": "facade_insulation",
+      "category_id": "envelope.wall.insulation",
+      "building_layer": "envelope",
+      "scope_action": "installed",
+      "base_size": 1027.42,
+      "sizing_factor": 1.0,
+      "sizing_basis": "retrofitted façade area"
+    },
+    {
+      "code_energy": "A130",
+      "code_carbon": "A141",
+      "name": "Roof insulation",
+      "embodied_energy_kwh_per_unit": 174.72222222222223,
+      "embodied_energy_unit": "kWh/m2",
+      "embodied_carbon_kg_per_unit": 52,
+      "embodied_carbon_unit": "kg/m2",
+      "lifetime_years": 40,
+      "size": 616,
+      "size_unit": "m2",
+      "source_cells": {
+        "energy": "ENERGY MODEL-DSS!U568",
+        "carbon": "ENERGY MODEL-DSS!U569",
+        "lifetime": "ENERGY MODEL-DSS!U570",
+        "size": "ENERGY MODEL-DSS!U571"
+      },
+      "asset_id": "roof_insulation",
+      "category_id": "envelope.roof.insulation",
+      "building_layer": "envelope",
+      "scope_action": "installed",
+      "base_size": 616,
+      "sizing_factor": 1.0,
+      "sizing_basis": "retrofitted roof area"
+    },
+    {
+      "code_energy": "A131",
+      "code_carbon": "A142",
+      "name": "Basement insulation",
+      "embodied_energy_kwh_per_unit": 192.5,
+      "embodied_energy_unit": "kWh/m2",
+      "embodied_carbon_kg_per_unit": 65,
+      "embodied_carbon_unit": "kg/m2",
+      "lifetime_years": 40,
+      "size": 629,
+      "size_unit": "m2",
+      "source_cells": {
+        "energy": "ENERGY MODEL-DSS!V568",
+        "carbon": "ENERGY MODEL-DSS!V569",
+        "lifetime": "ENERGY MODEL-DSS!V570",
+        "size": "ENERGY MODEL-DSS!V571"
+      },
+      "asset_id": "basement_insulation",
+      "category_id": "envelope.ground.insulation",
+      "building_layer": "envelope",
+      "scope_action": "installed",
+      "base_size": 629,
+      "sizing_factor": 1.0,
+      "sizing_basis": "retrofitted basement area"
+    },
+    {
+      "code_energy": "A132",
+      "code_carbon": "A143",
+      "name": "Glazing system",
+      "embodied_energy_kwh_per_unit": 143.61111111111111,
+      "embodied_energy_unit": "kWh/m2",
+      "embodied_carbon_kg_per_unit": 39,
+      "embodied_carbon_unit": "kg/m2",
+      "lifetime_years": 30,
+      "size": 182.57999999999998,
+      "size_unit": "m2",
+      "source_cells": {
+        "energy": "ENERGY MODEL-DSS!W568",
+        "carbon": "ENERGY MODEL-DSS!W569",
+        "lifetime": "ENERGY MODEL-DSS!W570",
+        "size": "ENERGY MODEL-DSS!W571"
+      },
+      "asset_id": "glazing_system",
+      "category_id": "envelope.window.glazing",
+      "building_layer": "envelope",
+      "scope_action": "installed",
+      "base_size": 182.57999999999998,
+      "sizing_factor": 1.0,
+      "sizing_basis": "replaced glazed area"
+    },
+    {
+      "code_energy": "A133",
+      "code_carbon": "A144",
+      "name": "Heat pump system",
+      "embodied_energy_kwh_per_unit": 6206.388888888889,
+      "embodied_energy_unit": "kWh/unit",
+      "embodied_carbon_kg_per_unit": 2288,
+      "embodied_carbon_unit": "kg/unit",
+      "lifetime_years": 15,
+      "size": 3,
+      "size_unit": "unit",
+      "source_cells": {
+        "energy": "ENERGY MODEL-DSS!X568",
+        "carbon": "ENERGY MODEL-DSS!X569",
+        "lifetime": "ENERGY MODEL-DSS!X570",
+        "size": "ENERGY MODEL-DSS!X571"
+      },
+      "asset_id": "heat_pump_system",
+      "category_id": "technical_system.heat_pump_group",
+      "building_layer": "technical_system",
+      "scope_action": "installed",
+      "base_size": 3,
+      "sizing_factor": 1.0,
+      "sizing_basis": "three heat pumps in the system"
+    },
+    {
+      "code_energy": "A134",
+      "code_carbon": "A145",
+      "name": "Water tank",
+      "embodied_energy_kwh_per_unit": 6689.722222222222,
+      "embodied_energy_unit": "kWh/unit",
+      "embodied_carbon_kg_per_unit": 2288,
+      "embodied_carbon_unit": "kg/unit",
+      "lifetime_years": 30,
+      "size": 0,
+      "size_unit": "unit",
+      "source_cells": {
+        "energy": "ENERGY MODEL-DSS!Y568",
+        "carbon": "ENERGY MODEL-DSS!Y569",
+        "lifetime": "ENERGY MODEL-DSS!Y570",
+        "size": "ENERGY MODEL-DSS!Y571"
+      },
+      "asset_id": "water_tank",
+      "category_id": "technical_system.water_tank",
+      "building_layer": "technical_system",
+      "scope_action": "installed",
+      "base_size": 0,
+      "sizing_factor": 1.0,
+      "sizing_basis": "installed water tanks"
+    },
+    {
+      "code_energy": "A135",
+      "code_carbon": "A146",
+      "name": "BACS (Building Automation and Control Systems)",
+      "embodied_energy_kwh_per_unit": 4988.611111111111,
+      "embodied_energy_unit": "kWh/unit",
+      "embodied_carbon_kg_per_unit": 1636,
+      "embodied_carbon_unit": "kg/unit",
+      "lifetime_years": 30,
+      "size": 3,
+      "size_unit": "unit",
+      "source_cells": {
+        "energy": "ENERGY MODEL-DSS!Z568",
+        "carbon": "ENERGY MODEL-DSS!Z569",
+        "lifetime": "ENERGY MODEL-DSS!Z570",
+        "size": "ENERGY MODEL-DSS!Z571"
+      },
+      "asset_id": "bacs",
+      "category_id": "control.bacs",
+      "building_layer": "control",
+      "scope_action": "installed",
+      "base_size": 3,
+      "sizing_factor": 1.0,
+      "sizing_basis": "BACS installation quantity"
+    },
+    {
+      "code_energy": "A136",
+      "code_carbon": "A147",
+      "name": "Fan coils HVAC",
+      "embodied_energy_kwh_per_unit": 212.22222222222223,
+      "embodied_energy_unit": "kWh/unit",
+      "embodied_carbon_kg_per_unit": 79,
+      "embodied_carbon_unit": "kg/unit",
+      "lifetime_years": 12,
+      "size": 20,
+      "size_unit": "unit",
+      "source_cells": {
+        "energy": "ENERGY MODEL-DSS!AA568",
+        "carbon": "ENERGY MODEL-DSS!AA569",
+        "lifetime": "ENERGY MODEL-DSS!AA570",
+        "size": "ENERGY MODEL-DSS!AA571"
+      },
+      "asset_id": "fan_coils_hvac",
+      "category_id": "technical_system.terminal.fan_coil",
+      "building_layer": "technical_system",
+      "scope_action": "installed",
+      "base_size": 20,
+      "sizing_factor": 1.0,
+      "sizing_basis": "installed HVAC fan-coil terminals"
+    },
+    {
+      "code_energy": "A137",
+      "code_carbon": "A148",
+      "name": "DHW heat pump",
+      "embodied_energy_kwh_per_unit": 284.1666666666667,
+      "embodied_energy_unit": "kWh/unit",
+      "embodied_carbon_kg_per_unit": 80,
+      "embodied_carbon_unit": "kg/unit",
+      "lifetime_years": 12,
+      "size": 26,
+      "size_unit": "unit",
+      "source_cells": {
+        "energy": "ENERGY MODEL-DSS!AB568",
+        "carbon": "ENERGY MODEL-DSS!AB569",
+        "lifetime": "ENERGY MODEL-DSS!AB570",
+        "size": "ENERGY MODEL-DSS!AB571"
+      },
+      "asset_id": "dhw_heat_pump",
+      "category_id": "technical_system.heat_pump.dhw",
+      "building_layer": "technical_system",
+      "scope_action": "installed",
+      "base_size": 26,
+      "sizing_factor": 1.0,
+      "sizing_basis": "dedicated DHW heat pumps; source quantity"
+    },
+    {
+      "code_energy": "A138",
+      "code_carbon": "A149",
+      "name": "Batteries",
+      "embodied_energy_kwh_per_unit": 275.8333333333333,
+      "embodied_energy_unit": "kWh/unit",
+      "embodied_carbon_kg_per_unit": 95,
+      "embodied_carbon_unit": "kg/unit",
+      "lifetime_years": 8,
+      "size": 0,
+      "size_unit": "unit",
+      "source_cells": {
+        "energy": "ENERGY MODEL-DSS!AC568",
+        "carbon": "ENERGY MODEL-DSS!AC569",
+        "lifetime": "ENERGY MODEL-DSS!AC570",
+        "size": "ENERGY MODEL-DSS!AC571"
+      },
+      "asset_id": "battery_system",
+      "category_id": "energy_storage.battery",
+      "building_layer": "energy_storage",
+      "scope_action": "installed",
+      "base_size": 0,
+      "sizing_factor": 1.0,
+      "sizing_basis": "installed battery capacity"
+    },
+    {
+      "code_energy": "A139",
+      "code_carbon": "A150",
+      "name": "PV system",
+      "embodied_energy_kwh_per_unit": 6736.111111111111,
+      "embodied_energy_unit": "kWh/kW",
+      "embodied_carbon_kg_per_unit": 248,
+      "embodied_carbon_unit": "kg/kW",
+      "lifetime_years": 25,
+      "size": 0,
+      "size_unit": "kW",
+      "source_cells": {
+        "energy": "ENERGY MODEL-DSS!AD568",
+        "carbon": "ENERGY MODEL-DSS!AD569",
+        "lifetime": "ENERGY MODEL-DSS!AD570",
+        "size": "ENERGY MODEL-DSS!AD571"
+      },
+      "asset_id": "pv_system",
+      "category_id": "renewable.pv",
+      "building_layer": "renewable",
+      "scope_action": "installed",
+      "base_size": 0,
+      "sizing_factor": 1.0,
+      "sizing_basis": "total installed PV capacity"
+    }
+  ],
+  "fuel_factors": [
+    {
+      "fuel_type": "natural gas L",
+      "lower_heating_value_kwh_per_unit": 8.797297297297296,
+      "primary_energy_factor": 1.1,
+      "carbon_factor_kgco2_per_kwh": 0.22,
+      "source_row": 2
+    },
+    {
+      "fuel_type": "natural gas H",
+      "lower_heating_value_kwh_per_unit": 10.306306306306306,
+      "primary_energy_factor": 1.1,
+      "carbon_factor_kgco2_per_kwh": 0.22,
+      "source_row": 3
+    },
+    {
+      "fuel_type": "methane",
+      "lower_heating_value_kwh_per_unit": 9.972972972972972,
+      "primary_energy_factor": 1.1,
+      "carbon_factor_kgco2_per_kwh": 0.22,
+      "source_row": 4
+    },
+    {
+      "fuel_type": "biogas",
+      "lower_heating_value_kwh_per_unit": 5.405405405405405,
+      "primary_energy_factor": 0.4,
+      "carbon_factor_kgco2_per_kwh": 0.1,
+      "source_row": 5
+    },
+    {
+      "fuel_type": "heating oil light",
+      "lower_heating_value_kwh_per_unit": 11.735849056603772,
+      "primary_energy_factor": 1.1,
+      "carbon_factor_kgco2_per_kwh": 0.29,
+      "source_row": 6
+    },
+    {
+      "fuel_type": "heating oil heavy",
+      "lower_heating_value_kwh_per_unit": 12.117924528301884,
+      "primary_energy_factor": 1.1,
+      "carbon_factor_kgco2_per_kwh": 0.29,
+      "source_row": 7
+    },
+    {
+      "fuel_type": "80 propane:20 butane",
+      "lower_heating_value_kwh_per_unit": 12.688073394495412,
+      "primary_energy_factor": 1.1,
+      "carbon_factor_kgco2_per_kwh": 0.29,
+      "source_row": 8
+    },
+    {
+      "fuel_type": "70 propane:30 butane",
+      "lower_heating_value_kwh_per_unit": 12.688073394495412,
+      "primary_energy_factor": 1.1,
+      "carbon_factor_kgco2_per_kwh": 0.29,
+      "source_row": 9
+    },
+    {
+      "fuel_type": "60 propane:40 butane",
+      "lower_heating_value_kwh_per_unit": 12.669724770642201,
+      "primary_energy_factor": 1.1,
+      "carbon_factor_kgco2_per_kwh": 0.29,
+      "source_row": 10
+    },
+    {
+      "fuel_type": "50 propane:50 butane",
+      "lower_heating_value_kwh_per_unit": 12.642201834862384,
+      "primary_energy_factor": 1.1,
+      "carbon_factor_kgco2_per_kwh": 0.29,
+      "source_row": 11
+    },
+    {
+      "fuel_type": "commercial propane",
+      "lower_heating_value_kwh_per_unit": 12.743119266055045,
+      "primary_energy_factor": 1.1,
+      "carbon_factor_kgco2_per_kwh": 0.29,
+      "source_row": 12
+    },
+    {
+      "fuel_type": "anthracite",
+      "lower_heating_value_kwh_per_unit": 8.942307692307693,
+      "primary_energy_factor": 1.1,
+      "carbon_factor_kgco2_per_kwh": 0.36,
+      "source_row": 13
+    },
+    {
+      "fuel_type": "bituminous coal",
+      "lower_heating_value_kwh_per_unit": 5.5769230769230775,
+      "primary_energy_factor": 1.1,
+      "carbon_factor_kgco2_per_kwh": 0.36,
+      "source_row": 14
+    },
+    {
+      "fuel_type": "charcoal",
+      "lower_heating_value_kwh_per_unit": 7.903846153846154,
+      "primary_energy_factor": 1.1,
+      "carbon_factor_kgco2_per_kwh": 0.36,
+      "source_row": 15
+    },
+    {
+      "fuel_type": "coke",
+      "lower_heating_value_kwh_per_unit": 7.884615384615383,
+      "primary_energy_factor": 1.1,
+      "carbon_factor_kgco2_per_kwh": 0.36,
+      "source_row": 16
+    },
+    {
+      "fuel_type": "lignite",
+      "lower_heating_value_kwh_per_unit": 5.787037037037036,
+      "primary_energy_factor": 1.1,
+      "carbon_factor_kgco2_per_kwh": 0.36,
+      "source_row": 17
+    },
+    {
+      "fuel_type": "peat",
+      "lower_heating_value_kwh_per_unit": 4.259259259259259,
+      "primary_energy_factor": 1.1,
+      "carbon_factor_kgco2_per_kwh": 0.36,
+      "source_row": 18
+    },
+    {
+      "fuel_type": "wood (dry)",
+      "lower_heating_value_kwh_per_unit": 3.981481481481481,
+      "primary_energy_factor": 0.2,
+      "carbon_factor_kgco2_per_kwh": 0.04,
+      "source_row": 19
+    }
+  ],
+  "expected_cells": {
+    "568": {
+      "T568": 192.5,
+      "U568": 174.72222222222223,
+      "V568": 192.5,
+      "W568": 143.61111111111111,
+      "X568": 6206.388888888889,
+      "Y568": 6689.722222222222,
+      "Z568": 4988.611111111111,
+      "AA568": 212.22222222222223,
+      "AB568": 284.1666666666667,
+      "AC568": 275.8333333333333,
+      "AD568": 6736.111111111111
+    },
+    "569": {
+      "T569": 65,
+      "U569": 52,
+      "V569": 65,
+      "W569": 39,
+      "X569": 2288,
+      "Y569": 2288,
+      "Z569": 1636,
+      "AA569": 79,
+      "AB569": 80,
+      "AC569": 95,
+      "AD569": 248
+    },
+    "570": {
+      "T570": 40,
+      "U570": 40,
+      "V570": 40,
+      "W570": 30,
+      "X570": 15,
+      "Y570": 30,
+      "Z570": 30,
+      "AA570": 12,
+      "AB570": 12,
+      "AC570": 8,
+      "AD570": 25
+    },
+    "571": {
+      "T571": 1027.42,
+      "U571": 616,
+      "V571": 629,
+      "W571": 182.57999999999998,
+      "X571": 3,
+      "Y571": 0,
+      "Z571": 3,
+      "AA571": 20,
+      "AB571": 26,
+      "AC571": 0,
+      "AD571": 0
+    },
+    "572": {
+      "T572": 1,
+      "U572": 1,
+      "V572": 1,
+      "W572": 1,
+      "X572": 2,
+      "Y572": 1,
+      "Z572": 1,
+      "AA572": 3,
+      "AB572": 3,
+      "AC572": 4,
+      "AD572": 2
+    },
+    "573": {
+      "T573": 4944.458750000001,
+      "U573": 2690.722222222222,
+      "V573": 3027.0625,
+      "W573": 874.0172222222221,
+      "X573": 1241.2777777777778,
+      "Y573": 0,
+      "Z573": 498.8611111111111,
+      "AA573": 353.70370370370375,
+      "AB573": 615.6944444444445,
+      "AC573": 0,
+      "AD573": 0
+    },
+    "574": {
+      "T574": 1669.5575000000001,
+      "U574": 800.8000000000001,
+      "V574": 1022.125,
+      "W574": 237.35399999999998,
+      "X574": 457.6,
+      "Y574": 0,
+      "Z574": 163.6,
+      "AA574": 131.66666666666666,
+      "AB574": 173.33333333333334,
+      "AC574": 0,
+      "AD574": 0
+    },
+    "575": {
+      "T575": 197778.35,
+      "U575": 107628.88888888889,
+      "V575": 121082.5,
+      "W575": 26220.516666666666,
+      "X575": 37238.33333333333,
+      "Y575": 0,
+      "Z575": 14965.833333333334,
+      "AA575": 12733.333333333336,
+      "AB575": 22165,
+      "AC575": 0,
+      "AD575": 0
+    },
+    "576": {
+      "T576": 66782.3,
+      "U576": 32032,
+      "V576": 40885,
+      "W576": 7120.619999999999,
+      "X576": 13728,
+      "Y576": 0,
+      "Z576": 4908,
+      "AA576": 4740,
+      "AB576": 6240,
+      "AC576": 0,
+      "AD576": 0
+    },
+    "577": {
+      "T577": 10,
+      "U577": 10,
+      "V577": 10,
+      "W577": 0,
+      "X577": 0,
+      "Y577": 0,
+      "Z577": 0,
+      "AA577": 6,
+      "AB577": 6,
+      "AC577": 2,
+      "AD577": 20
+    },
+    "578": {
+      "T578": 362.75998998999046
+    },
+    "579": {
+      "T579": 77.84587387387388
+    },
+    "580": {
+      "T580": 10882.799699699714
+    },
+    "581": {
+      "T581": 2335.3762162162166
+    },
+    "582": {
+      "T582": 14608.557721471474
+    },
+    "583": {
+      "T583": 4733.882373873874
+    },
+    "584": {
+      "T584": 550695.5552552552
+    },
+    "585": {
+      "T585": 178771.2962162162
+    },
+    "586": {
+      "T586": "electricity-no fuel"
+    },
+    "587": {
+      "T587": "electricity-no fuel"
+    },
+    "588": {
+      "T588": 133536
+    },
+    "589": {
+      "T589": 0
+    },
+    "590": {
+      "T590": 0
+    },
+    "591": {
+      "T591": 260395.19999999998
+    },
+    "592": {
+      "T592": 57420.479999999996
+    },
+    "593": {
+      "T593": 0
+    },
+    "594": {
+      "T594": 0
+    },
+    "595": {
+      "T595": 0
+    },
+    "596": {
+      "T596": 0
+    },
+    "597": {
+      "T597": 260395.19999999998
+    },
+    "598": {
+      "T598": 57420.479999999996
+    },
+    "599": {
+      "T599": 13.127747772709808
+    },
+    "600": {
+      "T600": 4.254028013905351
+    }
+  },
+  "expected_outputs": {
+    "T582": 14608.557721471474,
+    "T583": 4733.882373873874,
+    "T584": 550695.5552552552,
+    "T585": 178771.2962162162,
+    "T591": 260395.19999999998,
+    "T592": 57420.479999999996,
+    "T593": 0,
+    "T594": 0,
+    "T595": 0,
+    "T596": 0,
+    "T597": 260395.19999999998,
+    "T598": 57420.479999999996,
+    "T599": 13.127747772709808,
+    "T600": 4.254028013905351
+  },
+  "known_source_issue": {
+    "cell": "ENERGY MODEL-DSS!T595",
+    "formula": "=IF(T587=\"electricity-no fuel\",0,\"T553\"*(INDEX(...)))",
+    "description": "The quoted \"T553\" is a text literal, not a cell reference. The current benchmark selects no fuel and returns 0 through the IF branch. For a non-electricity DHW fuel the source formula yields a value error; this translation preserves and reports that limitation rather than silently changing the formula."
+  },
+  "notes": [
+    "Technology installations are linked to LCC replacement counts in the source workbook; standalone LCA computes the same count from project and service lives.",
+    "The source labels LCA settings D2 as kWh, while its formula multiplies by conditioned floor area and labels the result kWh; this module labels the dimensional input kWh/m2 as inferred from that formula and retains the source-reported unit in metadata.",
+    "DHW heat pump is a separate hot-water device. The source quantity and per-unit factors are preserved; the historical quantity 26 is a benchmark input, not an automatically validated design or an inferred kW capacity."
+  ]
+}

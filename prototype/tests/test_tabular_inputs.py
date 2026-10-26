@@ -12,10 +12,10 @@ from dt_prototype.cli import main as cli_main
 from dt_prototype.common.preprocessing.geometry import load_district_geojson
 from dt_prototype.common.preprocessing.tabular_geometry import load_district_tables
 from dt_prototype.common.project import ProjectInputs
-from dt_prototype.dynamic.simulation.config import SimulationConfig as DynamicConfig
-from dt_prototype.dynamic.simulation.runner import run_building as run_dynamic
-from dt_prototype.monthly.run import run_building as run_monthly
-from dt_prototype.monthly.simulation.config import SimulationConfig as MonthlyConfig
+from dt_prototype.dynamic_rc.simulation.config import SimulationConfig as DynamicConfig
+from dt_prototype.dynamic_rc.simulation.runner import run_building as run_dynamic
+from dt_prototype.monthly_ss.run import run_building as run_monthly
+from dt_prototype.monthly_ss.simulation.config import SimulationConfig as MonthlyConfig
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -84,7 +84,7 @@ def test_simplified_cli_results_are_identical_for_both_input_routes(tmp_path):
     tabular_output = tmp_path / "simplified_tabular"
     cli_main(
         [
-            "simplified",
+            "Monthly_SS_simplified",
             "--config",
             str(CONFIGS / "example.json"),
             "--output",
@@ -95,7 +95,7 @@ def test_simplified_cli_results_are_identical_for_both_input_routes(tmp_path):
     )
     cli_main(
         [
-            "simplified",
+            "Monthly_SS_simplified",
             "--config",
             str(CONFIGS / "example_tabular.json"),
             "--output",

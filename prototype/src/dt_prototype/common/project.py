@@ -1,10 +1,10 @@
 """Versioned shared input configuration for all DT-Prototype entry points."""
 from dataclasses import dataclass
 import hashlib
-import json
 import math
 from pathlib import Path
 from .input_validation import validate_calendar, validate_resolution
+from .json_io import load_json
 from .preprocessing.building_input import preprocess_district, preprocess_tabular_district
 from .preprocessing.geometry import load_district_geojson
 from .preprocessing.tabular_geometry import TABLE_FILENAMES, load_district_tables
@@ -32,15 +32,23 @@ class ProjectInputs:
     @classmethod
     def load(cls, path):
         path=Path(path).resolve()
-        configuration=json.loads(path.read_text(encoding='utf-8'))
+        configuration=load_json(path)
         if not isinstance(configuration, dict):
             raise ValueError('Configuration must be a JSON object')
         if configuration.get('schema_version')!='1.0':
             raise ValueError('Expected input schema_version 1.0')
+        allowed = {'schema_version', 'description', 'inputs', 'operating', 'dynamic', 'simplified'}
+        if set(configuration) - allowed:
+            raise ValueError(f'Unknown configuration fields: {sorted(set(configuration) - allowed)}')
         for section in ['inputs', 'operating', 'dynamic', 'simplified']:
             if not isinstance(configuration.get(section), dict):
                 raise ValueError(f'Missing configuration object {section}')
         data=configuration['inputs']
+        allowed_inputs = {'geometry', 'geometry_format', 'weather_epw', 'envelopes',
+                          'schedules', 'systems', 'calendar_year', 'time_steps_per_hour',
+                          'azimuth_subdivisions'}
+        if set(data) - allowed_inputs:
+            raise ValueError(f'Unknown inputs fields: {sorted(set(data) - allowed_inputs)}')
         for key in ['calendar_year','time_steps_per_hour','azimuth_subdivisions']:
             if key not in data:raise ValueError(f'Missing explicit input {key}')
         validate_calendar(data['calendar_year'])
@@ -82,6 +90,8 @@ class ProjectInputs:
                     or not math.isfinite(value) or sign * value < 0):
                 raise ValueError(f'dynamic.{key} must be finite with the correct sign, or null')
         simplified = configuration['simplified']
+        if set(simplified) - {'zone_mode', 'comparison_mode'}:
+            raise ValueError(f"Unknown simplified settings: {sorted(set(simplified) - {'zone_mode', 'comparison_mode'})}")
         if simplified.get('zone_mode') not in ('sum', 'collapsed', 'both'):
             raise ValueError('simplified.zone_mode must be sum, collapsed or both')
         if simplified.get('comparison_mode') not in ('legacy', 'seasonal_ahu'):

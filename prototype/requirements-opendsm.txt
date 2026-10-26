@@ -1,0 +1,4 @@
+# Isolated worker only. Do not install into the main pandas 3 environment.
+opendsm==1.2.7
+pandas==2.3.3
+multimethod<2

@@ -36,16 +36,31 @@ def preview(value: object) -> object:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("engine", choices=("dynamic", "monthly", "simplified"))
+    parser.add_argument("engine", choices=("dynamic", "monthly", "simplified", "vbdd"))
+    parser.add_argument(
+        "--energy",
+        action="store_true",
+        help="Call /runs/{engine}/energy with the example energy config",
+    )
     parser.add_argument("--base-url", default="http://127.0.0.1:8000")
     args = parser.parse_args()
-    example = openapi_spec()["components"]["examples"][f"{args.engine.title()}Request"]["value"]
-    project = copy.deepcopy(example["project"])
+    examples = openapi_spec()["components"]["examples"]
+    # The degree-day method takes the same project as the monthly one.
+    name = "Monthly" if args.engine == "vbdd" else args.engine.title()
+    project = copy.deepcopy(examples[f"{name}Request"]["value"]["project"])
     project["run_id"] = f"example_{args.engine}_{uuid.uuid4().hex[:12]}"
+    path = f"/runs/{args.engine}"
+    extra = {}
+    if args.energy:
+        path += "/energy"
+        if args.engine == "dynamic":
+            project["dynamic"].update(latent=False, plants=False, pv_battery=False)
+        energy = json.dumps(examples["EnergyConfigExample"]["value"])
+        extra["energy"] = ("energy.json", energy, "application/json")
     try:
         with WEATHER.open("rb") as weather:
             response = httpx.post(
-                f"{args.base_url.rstrip('/')}/runs/{args.engine}",
+                f"{args.base_url.rstrip('/')}{path}",
                 files={
                     "project": (
                         "project.json",
@@ -53,6 +68,7 @@ def main() -> None:
                         "application/json",
                     ),
                     "weather_epw": (WEATHER.name, weather, "text/plain"),
+                    **extra,
                 },
                 timeout=None,
             )
@@ -62,7 +78,7 @@ def main() -> None:
         raise SystemExit(f"HTTP {response.status_code}: {response.text[:2000]}")
     result = response.json()
     print(json.dumps(preview(result), indent=2, ensure_ascii=False))
-    if result["manifest"]["status"] != "complete":
+    if result["manifest"].get("status") != "complete":
         raise SystemExit(1)
 
 

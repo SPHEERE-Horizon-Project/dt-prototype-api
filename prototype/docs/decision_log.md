@@ -1,8 +1,21 @@
 # DT-Prototype decision log
 
+## 2026-10-10: shared energy workbook and contract completion
+
+The current distribution has four thermal families and one optional downstream
+energy layer. Three formula workbooks now expose monthly system/carrier,
+renewable/meter and impact calculations. Existing simplified/VB thermal sheets
+are preserved; QSS has a direct balance companion. Weather-derived production
+and ancillary loads are explicit preprocessing inputs, not inferred from monthly
+thermal demand. Frozen Python values feed terminal audits only. Native Excel
+checks include all reported VB modes and meaningful input perturbations.
+See [workbook instructions](workbook_instructions.md) and
+[validation evidence](../reports/workbooks/workbook_validation.md).
+The earlier dated decisions below describe their historical version.
+
 ## 2026-09-17: consolidation without changing scientific assumptions
 
-1. One installed package and a single versioned input manifest serve three independent launchers. Separate physical solvers remain separate.
+1. One installed package and a single versioned input manifest originally served three independent launchers; Monthly_SS_VBDD later became the fourth. Separate physical solvers remain separate.
 2. Case display names become Test building 1–5, in the requested order. IDs 1,18,19,20,21 are unchanged; they also influence deterministic stochastic-system inputs. Physical inputs and geometry remain unchanged.
 3. The primary comparison remains useful sensible zone plus AHU demand, in positive kWh. Candidate-minus-reference differences use the reference denominator. Legacy Model 3 has a different AHU boundary and remains explicitly NOT_COMPARABLE for strict totals.
 4. Independent lower/upper zones are retained, with no new inter-zone heat transfer. The collapsed alternative maps complete two-zone inputs into one equivalent case; it is not the removal of a zone. A native single-zone input needs no second-zone placeholders.
@@ -23,19 +36,20 @@ The original integration decisions for 5P fitting, coefficient interpretation an
 
 The separate active `third_party/model3_legacy` location was confusing because
 Model 3 is required by simplified simulations. The complete pipeline now lives
-in `src/dt_prototype/integration/model3/`, beside its adapter, mapping and
+in `src/dt_prototype/monthly_ss_simplified/model3/`, beside its adapter, mapping and
 comparison workflow. `Model3Engine` imports that module directly.
 
 The calculation source, example CSVs and golden reference CSVs were moved
 without byte changes. Documentation and small command wrappers were adjusted
 only so the pipeline runs as an installed subpackage. The former folder is
-recoverably archived under `archive/previous_layout/third_party/`.
+preserved in the user's pre-cleanup backup.
 
 The source hash remains
 `d0d4add1770f3e21cb9ae178f4ce8d206554a2ec9da1b63c8e50b55373e26f9c`.
 Both simplified zone representations and all detailed five-building comparison
-rows reproduce the previous numerical results exactly. Evidence is in
-`outputs/20260917_model3_relocation_verification/verification.json`.
+rows reproduce the previous numerical results exactly. The embedded Model 3
+golden outputs and current regression suite retain this check; the dated
+relocation artifact remains in the user's backup.
 
 ## 2026-09-17: unified launchers and tabular geometry
 

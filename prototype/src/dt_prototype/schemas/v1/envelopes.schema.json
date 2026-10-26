@@ -1,0 +1,1022 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dt-prototype:input:v1:envelopes",
+  "title": "DT Prototype envelopes contract v1",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "envelopes": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "ext_wall": {
+                "type": "object",
+                "properties": {
+                  "layers": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "thickness": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "conductivity": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "density": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "specific_heat": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        }
+                      },
+                      "required": [
+                        "thickness",
+                        "conductivity",
+                        "density",
+                        "specific_heat"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 1
+                  },
+                  "u_value": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "mass_class": {
+                    "enum": [
+                      "Very heavy",
+                      "Heavy",
+                      "Medium",
+                      "Light",
+                      "Very light"
+                    ]
+                  },
+                  "absorptance": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [],
+                "additionalProperties": false,
+                "patternProperties": {
+                  "^_": {}
+                },
+                "anyOf": [
+                  {
+                    "required": [
+                      "layers"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "u_value"
+                    ]
+                  }
+                ]
+              },
+              "roof": {
+                "type": "object",
+                "properties": {
+                  "layers": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "thickness": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "conductivity": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "density": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "specific_heat": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        }
+                      },
+                      "required": [
+                        "thickness",
+                        "conductivity",
+                        "density",
+                        "specific_heat"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 1
+                  },
+                  "u_value": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "mass_class": {
+                    "enum": [
+                      "Very heavy",
+                      "Heavy",
+                      "Medium",
+                      "Light",
+                      "Very light"
+                    ]
+                  },
+                  "absorptance": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [],
+                "additionalProperties": false,
+                "patternProperties": {
+                  "^_": {}
+                },
+                "anyOf": [
+                  {
+                    "required": [
+                      "layers"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "u_value"
+                    ]
+                  }
+                ]
+              },
+              "ground_floor": {
+                "type": "object",
+                "properties": {
+                  "layers": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "thickness": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "conductivity": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "density": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "specific_heat": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        }
+                      },
+                      "required": [
+                        "thickness",
+                        "conductivity",
+                        "density",
+                        "specific_heat"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 1
+                  },
+                  "u_value": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "mass_class": {
+                    "enum": [
+                      "Very heavy",
+                      "Heavy",
+                      "Medium",
+                      "Light",
+                      "Very light"
+                    ]
+                  },
+                  "absorptance": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [],
+                "additionalProperties": false,
+                "patternProperties": {
+                  "^_": {}
+                },
+                "anyOf": [
+                  {
+                    "required": [
+                      "layers"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "u_value"
+                    ]
+                  }
+                ]
+              },
+              "int_wall": {
+                "type": "object",
+                "properties": {
+                  "layers": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "thickness": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "conductivity": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "density": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "specific_heat": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        }
+                      },
+                      "required": [
+                        "thickness",
+                        "conductivity",
+                        "density",
+                        "specific_heat"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 1
+                  },
+                  "u_value": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "mass_class": {
+                    "enum": [
+                      "Very heavy",
+                      "Heavy",
+                      "Medium",
+                      "Light",
+                      "Very light"
+                    ]
+                  },
+                  "absorptance": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [],
+                "additionalProperties": false,
+                "patternProperties": {
+                  "^_": {}
+                },
+                "anyOf": [
+                  {
+                    "required": [
+                      "layers"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "u_value"
+                    ]
+                  }
+                ]
+              },
+              "int_ceiling": {
+                "type": "object",
+                "properties": {
+                  "layers": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "thickness": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "conductivity": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "density": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "specific_heat": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        }
+                      },
+                      "required": [
+                        "thickness",
+                        "conductivity",
+                        "density",
+                        "specific_heat"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 1
+                  },
+                  "u_value": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "mass_class": {
+                    "enum": [
+                      "Very heavy",
+                      "Heavy",
+                      "Medium",
+                      "Light",
+                      "Very light"
+                    ]
+                  },
+                  "absorptance": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [],
+                "additionalProperties": false,
+                "patternProperties": {
+                  "^_": {}
+                },
+                "anyOf": [
+                  {
+                    "required": [
+                      "layers"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "u_value"
+                    ]
+                  }
+                ]
+              },
+              "int_floor": {
+                "type": "object",
+                "properties": {
+                  "layers": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "thickness": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "conductivity": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "density": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "specific_heat": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        }
+                      },
+                      "required": [
+                        "thickness",
+                        "conductivity",
+                        "density",
+                        "specific_heat"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 1
+                  },
+                  "u_value": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "mass_class": {
+                    "enum": [
+                      "Very heavy",
+                      "Heavy",
+                      "Medium",
+                      "Light",
+                      "Very light"
+                    ]
+                  },
+                  "absorptance": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [],
+                "additionalProperties": false,
+                "patternProperties": {
+                  "^_": {}
+                },
+                "anyOf": [
+                  {
+                    "required": [
+                      "layers"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "u_value"
+                    ]
+                  }
+                ]
+              },
+              "window": {
+                "type": "object",
+                "properties": {
+                  "u_value": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "shgc": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "frame_factor": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "shading_coef": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                },
+                "required": [
+                  "u_value",
+                  "shgc"
+                ],
+                "additionalProperties": false
+              },
+              "wwr": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "infiltration_ach": {
+                "type": "number",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "ext_wall",
+              "roof",
+              "ground_floor",
+              "int_wall",
+              "int_ceiling",
+              "window"
+            ],
+            "additionalProperties": false,
+            "patternProperties": {
+              "^_": {}
+            }
+          },
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "patternProperties": {
+            "^_": {}
+          }
+        }
+      },
+      "required": [
+        "envelopes"
+      ],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^_": {}
+      }
+    },
+    {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "ext_wall": {
+            "type": "object",
+            "properties": {
+              "layers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "thickness": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "conductivity": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "density": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "specific_heat": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    }
+                  },
+                  "required": [
+                    "thickness",
+                    "conductivity",
+                    "density",
+                    "specific_heat"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1
+              },
+              "u_value": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "mass_class": {
+                "enum": [
+                  "Very heavy",
+                  "Heavy",
+                  "Medium",
+                  "Light",
+                  "Very light"
+                ]
+              },
+              "absorptance": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "required": [],
+            "additionalProperties": false,
+            "patternProperties": {
+              "^_": {}
+            },
+            "anyOf": [
+              {
+                "required": [
+                  "layers"
+                ]
+              },
+              {
+                "required": [
+                  "u_value"
+                ]
+              }
+            ]
+          },
+          "roof": {
+            "type": "object",
+            "properties": {
+              "layers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "thickness": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "conductivity": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "density": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "specific_heat": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    }
+                  },
+                  "required": [
+                    "thickness",
+                    "conductivity",
+                    "density",
+                    "specific_heat"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1
+              },
+              "u_value": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "mass_class": {
+                "enum": [
+                  "Very heavy",
+                  "Heavy",
+                  "Medium",
+                  "Light",
+                  "Very light"
+                ]
+              },
+              "absorptance": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "required": [],
+            "additionalProperties": false,
+            "patternProperties": {
+              "^_": {}
+            },
+            "anyOf": [
+              {
+                "required": [
+                  "layers"
+                ]
+              },
+              {
+                "required": [
+                  "u_value"
+                ]
+              }
+            ]
+          },
+          "ground_floor": {
+            "type": "object",
+            "properties": {
+              "layers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "thickness": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "conductivity": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "density": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "specific_heat": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    }
+                  },
+                  "required": [
+                    "thickness",
+                    "conductivity",
+                    "density",
+                    "specific_heat"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1
+              },
+              "u_value": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "mass_class": {
+                "enum": [
+                  "Very heavy",
+                  "Heavy",
+                  "Medium",
+                  "Light",
+                  "Very light"
+                ]
+              },
+              "absorptance": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "required": [],
+            "additionalProperties": false,
+            "patternProperties": {
+              "^_": {}
+            },
+            "anyOf": [
+              {
+                "required": [
+                  "layers"
+                ]
+              },
+              {
+                "required": [
+                  "u_value"
+                ]
+              }
+            ]
+          },
+          "int_wall": {
+            "type": "object",
+            "properties": {
+              "layers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "thickness": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "conductivity": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "density": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "specific_heat": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    }
+                  },
+                  "required": [
+                    "thickness",
+                    "conductivity",
+                    "density",
+                    "specific_heat"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1
+              },
+              "u_value": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "mass_class": {
+                "enum": [
+                  "Very heavy",
+                  "Heavy",
+                  "Medium",
+                  "Light",
+                  "Very light"
+                ]
+              },
+              "absorptance": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "required": [],
+            "additionalProperties": false,
+            "patternProperties": {
+              "^_": {}
+            },
+            "anyOf": [
+              {
+                "required": [
+                  "layers"
+                ]
+              },
+              {
+                "required": [
+                  "u_value"
+                ]
+              }
+            ]
+          },
+          "int_ceiling": {
+            "type": "object",
+            "properties": {
+              "layers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "thickness": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "conductivity": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "density": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "specific_heat": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    }
+                  },
+                  "required": [
+                    "thickness",
+                    "conductivity",
+                    "density",
+                    "specific_heat"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1
+              },
+              "u_value": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "mass_class": {
+                "enum": [
+                  "Very heavy",
+                  "Heavy",
+                  "Medium",
+                  "Light",
+                  "Very light"
+                ]
+              },
+              "absorptance": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "required": [],
+            "additionalProperties": false,
+            "patternProperties": {
+              "^_": {}
+            },
+            "anyOf": [
+              {
+                "required": [
+                  "layers"
+                ]
+              },
+              {
+                "required": [
+                  "u_value"
+                ]
+              }
+            ]
+          },
+          "int_floor": {
+            "type": "object",
+            "properties": {
+              "layers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "thickness": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "conductivity": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "density": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "specific_heat": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    }
+                  },
+                  "required": [
+                    "thickness",
+                    "conductivity",
+                    "density",
+                    "specific_heat"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 1
+              },
+              "u_value": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "mass_class": {
+                "enum": [
+                  "Very heavy",
+                  "Heavy",
+                  "Medium",
+                  "Light",
+                  "Very light"
+                ]
+              },
+              "absorptance": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "required": [],
+            "additionalProperties": false,
+            "patternProperties": {
+              "^_": {}
+            },
+            "anyOf": [
+              {
+                "required": [
+                  "layers"
+                ]
+              },
+              {
+                "required": [
+                  "u_value"
+                ]
+              }
+            ]
+          },
+          "window": {
+            "type": "object",
+            "properties": {
+              "u_value": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "shgc": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "frame_factor": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "shading_coef": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "required": [
+              "u_value",
+              "shgc"
+            ],
+            "additionalProperties": false
+          },
+          "wwr": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "infiltration_ach": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "ext_wall",
+          "roof",
+          "ground_floor",
+          "int_wall",
+          "int_ceiling",
+          "window"
+        ],
+        "additionalProperties": false,
+        "patternProperties": {
+          "^_": {}
+        }
+      },
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "\\S"
+      },
+      "patternProperties": {
+        "^_": {}
+      },
+      "not": {
+        "required": [
+          "envelopes"
+        ]
+      }
+    }
+  ]
+}

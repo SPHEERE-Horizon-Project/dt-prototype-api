@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opendsm-benchmark"
+version = "1.2.0"
+description = "OpenDSM hourly models as the benchmark of energy_insight: predictions in and out of sample on the shared cross-validation folds"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "opendsm==1.2.7",
+    "multimethod<2",          # scikit-fda (an OpenDSM dependency) fails to import with multimethod 2.x
+    "pandas>=2.2,<3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+opendsm-benchmark = "opendsm_benchmark.pipeline:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

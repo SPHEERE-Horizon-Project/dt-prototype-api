@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dt-prototype:input:v1:project",
+  "title": "DT Prototype project contract v1",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "inputs": {
+      "type": "object",
+      "properties": {
+        "geometry": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "weather_epw": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "envelopes": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "schedules": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "systems": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "geometry_format": {
+          "enum": [
+            "geojson",
+            "tabular"
+          ]
+        },
+        "calendar_year": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9998
+        },
+        "time_steps_per_hour": {
+          "enum": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            10,
+            12,
+            15,
+            20,
+            30,
+            60
+          ]
+        },
+        "azimuth_subdivisions": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 360
+        }
+      },
+      "required": [
+        "geometry",
+        "weather_epw",
+        "envelopes",
+        "schedules",
+        "systems",
+        "calendar_year",
+        "time_steps_per_hour",
+        "azimuth_subdivisions"
+      ],
+      "additionalProperties": false
+    },
+    "operating": {
+      "type": "object",
+      "properties": {
+        "heating_season": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 365
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "cooling_season": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 365
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "ahu_mode": {
+          "enum": [
+            "extended",
+            "basic"
+          ]
+        },
+        "initial_temperature": {
+          "type": "number"
+        },
+        "initial_specific_humidity": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "heating_season",
+        "cooling_season",
+        "ahu_mode",
+        "initial_temperature",
+        "initial_specific_humidity"
+      ],
+      "additionalProperties": false
+    },
+    "dynamic": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "enum": [
+            "5R1C",
+            "7R2C",
+            "1C",
+            "2C"
+          ]
+        },
+        "latent": {
+          "type": "boolean"
+        },
+        "plants": {
+          "type": "boolean"
+        },
+        "dhw_tank": {
+          "type": "boolean"
+        },
+        "pv_battery": {
+          "type": "boolean"
+        },
+        "sizing": {
+          "enum": [
+            "static",
+            "design_day"
+          ]
+        },
+        "heating_max_power": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cooling_max_power": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "maximum": 0
+        }
+      },
+      "required": [
+        "model"
+      ],
+      "additionalProperties": false
+    },
+    "simplified": {
+      "type": "object",
+      "properties": {
+        "zone_mode": {
+          "enum": [
+            "sum",
+            "collapsed",
+            "both"
+          ]
+        },
+        "comparison_mode": {
+          "enum": [
+            "legacy",
+            "seasonal_ahu"
+          ]
+        }
+      },
+      "required": [
+        "zone_mode",
+        "comparison_mode"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "inputs",
+    "operating",
+    "dynamic",
+    "simplified"
+  ],
+  "additionalProperties": false
+}

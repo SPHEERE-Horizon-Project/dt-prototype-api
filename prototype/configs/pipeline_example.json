@@ -1,0 +1,8 @@
+{
+  "schema_version": "1.0",
+  "description": "Existing all-engine simulation; external assessment disabled by default.",
+  "project_config": "example.json",
+  "energy_config": "energy_example.json",
+  "energy": {"mode": "run", "engine": "all", "zone_mode": "both"},
+  "assessment": {"enabled": false}
+}

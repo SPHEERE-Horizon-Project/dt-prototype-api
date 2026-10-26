@@ -1,0 +1,9 @@
+{
+  "schema_version": "1.0",
+  "mode": "forward",
+  "project_config": "example.json",
+  "energy_config": "energy_example.json",
+  "energy": {"mode":"run", "engine":"Monthly_SS"},
+  "analysis": {"enabled":true, "config":"inverse_simulation_example.json"},
+  "assessment": {"enabled":false}
+}

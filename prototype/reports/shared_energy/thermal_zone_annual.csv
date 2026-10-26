@@ -1,0 +1,80 @@
+building_id,building_name,model,representation,resolution,year,zone_id,zone_heating_kWh,ahu_heating_kWh,zone_cooling_kWh,ahu_cooling_kWh
+1,Test building 1,Dynamic_RC 5R1C,sum_of_independent_zones,dynamic,2023,lower,30434.67165965287,71191.11817021467,33185.25693115502,12939.264445369046
+1,Test building 1,Dynamic_RC 5R1C,sum_of_independent_zones,dynamic,2023,upper,118291.32626724994,84482.89812371257,9753.615809765493,7922.511516818018
+1,Test building 1,Dynamic_RC 7R2C,sum_of_independent_zones,dynamic,2023,lower,37588.02955339432,72558.68664118924,33593.71822312142,12614.801980507977
+1,Test building 1,Dynamic_RC 7R2C,sum_of_independent_zones,dynamic,2023,upper,123898.5883530908,84269.8828186947,8510.84171203971,8160.512396752164
+1,Test building 1,Monthly_SS,sum_of_independent_zones,monthly,2023,lower,44853.633003174444,77678.26780233835,40209.158855828086,10918.9447098622
+1,Test building 1,Monthly_SS,sum_of_independent_zones,monthly,2023,upper,116792.33686569793,80756.7046934252,11603.466541345935,9372.597019430399
+1,Test building 1,Monthly_SS_simplified collapsed,single_zone_collapsed,monthly,2023,collapsed,132538.98069192626,164246.48654395615,49156.85097770968,17775.12890611763
+1,Test building 1,Monthly_SS_simplified zone sum,sum_of_independent_zones,monthly,2023,lower,43435.85680781291,76229.32889290512,39662.27164265636,9536.366956584518
+1,Test building 1,Monthly_SS_simplified zone sum,sum_of_independent_zones,monthly,2023,upper,116466.09480105387,79551.91126599906,11759.038013364618,8238.761949533062
+1,Test building 1,Monthly_SS_VBDD fixed collapsed,single_zone_collapsed,monthly,2023,collapsed,130710.958613511,158434.97249576356,30591.50367326674,20291.5417292926
+1,Test building 1,Monthly_SS_VBDD fixed zone sum,sum_of_independent_zones,monthly,2023,lower,20203.58095303308,77678.26780233835,33057.46938850852,10918.9447098622
+1,Test building 1,Monthly_SS_VBDD fixed zone sum,sum_of_independent_zones,monthly,2023,upper,113845.93568890286,80756.7046934252,4610.452595087667,9372.597019430399
+1,Test building 1,Monthly_SS_VBDD linear collapsed,single_zone_collapsed,monthly,2023,collapsed,146014.1445271082,158434.97249576356,48618.50249523443,20291.5417292926
+1,Test building 1,Monthly_SS_VBDD linear zone sum,sum_of_independent_zones,monthly,2023,lower,44856.314540628024,77678.26780233835,40456.966042822474,10918.9447098622
+1,Test building 1,Monthly_SS_VBDD linear zone sum,sum_of_independent_zones,monthly,2023,upper,116671.29382422134,80756.7046934252,11827.304792760717,9372.597019430399
+1,Test building 1,Monthly_SS_VBDD monthly collapsed,single_zone_collapsed,monthly,2023,collapsed,146108.8859615211,158434.97249576356,47748.937671621636,20291.5417292926
+1,Test building 1,Monthly_SS_VBDD monthly zone sum,sum_of_independent_zones,monthly,2023,lower,44853.63300317447,77678.26780233835,40209.158855828086,10918.9447098622
+1,Test building 1,Monthly_SS_VBDD monthly zone sum,sum_of_independent_zones,monthly,2023,upper,116792.33686569797,80756.7046934252,11603.466541345922,9372.597019430399
+18,Test building 2,Dynamic_RC 5R1C,sum_of_independent_zones,dynamic,2023,lower,18583.261250699303,30109.881653967834,15731.972362303184,5334.1429381492935
+18,Test building 2,Dynamic_RC 5R1C,sum_of_independent_zones,dynamic,2023,upper,79984.0174210562,0.0,9275.905542887687,0.0
+18,Test building 2,Dynamic_RC 7R2C,sum_of_independent_zones,dynamic,2023,lower,24229.94520928202,30771.777569010603,15597.680181795622,5163.925771614221
+18,Test building 2,Dynamic_RC 7R2C,sum_of_independent_zones,dynamic,2023,upper,83917.4691619152,0.0,9047.100079392236,0.0
+18,Test building 2,Monthly_SS,sum_of_independent_zones,monthly,2023,lower,26300.21219420612,31973.451814120926,19516.876322389595,4494.389002471039
+18,Test building 2,Monthly_SS,sum_of_independent_zones,monthly,2023,upper,79780.72621795197,0.0,10278.199943405658,0.0
+18,Test building 2,Monthly_SS_simplified collapsed,single_zone_collapsed,monthly,2023,collapsed,92464.19213677206,35726.98607300778,28496.964171115622,3925.300833741706
+18,Test building 2,Monthly_SS_simplified zone sum,sum_of_independent_zones,monthly,2023,lower,26561.171095121703,31377.048473610645,19638.47336018819,3925.300833741706
+18,Test building 2,Monthly_SS_simplified zone sum,sum_of_independent_zones,monthly,2023,upper,79717.54094277548,0.0,10706.776160970578,0.0
+18,Test building 2,Monthly_SS_VBDD fixed collapsed,single_zone_collapsed,monthly,2023,collapsed,92090.83324887499,31973.451814120926,21419.365034534203,4494.38900247104
+18,Test building 2,Monthly_SS_VBDD fixed zone sum,sum_of_independent_zones,monthly,2023,lower,16859.627711582558,31973.451814120926,16315.497485762855,4494.38900247104
+18,Test building 2,Monthly_SS_VBDD fixed zone sum,sum_of_independent_zones,monthly,2023,upper,78450.15125652462,0.0,7314.96318332545,0.0
+18,Test building 2,Monthly_SS_VBDD linear collapsed,single_zone_collapsed,monthly,2023,collapsed,99680.10931388769,31973.451814120926,29844.320721019256,4494.38900247104
+18,Test building 2,Monthly_SS_VBDD linear zone sum,sum_of_independent_zones,monthly,2023,lower,26267.04911918773,31973.451814120926,19759.243412231022,4494.38900247104
+18,Test building 2,Monthly_SS_VBDD linear zone sum,sum_of_independent_zones,monthly,2023,upper,79613.68239061035,0.0,10655.46465813624,0.0
+18,Test building 2,Monthly_SS_VBDD monthly collapsed,single_zone_collapsed,monthly,2023,collapsed,99837.43721481762,31973.451814120926,29126.244117718812,4494.38900247104
+18,Test building 2,Monthly_SS_VBDD monthly zone sum,sum_of_independent_zones,monthly,2023,lower,26300.212194206117,31973.451814120926,19516.87632238959,4494.38900247104
+18,Test building 2,Monthly_SS_VBDD monthly zone sum,sum_of_independent_zones,monthly,2023,upper,79780.72621795197,0.0,10278.19994340566,0.0
+19,Test building 3,Dynamic_RC 5R1C,sum_of_independent_zones,dynamic,2023,lower,27843.205606594292,39133.69892815377,17789.062044469105,6491.605272580426
+19,Test building 3,Dynamic_RC 5R1C,sum_of_independent_zones,dynamic,2023,upper,233052.02060243668,0.0,10873.011057187583,0.0
+19,Test building 3,Dynamic_RC 7R2C,sum_of_independent_zones,dynamic,2023,lower,33759.82829089525,39670.82581568176,17816.87936715579,6351.985915479479
+19,Test building 3,Dynamic_RC 7R2C,sum_of_independent_zones,dynamic,2023,upper,241140.52631861778,0.0,10009.623874339883,0.0
+19,Test building 3,Monthly_SS,sum_of_independent_zones,monthly,2023,lower,36180.83025266658,40557.746547130686,22314.37274289226,5701.0513317779405
+19,Test building 3,Monthly_SS,sum_of_independent_zones,monthly,2023,upper,227574.96336630656,0.0,9847.524056790538,0.0
+19,Test building 3,Monthly_SS_simplified collapsed,single_zone_collapsed,monthly,2023,collapsed,244526.13410348777,46008.76417490068,30734.392304699795,4979.173261043597
+19,Test building 3,Monthly_SS_simplified zone sum,sum_of_independent_zones,monthly,2023,lower,35856.936633918405,39801.2196739954,22208.914406988508,4979.173261043597
+19,Test building 3,Monthly_SS_simplified zone sum,sum_of_independent_zones,monthly,2023,upper,225671.69485532766,0.0,10285.58909763395,0.0
+19,Test building 3,Monthly_SS_VBDD fixed collapsed,single_zone_collapsed,monthly,2023,collapsed,243424.72012414958,40557.746547130686,14332.848060384416,5701.0513317779405
+19,Test building 3,Monthly_SS_VBDD fixed zone sum,sum_of_independent_zones,monthly,2023,lower,24330.481022356595,40557.746547130686,17450.185241128187,5701.0513317779405
+19,Test building 3,Monthly_SS_VBDD fixed zone sum,sum_of_independent_zones,monthly,2023,upper,226721.52914095242,0.0,3624.9839416075583,0.0
+19,Test building 3,Monthly_SS_VBDD linear collapsed,single_zone_collapsed,monthly,2023,collapsed,252020.5456180855,40557.746547130686,29687.701799097318,5701.0513317779405
+19,Test building 3,Monthly_SS_VBDD linear zone sum,sum_of_independent_zones,monthly,2023,lower,36189.2344684907,40557.746547130686,22505.958160223145,5701.0513317779405
+19,Test building 3,Monthly_SS_VBDD linear zone sum,sum_of_independent_zones,monthly,2023,upper,226968.2496454281,0.0,9988.496389509024,0.0
+19,Test building 3,Monthly_SS_VBDD monthly collapsed,single_zone_collapsed,monthly,2023,collapsed,252258.3982210016,40557.746547130686,29206.594374208027,5701.0513317779405
+19,Test building 3,Monthly_SS_VBDD monthly zone sum,sum_of_independent_zones,monthly,2023,lower,36180.83025266659,40557.746547130686,22314.37274289226,5701.0513317779405
+19,Test building 3,Monthly_SS_VBDD monthly zone sum,sum_of_independent_zones,monthly,2023,upper,227574.96336630653,0.0,9847.52405679054,0.0
+20,Test building 4,Dynamic_RC 5R1C,sum_of_independent_zones,dynamic,2023,lower,287708.50971291715,0.0,5367.986724114435,0.0
+20,Test building 4,Dynamic_RC 5R1C,sum_of_independent_zones,dynamic,2023,upper,450601.0032412984,443517.13183299487,27307.88042327053,40120.3449306898
+20,Test building 4,Dynamic_RC 7R2C,sum_of_independent_zones,dynamic,2023,lower,310726.78622048936,0.0,4953.610367879342,0.0
+20,Test building 4,Dynamic_RC 7R2C,sum_of_independent_zones,dynamic,2023,upper,471105.5826684281,443009.6911932936,23040.784593357963,40983.520611027576
+20,Test building 4,Monthly_SS,sum_of_independent_zones,monthly,2023,lower,296723.4689279719,0.0,2660.5141610684523,0.0
+20,Test building 4,Monthly_SS,sum_of_independent_zones,monthly,2023,upper,437363.64879394986,425487.87150579435,32594.626310342563,49381.984708492804
+20,Test building 4,Monthly_SS_simplified collapsed,single_zone_collapsed,monthly,2023,collapsed,726062.0033754373,419140.1014601269,35848.51108016373,43408.077373359556
+20,Test building 4,Monthly_SS_simplified zone sum,sum_of_independent_zones,monthly,2023,lower,295093.41680673877,0.0,2358.8496495376385,0.0
+20,Test building 4,Monthly_SS_simplified zone sum,sum_of_independent_zones,monthly,2023,upper,436116.9128067415,419140.1014601269,33296.93980977261,43408.077373359556
+20,Test building 4,Monthly_SS_VBDD fixed collapsed,single_zone_collapsed,monthly,2023,collapsed,720469.3566728208,425487.87150579435,7547.976716459074,49381.984708492804
+20,Test building 4,Monthly_SS_VBDD fixed zone sum,sum_of_independent_zones,monthly,2023,lower,296516.895582318,0.0,0.0,0.0
+20,Test building 4,Monthly_SS_VBDD fixed zone sum,sum_of_independent_zones,monthly,2023,upper,427613.62046386104,425487.87150579435,9075.880861307574,49381.984708492804
+20,Test building 4,Monthly_SS_VBDD linear collapsed,single_zone_collapsed,monthly,2023,collapsed,728324.2504839515,425487.87150579435,35021.61308126922,49381.984708492804
+20,Test building 4,Monthly_SS_VBDD linear zone sum,sum_of_independent_zones,monthly,2023,lower,296414.66179795034,0.0,2729.6169706633436,0.0
+20,Test building 4,Monthly_SS_VBDD linear zone sum,sum_of_independent_zones,monthly,2023,upper,437265.07658388896,425487.87150579435,33513.57239572006,49381.984708492804
+20,Test building 4,Monthly_SS_VBDD monthly collapsed,single_zone_collapsed,monthly,2023,collapsed,728891.1994379957,425487.87150579435,34102.75450993467,49381.984708492804
+20,Test building 4,Monthly_SS_VBDD monthly zone sum,sum_of_independent_zones,monthly,2023,lower,296723.4689279718,0.0,2660.51416106845,0.0
+20,Test building 4,Monthly_SS_VBDD monthly zone sum,sum_of_independent_zones,monthly,2023,upper,437363.64879394986,425487.87150579435,32594.62631034254,49381.984708492804
+21,Test building 5,Dynamic_RC 5R1C,native_single_zone,dynamic,2023,single,1380903.653303716,1641609.2667585958,70277.65283397846,146499.75735221486
+21,Test building 5,Dynamic_RC 7R2C,native_single_zone,dynamic,2023,single,1452655.7888840218,1640362.0698128925,57244.367184745584,148920.79555962948
+21,Test building 5,Monthly_SS,native_single_zone,monthly,2023,single,1350612.0584433794,1580575.5452503446,85648.02117976134,183441.08641674236
+21,Test building 5,Monthly_SS_simplified zone sum,native_single_zone,monthly,2023,single,1351482.6540694572,1556995.248905945,93065.42426391359,161249.59172128272
+21,Test building 5,Monthly_SS_VBDD fixed zone sum,native_single_zone,monthly,2023,single,1324020.283267122,1580575.5452503446,18118.609025030106,183441.0864167424
+21,Test building 5,Monthly_SS_VBDD linear zone sum,native_single_zone,monthly,2023,single,1351458.2515039283,1580575.5452503446,88762.6638839704,183441.0864167424
+21,Test building 5,Monthly_SS_VBDD monthly zone sum,native_single_zone,monthly,2023,single,1350612.0584433794,1580575.5452503446,85648.02117976137,183441.0864167424

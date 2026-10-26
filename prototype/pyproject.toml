@@ -4,30 +4,46 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dt-prototype"
-version = "0.4.0"
-description = "Independent dynamic, monthly and simplified building-energy tools with shared inputs"
+version = "0.5.1"
+description = "Dynamic_RC, Monthly_SS, Monthly_SS_simplified, Monthly_SS_VBDD and Energy_carriers building model components"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = ["numpy", "pandas", "matplotlib"]
+dependencies = ["numpy", "pandas", "matplotlib", "jsonschema>=4.18,<5"]
 license = {text = "See LICENSE and THIRD_PARTY_NOTICES.md"}
 
 [project.optional-dependencies]
-dev = ["pytest"]
+dev = ["pytest", "openpyxl"]
+quantity-inputs = ["openpyxl"]
 
 [project.scripts]
 dt-prototype = "dt_prototype.cli:main"
+dt-dynamic-rc = "dt_prototype.cli:dynamic_rc_main"
+dt-monthly-ss = "dt_prototype.cli:monthly_ss_main"
+dt-monthly-ss-simplified = "dt_prototype.cli:monthly_ss_simplified_main"
+dt-monthly-ss-vbdd = "dt_prototype.monthly_ss_vbdd.cli:main"
+dt-energy-carriers = "dt_prototype.energy_carriers.cli:main"
+dt-assessment = "dt_prototype.assessment.cli:main"
+dt-asset-quantities = "dt_prototype.assessment.quantity_cli:main"
+
+dt-pipeline = "dt_prototype.pipeline:main"
+
+dt-inverse-models = "dt_prototype.inverse_models.cli:main"
+dt-preflight = "dt_prototype.validation:main"
+dt-validate-measured = "dt_prototype.inverse_models.acceptance:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-"dt_prototype.integration.model3" = [
+"dt_prototype" = ["schemas/v1/*.json"]
+"dt_prototype.monthly_ss_simplified.model3" = [
   "*.md",
   "example_data/*.csv",
   "reference_outputs/*.csv",
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "to_be_integrated/lcc/tests", "to_be_integrated/lca/tests", "to_be_integrated/circularity/tests"]
 pythonpath = ["src", "."]
 addopts = "--import-mode=importlib"
+markers = ["opendsm: requires the isolated OpenDSM runtime; mandatory in full release validation"]
