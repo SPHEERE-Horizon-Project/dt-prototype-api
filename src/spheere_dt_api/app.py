@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import importlib
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -12,20 +11,30 @@ from fastapi.responses import FileResponse, JSONResponse
 
 from .contract import openapi_spec
 from .core import Context, InputError, RunnerError, problem, valid_run_id
+from .tools import (
+    assessment,
+    calculators,
+    energy,
+    footprints,
+    inverse,
+    pipeline,
+    quantities,
+    thermal,
+    validate,
+    vbdd,
+)
 
-# Each module registers its own routes and imports DT Prototype code only when a
-# request arrives, so one tool's DT Prototype code cannot stop the others from loading.
 TOOLS = (
-    "thermal",
-    "vbdd",
-    "energy",
-    "validate",
-    "footprints",
-    "quantities",
-    "assessment",
-    "calculators",
-    "inverse",
-    "pipeline",
+    thermal,
+    vbdd,
+    energy,
+    validate,
+    footprints,
+    quantities,
+    assessment,
+    calculators,
+    inverse,
+    pipeline,
 )
 
 
@@ -44,8 +53,8 @@ def create_app(runs_root: Path | None = None, environ: dict[str, str] | None = N
     )
     application.openapi = openapi_spec
     application.state.context = context
-    for name in TOOLS:
-        importlib.import_module(f".tools.{name}", __package__).register(application, context)
+    for tool in TOOLS:
+        tool.register(application, context)
 
     def existing_run(run_id: str):
         if not valid_run_id(run_id):
@@ -76,7 +85,10 @@ def create_app(runs_root: Path | None = None, environ: dict[str, str] | None = N
         reader = context.readers.get(record.get("tool", ""))
         if record.get("status") == "complete" and reader is not None:
             try:
-                body["result"] = {"run_id": run.run_id, **reader(run, record.get("meta", {}))}
+                body["result"] = {
+                    "run_id": run.run_id,
+                    **reader(run, record.get("meta", {})).payload,
+                }
             except (InputError, RunnerError, OSError, ValueError, KeyError) as exc:
                 return problem(500, "result_unreadable", str(exc))
         return JSONResponse(body)

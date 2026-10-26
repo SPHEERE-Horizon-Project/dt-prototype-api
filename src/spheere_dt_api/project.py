@@ -5,7 +5,10 @@ from __future__ import annotations
 import csv
 from pathlib import Path
 
-from .contract import validate_project
+from dt_prototype.common.preprocessing.building_input import DistrictInput
+from dt_prototype.common.project import ProjectInputs
+
+from .contract import openapi_spec, validate_project
 from .core import RUN_ID_MESSAGE, InputError, valid_run_id, write_json
 
 # Public method names and the DT Prototype CLI engine each one runs.
@@ -120,14 +123,12 @@ def write_project(directory: Path, project: dict, weather: bytes) -> Path:
     return config_path
 
 
-def stage_project(directory: Path, project: dict, weather: bytes) -> tuple[Path, object]:
+def stage_project(directory: Path, project: dict, weather: bytes) -> tuple[Path, DistrictInput]:
     """Write the project files and check that DT Prototype accepts them.
 
     Returns the config path and the preprocessed district. Every tool that takes a
     project (thermal, energy, VBDD, asset quantities, pipeline) stages it this way.
     """
-    from dt_prototype.common.project import ProjectInputs
-
     config_path = write_project(directory, project, weather)
     try:
         district = ProjectInputs.load(config_path).preprocess()
@@ -155,8 +156,6 @@ GEOMETRY_SCHEMAS = {"buildings": "BuildingRow", "zones": "ZoneRow", "surfaces": 
 
 def read_geometry(directory: Path) -> dict:
     """Read buildings/zones/surfaces CSVs as tabular geometry ready for a project."""
-    from .contract import openapi_spec
-
     schemas = openapi_spec()["components"]["schemas"]
     geometry: dict[str, object] = {"format": "tabular"}
     for name, schema_name in GEOMETRY_SCHEMAS.items():

@@ -4,7 +4,21 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 
-from ..core import Context, Job, Part, Run, Tool, python, read_json, read_table, route, write_json
+from ..core import (
+    Context,
+    EmptyMetadata,
+    Job,
+    Part,
+    ReadResult,
+    RequestValues,
+    Run,
+    Tool,
+    python,
+    read_json,
+    read_table,
+    route,
+    write_json,
+)
 from ..project import read_geometry
 
 TOOL = Tool("footprints")
@@ -21,20 +35,22 @@ CALL = (
 )
 
 
-def stager(run: Run, values: dict) -> Job:
+def stager(run: Run, values: RequestValues) -> Job[EmptyMetadata]:
     footprints = run.inputs / "footprints.geojson"
     footprints.write_bytes(values["footprints"])
     rules = run.inputs / "rules.json"
     write_json(rules, values["rules"])
-    return Job(python("-c", CALL, str(footprints), str(rules), str(run.results)))
+    return Job(python("-c", CALL, str(footprints), str(rules), str(run.results)), {})
 
 
-def reader(run: Run, meta: dict) -> dict:
-    return {
-        "manifest": read_json(run.results / "preprocessing_manifest.json", run.root),
+def reader(run: Run, meta: EmptyMetadata) -> ReadResult:
+    manifest = read_json(run.results / "preprocessing_manifest.json", run.root)
+    payload = {
+        "manifest": manifest,
         "geometry": read_geometry(run.results / "geometry"),
         "report": read_table(run.results / "preprocessing_report.csv"),
     }
+    return ReadResult.reported(payload, manifest.get("status"), {"complete": 0})
 
 
 def register(app: FastAPI, context: Context) -> None:

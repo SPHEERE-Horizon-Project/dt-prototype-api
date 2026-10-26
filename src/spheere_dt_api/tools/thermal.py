@@ -5,11 +5,24 @@ from __future__ import annotations
 import csv
 import math
 from pathlib import Path
+from typing import TypedDict
 
 from fastapi import FastAPI
 
 from ..contract import openapi_spec
-from ..core import Context, Job, Part, Run, RunnerError, Tool, python, read_manifest, route
+from ..core import (
+    Context,
+    Job,
+    Part,
+    ReadResult,
+    RequestValues,
+    Run,
+    RunnerError,
+    Tool,
+    python,
+    read_manifest,
+    route,
+)
 from ..project import CLI_ENGINES, PUBLIC_ENGINES, stage_project, validated_project
 
 TOOL = Tool("thermal")
@@ -32,6 +45,11 @@ RESULT_SCHEMAS = {
     "monthly": "MonthlyDetail",
     "simplified": "SimplifiedDetail",
 }
+
+
+class ThermalMetadata(TypedDict):
+    engine: str
+    zone_labels: list[str]
 
 
 def zone_labels(project: dict) -> list[str]:
@@ -142,8 +160,8 @@ def register(app: FastAPI, context: Context) -> None:
     for engine, cli_engine in CLI_ENGINES.items():
 
         def stager(
-            run: Run, values: dict, engine: str = engine, cli_engine: str = cli_engine
-        ) -> Job:
+            run: Run, values: RequestValues, engine: str = engine, cli_engine: str = cli_engine
+        ) -> Job[ThermalMetadata]:
             project = values["project"]
             config, _ = stage_project(run.inputs, project, values["weather_epw"])
             command = python(
@@ -157,8 +175,14 @@ def register(app: FastAPI, context: Context) -> None:
             )
             return Job(command, {"engine": engine, "zone_labels": zone_labels(project)})
 
-        def reader(run: Run, meta: dict) -> dict:
-            return result_from_output(meta["engine"], run.results, meta["zone_labels"])
+        def reader(run: Run, meta: ThermalMetadata) -> ReadResult:
+            payload = result_from_output(meta["engine"], run.results, meta["zone_labels"])
+            return ReadResult.reported(
+                payload, payload["manifest"]["status"], {"complete": 0, "failed": 1}
+            )
+
+        def validate(values: RequestValues, engine: str = engine) -> None:
+            validated_project(engine, values["project"])
 
         route(
             app,
@@ -169,8 +193,7 @@ def register(app: FastAPI, context: Context) -> None:
             PARTS,
             stager,
             reader,
-            run_id=lambda values, engine=engine: validated_project(engine, values["project"])[
-                "run_id"
-            ],
+            validate=validate,
+            run_id=lambda values: values["project"]["run_id"],
             invalid_code={"project": "invalid_project", "weather_epw": "invalid_weather"},
         )

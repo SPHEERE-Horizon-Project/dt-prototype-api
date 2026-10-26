@@ -1,8 +1,8 @@
 """Shared plumbing for every tool: request parts, run folders, lanes and results.
 
 Each tool stages its inputs into a run folder, runs one DT Prototype command in a
-separate process, and reads that command's output files. Tools import this module
-and never each other, so a change or failure in one tool stays inside it.
+separate process, and reads that command's output files. Tool modules use shared
+helpers rather than importing each other.
 """
 
 from __future__ import annotations
@@ -19,11 +19,12 @@ import sys
 import uuid
 from collections.abc import Callable, Mapping
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal, TypedDict, Unpack, cast
 
+from dt_prototype.validation import schema_errors
 from fastapi import FastAPI, Request
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse
@@ -58,6 +59,60 @@ UNFINISHED = {"queued", "running"}
 STATUS_BY_CODE = {"run_exists": 409, "opendsm_unavailable": 503}
 # Manifest fields that repeat the inputs or list source hashes; responses leave them out.
 MANIFEST_NOISE = {"code_hashes", "code_sha256", "configuration"}
+
+type Lane = Literal["fast", "slow"]
+type RunState = Literal["staging", "queued", "running", "complete", "failed", "interrupted"]
+# Request JSON is checked against each tool's schema after multipart decoding.
+type RequestValues = dict[str, Any]
+
+
+class EmptyMetadata(TypedDict):
+    """Metadata for tools whose readers need only the run folders."""
+
+
+class RunError(TypedDict):
+    code: str
+    message: str
+
+
+class RunRecord(TypedDict, total=False):
+    """The existing status.json format; older records may omit optional fields."""
+
+    run_id: str
+    tool: str
+    status: RunState
+    created_utc: str
+    queued_utc: str
+    started_utc: str
+    finished_utc: str
+    meta: Mapping[str, object]
+    error: RunError
+
+
+def decode_run_record(value: object) -> RunRecord:
+    """Check stored record fields at the JSON boundary without changing their format."""
+    if not isinstance(value, dict):
+        raise ValueError("Run status must be an object")
+    if value.get("status") not in {
+        "staging",
+        "queued",
+        "running",
+        "complete",
+        "failed",
+        "interrupted",
+    }:
+        raise ValueError("Invalid run status")
+    for key in ("run_id", "tool", "created_utc", "queued_utc", "started_utc", "finished_utc"):
+        if key in value and not isinstance(value[key], str):
+            raise ValueError(f"Run {key} must be text")
+    if "meta" in value and not isinstance(value["meta"], dict):
+        raise ValueError("Run metadata must be an object")
+    if "error" in value and (
+        not isinstance(value["error"], dict)
+        or not all(isinstance(value["error"].get(key), str) for key in ("code", "message"))
+    ):
+        raise ValueError("Run error needs a code and message")
+    return cast(RunRecord, value)
 
 
 class InputError(Exception):
@@ -117,11 +172,11 @@ def now() -> str:
 class Part:
     """One multipart field: a JSON document, an uploaded file or a short text value."""
 
-    kind: str
+    kind: Literal["json", "file", "text"]
     required: bool = True
 
 
-async def read_parts(request: Request, spec: Mapping[str, Part]) -> dict[str, Any]:
+async def read_parts(request: Request, spec: Mapping[str, Part]) -> RequestValues:
     """Read the declared multipart fields, raising InputError for missing or bad ones."""
     try:
         form = await request.form()
@@ -150,19 +205,46 @@ async def read_parts(request: Request, spec: Mapping[str, Part]) -> dict[str, An
 
 
 @dataclass(frozen=True)
-class Job:
+class ExecutionPolicy:
+    """Worker selection and whether the caller waits are independent decisions."""
+
+    lane: Lane = "fast"
+    background: bool = False
+
+
+@dataclass(frozen=True)
+class Job[Meta: Mapping[str, object]]:
     """A staged command plus what the reader needs to interpret its output later."""
 
     command: list[str]
-    meta: dict[str, Any] = field(default_factory=dict)
+    meta: Meta
+    policy: ExecutionPolicy = ExecutionPolicy()
+
+
+@dataclass(frozen=True)
+class ReadResult:
+    """An API payload and the CLI exit code its report describes."""
+
+    payload: dict[str, Any]
+    expected_exit_code: int = 0
+
+    @classmethod
+    def reported(
+        cls, payload: dict[str, Any], status: object, exits: Mapping[str, int]
+    ) -> ReadResult:
+        """Interpret a report using the tool's declared terminal statuses."""
+        if not isinstance(status, str) or status not in exits:
+            raise RunnerError(
+                f"The runner produced an unknown or unfinished report status: {status!r}"
+            )
+        return cls(payload, exits[status])
 
 
 @dataclass(frozen=True)
 class Tool:
-    """A tool's identity, the lane it runs in and its default timeout."""
+    """A tool's identity and default timeout."""
 
     name: str
-    lane: str = "fast"
     timeout_s: float = 600.0
 
 
@@ -182,17 +264,23 @@ class Run:
     def status_path(self) -> Path:
         return self.inputs / "status.json"
 
-    def status(self) -> dict[str, Any] | None:
+    def status(self) -> RunRecord | None:
         if not self.status_path.is_file():
             return None
-        return json.loads(self.status_path.read_text(encoding="utf-8"))
+        return decode_run_record(json.loads(self.status_path.read_text(encoding="utf-8")))
 
-    def set_status(self, **changes: Any) -> dict[str, Any]:
-        record = {**(self.status() or {}), **changes}
+    def set_status(self, **changes: Unpack[RunRecord]) -> RunRecord:
+        record: RunRecord = {**(self.status() or {}), **changes}
         temporary = self.status_path.with_suffix(".tmp")
         write_json(temporary, record)
         temporary.replace(self.status_path)
         return record
+
+
+type Validator = Callable[[RequestValues], None]
+type RunIdSelector = Callable[[RequestValues], str | None]
+type Stager[Meta: Mapping[str, object]] = Callable[[Run, RequestValues], Job[Meta]]
+type Reader[Meta: Mapping[str, object]] = Callable[[Run, Meta], ReadResult]
 
 
 class Context:
@@ -215,7 +303,9 @@ class Context:
         }
         worker = env.get("DT_OPENDSM_PYTHON", "")
         self.opendsm_python = Path(worker) if worker and Path(worker).is_file() else None
-        self.readers: dict[str, Callable[[Run, dict], dict]] = {}
+        # Different tools persist different metadata. Type erasure is confined to
+        # this registry, which is used when polling deserialized run records.
+        self.readers: dict[str, Reader[Any]] = {}
         (root / "inputs").mkdir(parents=True, exist_ok=True)
         (root / "results").mkdir(parents=True, exist_ok=True)
         self._mark_interrupted()
@@ -270,7 +360,9 @@ class Context:
             lane.shutdown(wait=False, cancel_futures=True)
 
 
-def execute(job: Job, run: Run, timeout: float) -> subprocess.CompletedProcess[str]:
+def execute(
+    job: Job[Mapping[str, object]], run: Run, timeout: float
+) -> subprocess.CompletedProcess[str]:
     """Run one staged command with the run folder as its working directory."""
     try:
         return subprocess.run(
@@ -294,8 +386,6 @@ def python(*args: str) -> list[str]:
 
 def check_dt_prototype_schema(kind: str, value: object, field: str) -> None:
     """Validate a JSON part against the DT Prototype schema of that kind."""
-    from dt_prototype.validation import schema_errors
-
     errors = schema_errors(value, kind)
     if errors:
         first = errors[0]
@@ -375,20 +465,18 @@ def read_json(path: Path, root: Path | None = None) -> Any:
     return server_paths_removed(value, root) if root is not None else value
 
 
-async def respond(
+async def respond[Meta: Mapping[str, object]](
     context: Context,
     tool: Tool,
     run: Run,
-    job: Job,
-    reader: Callable[[Run, dict], dict],
-    *,
-    background: bool = False,
+    job: Job[Meta],
+    reader: Reader[Meta],
 ) -> JSONResponse:
     """Run a staged job in its lane and answer with its result, or with 202."""
     run.set_status(status="queued", meta=job.meta, queued_utc=now())
     timeout = context.timeout(tool)
-    lane = context.lanes[tool.lane]
-    if background:
+    lane = context.lanes[job.policy.lane]
+    if job.policy.background:
         lane.submit(_finish, run, job, reader, timeout)
         return JSONResponse(
             {"run_id": run.run_id, "status": "queued", "status_url": f"/runs/{run.run_id}"},
@@ -403,7 +491,9 @@ async def respond(
     return JSONResponse(result)
 
 
-def _finish(run: Run, job: Job, reader: Callable[[Run, dict], dict], timeout: float) -> dict:
+def _finish[Meta: Mapping[str, object]](
+    run: Run, job: Job[Meta], reader: Reader[Meta], timeout: float
+) -> dict[str, Any]:
     """Run the command, read its output and record the final state."""
     run.set_status(status="running", started_utc=now())
     try:
@@ -414,10 +504,13 @@ def _finish(run: Run, job: Job, reader: Callable[[Run, dict], dict], timeout: fl
             if process.returncode:
                 raise classify_failure(process) from exc
             raise RunnerError(str(exc)) from exc
-        # A nonzero exit is expected when the manifest itself reports a failed or
-        # incomplete run; a "complete" manifest from a failing command is not trusted.
-        if process.returncode and result.get("manifest", {}).get("status") == "complete":
-            raise classify_failure(process)
+        if process.returncode != result.expected_exit_code:
+            if process.returncode:
+                raise classify_failure(process)
+            raise RunnerError(
+                f"Runner exit code {process.returncode} does not match its report "
+                f"(expected {result.expected_exit_code})"
+            )
     except (InputError, RunnerError) as exc:
         run.set_status(
             status="failed", finished_utc=now(), error={"code": exc.code, "message": str(exc)}
@@ -431,12 +524,12 @@ def _finish(run: Run, job: Job, reader: Callable[[Run, dict], dict], timeout: fl
         )
         raise RunnerError(str(exc)) from exc
     run.set_status(status="complete", finished_utc=now())
-    return {"run_id": run.run_id, **result}
+    return {"run_id": run.run_id, **result.payload}
 
 
-async def stage(
-    context: Context, tool: Tool, run_id: str | None, stager: Callable[[Run], Job]
-) -> tuple[Run, Job]:
+async def stage[Meta: Mapping[str, object]](
+    context: Context, tool: Tool, run_id: str | None, stager: Callable[[Run], Job[Meta]]
+) -> tuple[Run, Job[Meta]]:
     """Reserve a run folder and stage inputs, removing the folder if staging fails."""
     run = context.reserve(tool, run_id)
     try:
@@ -447,18 +540,18 @@ async def stage(
     return run, job
 
 
-def route(
+def route[Meta: Mapping[str, object]](
     app: FastAPI,
     context: Context,
     tool: Tool,
     path: str,
     operation_id: str,
     parts: Mapping[str, Part],
-    stager: Callable[[Run, dict], Job],
-    reader: Callable[[Run, dict], dict],
+    stager: Stager[Meta],
+    reader: Reader[Meta],
     *,
-    run_id: Callable[[dict], str | None] = lambda values: values.get("run_id"),
-    background: Callable[[dict], bool] = lambda values: False,
+    validate: Validator | None = None,
+    run_id: RunIdSelector = lambda values: values.get("run_id"),
     invalid_code: Mapping[str, str] | None = None,
 ) -> None:
     """Register one POST endpoint that stages inputs, runs a job and returns its result."""
@@ -470,6 +563,8 @@ def route(
         try:
             # Path parameters, such as the method in /runs/{method}/energy, join the parts.
             values = {**request.path_params, **await read_parts(request, parts)}
+            if validate is not None:
+                validate(values)
             requested_id = run_id(values)
             run, job = await stage(context, tool, requested_id, lambda run: stager(run, values))
         except InputError as exc:
@@ -480,11 +575,9 @@ def route(
         except (ValueError, KeyError, TypeError) as exc:
             return problem(422, "invalid_input", str(exc))
         except Exception as exc:
-            # A broken DT Prototype import or bug fails this tool's request only.
+            # A staging failure affects this request only.
             return problem(500, "staging_failed", f"{type(exc).__name__}: {exc}")
-        slow = background(values)
-        lane_tool = Tool(tool.name, "slow", tool.timeout_s) if slow else tool
-        return await respond(context, lane_tool, run, job, reader, background=slow)
+        return await respond(context, tool, run, job, reader)
 
     app.add_api_route(path, endpoint, methods=["POST"], operation_id=operation_id)
 

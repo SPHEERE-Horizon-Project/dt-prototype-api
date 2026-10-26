@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Literal, TypedDict
+
 from fastapi import FastAPI
 
 from ..contract import validate_project
@@ -10,6 +12,8 @@ from ..core import (
     InputError,
     Job,
     Part,
+    ReadResult,
+    RequestValues,
     Run,
     Tool,
     python,
@@ -17,7 +21,7 @@ from ..core import (
     route,
     write_json,
 )
-from ..inverse_config import stage_inverse
+from ..inverse_config import resolve_simulation_source, stage_inverse
 from ..project import write_project
 
 TOOL = Tool("validate")
@@ -35,14 +39,18 @@ PARTS = {
 }
 
 
-def _require(values: dict, *names: str) -> None:
+class ValidationMetadata(TypedDict):
+    kind: Literal["project", "energy", "inverse"]
+
+
+def _require(values: RequestValues, *names: str) -> None:
     for name in names:
         if name not in values:
             raise InputError(f"kind={values['kind']} needs the {name} part", name)
 
 
 def register(app: FastAPI, context: Context) -> None:
-    def stager(run: Run, values: dict) -> Job:
+    def stager(run: Run, values: RequestValues) -> Job[ValidationMetadata]:
         kind = values["kind"]
         if kind not in KINDS:
             raise InputError(f"kind must be one of {', '.join(KINDS)}", "kind")
@@ -59,11 +67,10 @@ def register(app: FastAPI, context: Context) -> None:
             write_json(config, values["energy"])
         else:
             _require(values, "config")
-            simulation = None
-            if "energy_run_id" in values:
-                energy_run = context.completed(values["energy_run_id"], {"energy"}, "energy_run_id")
-                simulation = (energy_run.results, energy_run.inputs / "config.json")
-            config = stage_inverse(
+            simulation = resolve_simulation_source(
+                context, values["config"], energy_run_id=values.get("energy_run_id")
+            )
+            staged = stage_inverse(
                 context,
                 run.inputs,
                 values["config"],
@@ -71,6 +78,7 @@ def register(app: FastAPI, context: Context) -> None:
                 weather=values.get("weather"),
                 simulation=simulation,
             )
+            config = staged.path
         command = python(
             "-m",
             "dt_prototype.validation",
@@ -83,9 +91,9 @@ def register(app: FastAPI, context: Context) -> None:
         )
         return Job(command, {"kind": kind})
 
-    def reader(run: Run, meta: dict) -> dict:
+    def reader(run: Run, meta: ValidationMetadata) -> ReadResult:
         report = read_json(run.results / "report.json", run.root)
         report.pop("configuration", None)
-        return report
+        return ReadResult.reported(report, report.get("status"), {"passed": 0, "failed": 1})
 
     route(app, context, TOOL, "/validate", "validateInputs", PARTS, stager, reader)

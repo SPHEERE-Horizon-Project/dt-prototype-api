@@ -6,9 +6,12 @@ from fastapi import FastAPI
 
 from ..core import (
     Context,
+    EmptyMetadata,
     InputError,
     Job,
     Part,
+    ReadResult,
+    RequestValues,
     Run,
     Tool,
     python,
@@ -30,7 +33,7 @@ PARTS = {
 XLSX_SIGNATURE = b"PK\x03\x04"
 
 
-def stager(run: Run, values: dict) -> Job:
+def stager(run: Run, values: RequestValues) -> Job[EmptyMetadata]:
     # The fillable workbook is a ZIP container; anything else is read as JSON.
     raw = values["inputs"]
     inputs = run.inputs / ("inputs.xlsx" if raw.startswith(XLSX_SIGNATURE) else "inputs.json")
@@ -56,14 +59,16 @@ def stager(run: Run, values: dict) -> Job:
         str(run.results),
         *arguments,
     )
-    return Job(command)
+    return Job(command, {})
 
 
-def reader(run: Run, meta: dict) -> dict:
-    return {
-        "manifest": read_manifest(run.results / "manifest.json", root=run.root),
+def reader(run: Run, meta: EmptyMetadata) -> ReadResult:
+    manifest = read_manifest(run.results / "manifest.json", root=run.root)
+    payload = {
+        "manifest": manifest,
         "quantities": read_table(run.results / "resolved_asset_quantities.csv"),
     }
+    return ReadResult.reported(payload, manifest.get("status"), {"complete": 0, "incomplete": 2})
 
 
 def register(app: FastAPI, context: Context) -> None:

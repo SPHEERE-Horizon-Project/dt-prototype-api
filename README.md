@@ -28,7 +28,7 @@ OpenDSM models in `/inverse` need a separate Python (pandas 2) from the API (pan
 ## How it works
 
 - `prototype/` is the read-only DT Prototype codebase.
-- Tools in `src/spheere_dt_api/tools/` each run a DT Prototype command in their own process and read its outputs. They only share `core.py` and don’t depend on each other.
+- Each tool in `src/spheere_dt_api/tools/` runs a DT Prototype command independently, sharing helpers for input and execution.
 - Run files are stored in `inputs/<run_id>/` and `results/<run_id>/` under `DT_API_RUNS_ROOT`.
 - Long runs (`/pipeline`, OpenDSM) use dedicated workers and return `202` responses.
 

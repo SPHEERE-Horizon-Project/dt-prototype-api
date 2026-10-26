@@ -8,13 +8,18 @@ from __future__ import annotations
 
 import copy
 
+from dt_prototype.pipeline import load_configuration
 from fastapi import FastAPI
 
 from ..core import (
     Context,
+    EmptyMetadata,
+    ExecutionPolicy,
     InputError,
     Job,
     Part,
+    ReadResult,
+    RequestValues,
     Run,
     Tool,
     check_dt_prototype_schema,
@@ -24,10 +29,11 @@ from ..core import (
     route,
     write_json,
 )
-from ..inverse_config import stage_inverse
-from ..project import stage_project, validated_project
+from ..energy_config import stage_energy
+from ..inverse_config import SimulationSource, resolve_simulation_source, stage_inverse
+from ..project import validated_project
 
-TOOL = Tool("pipeline", lane="slow", timeout_s=7200)
+TOOL = Tool("pipeline", timeout_s=7200)
 PARTS = {
     "run_id": Part("text", required=False),
     "pipeline": Part("json"),
@@ -52,21 +58,26 @@ STAGE_TABLES = {
 }
 
 
-def _require(values: dict, *names: str) -> None:
+def _require(values: RequestValues, *names: str) -> None:
     for name in names:
         if name not in values:
             raise InputError(f"This pipeline needs the {name} part", name)
 
 
 def register(app: FastAPI, context: Context) -> None:
-    def stage_forward(run: Run, values: dict, pipeline: dict) -> None:
+    def stage_forward(run: Run, values: RequestValues, pipeline: dict) -> None:
         _require(values, "project", "weather_epw", "energy")
         validated_project("monthly", {"run_id": run.run_id, **values["project"]})
-        config, _ = stage_project(run.inputs, values["project"], values["weather_epw"])
-        energy = run.inputs / "energy.json"
-        write_json(energy, values["energy"])
-        pipeline["project_config"], pipeline["energy_config"] = str(config), str(energy)
         settings = pipeline.setdefault("energy", {})
+        staged = stage_energy(
+            run.inputs,
+            values["project"],
+            values["weather_epw"],
+            values["energy"],
+            engine=None if settings.get("mode") == "reuse" else settings.get("engine", "all"),
+        )
+        pipeline["project_config"] = str(staged.project_config)
+        pipeline["energy_config"] = str(staged.energy_config)
         if settings.get("mode") == "reuse":
             _require(values, "energy_run_id")
             earlier = context.completed(values["energy_run_id"], {"energy"}, "energy_run_id")
@@ -90,22 +101,27 @@ def register(app: FastAPI, context: Context) -> None:
                     context,
                     run.inputs,
                     values["inverse_config"],
-                    simulation=(run.results / "energy", config),
+                    simulation=SimulationSource(run.results / "energy", staged.project_config),
                     field="inverse_config",
-                )
+                ).path
             )
 
-    def stager(run: Run, values: dict) -> Job:
+    def stager(run: Run, values: RequestValues) -> Job[EmptyMetadata]:
         pipeline = values["pipeline"]
         if not isinstance(pipeline, dict):
             raise InputError("The pipeline part must be a JSON object", "pipeline")
         pipeline = copy.deepcopy(pipeline)
+        for section in ("energy", "assessment", "analysis"):
+            if section in pipeline and not isinstance(pipeline[section], dict):
+                raise InputError(f"pipeline.{section} must be an object", "pipeline")
         if pipeline.get("mode") == "inverse":
             _require(values, "inverse_config")
-            simulation = None
-            if "energy_run_id" in values:
-                earlier = context.completed(values["energy_run_id"], {"energy"}, "energy_run_id")
-                simulation = (earlier.results, earlier.inputs / "config.json")
+            simulation = resolve_simulation_source(
+                context,
+                values["inverse_config"],
+                energy_run_id=values.get("energy_run_id"),
+                field="inverse_config",
+            )
             pipeline["inverse_config"] = str(
                 stage_inverse(
                     context,
@@ -115,25 +131,33 @@ def register(app: FastAPI, context: Context) -> None:
                     weather=values.get("weather"),
                     simulation=simulation,
                     field="inverse_config",
-                )
+                ).path
             )
         else:
             stage_forward(run, values, pipeline)
         check_dt_prototype_schema("pipeline", pipeline, "pipeline")
         path = run.inputs / "pipeline.json"
         write_json(path, pipeline)
+        try:
+            load_configuration(path)
+        except (ValueError, KeyError, TypeError) as exc:
+            raise InputError(str(exc), "pipeline") from exc
         command = python(
             "-m", "dt_prototype.pipeline", "--config", str(path), "--output", str(run.results)
         )
-        return Job(command)
+        return Job(command, {}, ExecutionPolicy("slow", True))
 
-    def reader(run: Run, meta: dict) -> dict:
+    def reader(run: Run, meta: EmptyMetadata) -> ReadResult:
         result = {"manifest": read_manifest(run.results / "manifest.json", root=run.root)}
         for stage, tables in STAGE_TABLES.items():
             folder = run.results / stage
             if folder.is_dir():
                 result[stage] = {name: read_table(folder / f"{name}.csv") for name in tables}
-        return result
+        return ReadResult.reported(
+            result,
+            result["manifest"].get("status"),
+            {"complete": 0, "failed": 1, "partial": 2, "incomplete": 2},
+        )
 
     route(
         app,
@@ -144,5 +168,4 @@ def register(app: FastAPI, context: Context) -> None:
         PARTS,
         stager,
         reader,
-        background=lambda values: True,
     )

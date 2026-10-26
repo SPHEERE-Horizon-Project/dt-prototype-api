@@ -6,10 +6,12 @@ from fastapi import FastAPI
 
 from ..core import (
     Context,
+    EmptyMetadata,
     Job,
     Part,
+    ReadResult,
+    RequestValues,
     Run,
-    RunnerError,
     Tool,
     python,
     read_manifest,
@@ -22,7 +24,7 @@ TOOL = Tool("vbdd")
 PARTS = {"project": Part("json"), "weather_epw": Part("file")}
 
 
-def stager(run: Run, values: dict) -> Job:
+def stager(run: Run, values: RequestValues) -> Job[EmptyMetadata]:
     project = values["project"]
     config, _ = stage_project(run.inputs, project, values["weather_epw"])
     command = python(
@@ -34,19 +36,22 @@ def stager(run: Run, values: dict) -> Job:
         str(run.results),
         *vbdd_args(project),
     )
-    return Job(command)
+    return Job(command, {})
 
 
-def reader(run: Run, meta: dict) -> dict:
+def reader(run: Run, meta: EmptyMetadata) -> ReadResult:
     manifest = read_manifest(run.results / "manifest.json", root=run.root)
-    if manifest.get("status") != "complete":
-        raise RunnerError("The degree-day run did not complete")
-    return {
+    payload = {
         "manifest": manifest,
         "monthly": read_table(run.results / "monthly.csv"),
         "annual": read_table(run.results / "annual.csv"),
         "zone_sum_monthly": read_table(run.results / "independent_zone_sum_monthly.csv"),
     }
+    return ReadResult.reported(payload, manifest.get("status"), {"complete": 0})
+
+
+def validate(values: RequestValues) -> None:
+    validated_project("vbdd", values["project"])
 
 
 def register(app: FastAPI, context: Context) -> None:
@@ -59,6 +64,7 @@ def register(app: FastAPI, context: Context) -> None:
         PARTS,
         stager,
         reader,
-        run_id=lambda values: validated_project("vbdd", values["project"])["run_id"],
+        validate=validate,
+        run_id=lambda values: values["project"]["run_id"],
         invalid_code={"project": "invalid_project", "weather_epw": "invalid_weather"},
     )

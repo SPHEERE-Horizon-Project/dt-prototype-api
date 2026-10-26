@@ -6,9 +6,12 @@ from fastapi import FastAPI
 
 from ..core import (
     Context,
+    EmptyMetadata,
     InputError,
     Job,
     Part,
+    ReadResult,
+    RequestValues,
     Run,
     Tool,
     python,
@@ -33,7 +36,7 @@ TABLES = {
 
 
 def register(app: FastAPI, context: Context) -> None:
-    def stager(run: Run, values: dict) -> Job:
+    def stager(run: Run, values: RequestValues) -> Job[EmptyMetadata]:
         results = run.inputs / "asset_results.csv"
         results.write_bytes(values["asset_results"])
         arguments = []
@@ -65,12 +68,14 @@ def register(app: FastAPI, context: Context) -> None:
             str(run.results),
             *arguments,
         )
-        return Job(command)
+        return Job(command, {})
 
-    def reader(run: Run, meta: dict) -> dict:
-        return {
-            "manifest": read_manifest(run.results / "manifest.json", root=run.root),
+    def reader(run: Run, meta: EmptyMetadata) -> ReadResult:
+        manifest = read_manifest(run.results / "manifest.json", root=run.root)
+        payload = {
+            "manifest": manifest,
             **{key: read_table(run.results / name) for key, name in TABLES.items()},
         }
+        return ReadResult.reported(payload, manifest.get("status"), {"complete": 0})
 
     route(app, context, TOOL, "/assessment", "runAssessment", PARTS, stager, reader)

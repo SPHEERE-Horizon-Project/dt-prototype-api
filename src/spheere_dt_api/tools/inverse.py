@@ -6,8 +6,12 @@ from fastapi import FastAPI
 
 from ..core import (
     Context,
+    EmptyMetadata,
+    ExecutionPolicy,
     Job,
     Part,
+    ReadResult,
+    RequestValues,
     Run,
     Tool,
     python,
@@ -18,7 +22,7 @@ from ..core import (
     server_paths_removed,
     write_json,
 )
-from ..inverse_config import stage_inverse, uses_opendsm
+from ..inverse_config import resolve_simulation_source, stage_inverse
 
 TOOL = Tool("inverse", timeout_s=2400)
 ACCEPTANCE = Tool("acceptance")
@@ -46,12 +50,13 @@ TABLES = {
 
 
 def register(app: FastAPI, context: Context) -> None:
-    def stager(run: Run, values: dict) -> Job:
-        simulation = None
-        for field, tools in (("energy_run_id", {"energy"}), ("thermal_run_id", {"thermal"})):
-            if field in values:
-                earlier = context.completed(values[field], tools, field)
-                simulation = (earlier.results, earlier.inputs / "config.json")
+    def stager(run: Run, values: RequestValues) -> Job[EmptyMetadata]:
+        simulation = resolve_simulation_source(
+            context,
+            values["config"],
+            energy_run_id=values.get("energy_run_id"),
+            thermal_run_id=values.get("thermal_run_id"),
+        )
         model_dir = None
         if "model_run_id" in values:
             model_dir = context.completed(
@@ -70,15 +75,17 @@ def register(app: FastAPI, context: Context) -> None:
             "-m",
             "dt_prototype.inverse_models.cli",
             "--config",
-            str(config),
+            str(config.path),
             "--output",
             str(run.results),
         )
-        return Job(command)
+        policy = ExecutionPolicy("slow", True) if config.needs_opendsm else ExecutionPolicy()
+        return Job(command, {}, policy)
 
-    def reader(run: Run, meta: dict) -> dict:
-        return {
-            "manifest": read_manifest(run.results / "manifest.json", root=run.root),
+    def reader(run: Run, meta: EmptyMetadata) -> ReadResult:
+        manifest = read_manifest(run.results / "manifest.json", root=run.root)
+        payload = {
+            "manifest": manifest,
             "model_index": read_json(run.results / "model_index.json", run.root),
             # Worker errors in these tables name server paths; make them run-relative.
             **{
@@ -86,6 +93,11 @@ def register(app: FastAPI, context: Context) -> None:
                 for key, name in TABLES.items()
             },
         }
+        return ReadResult.reported(
+            payload,
+            manifest.get("status"),
+            {"complete": 0, "failed": 1, "partial": 2, "incomplete": 2},
+        )
 
     route(
         app,
@@ -96,10 +108,9 @@ def register(app: FastAPI, context: Context) -> None:
         PARTS,
         stager,
         reader,
-        background=lambda values: uses_opendsm(values.get("config") or {}),
     )
 
-    def acceptance_stager(run: Run, values: dict) -> Job:
+    def acceptance_stager(run: Run, values: RequestValues) -> Job[EmptyMetadata]:
         inverse = context.completed(values["inverse_run_id"], {"inverse"}, "inverse_run_id")
         policy = run.inputs / "policy.json"
         write_json(policy, values["policy"])
@@ -114,12 +125,14 @@ def register(app: FastAPI, context: Context) -> None:
             "--report",
             str(run.results / "report.json"),
         )
-        return Job(command)
+        return Job(command, {})
 
-    def acceptance_reader(run: Run, meta: dict) -> dict:
+    def acceptance_reader(run: Run, meta: EmptyMetadata) -> ReadResult:
         report = read_json(run.results / "report.json", run.root)
         report.pop("run", None)
-        return report
+        return ReadResult.reported(
+            report, report.get("status"), {"accepted": 0, "review_required": 2}
+        )
 
     route(
         app,

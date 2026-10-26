@@ -7,6 +7,7 @@ with its own runner script that puts its source folder on the import path.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Literal, TypedDict
 
 from fastapi import FastAPI
 
@@ -16,7 +17,11 @@ from ..core import (
     InputError,
     Job,
     Part,
+    Reader,
+    ReadResult,
+    RequestValues,
     Run,
+    Stager,
     Tool,
     python,
     read_json,
@@ -64,6 +69,10 @@ CALCULATORS = (
 MODES = ("component", "building")
 
 
+class CalculatorMetadata(TypedDict):
+    mode: Literal["component", "building"]
+
+
 def _parts(calculator: Calculator) -> dict[str, Part]:
     parts = {"run_id": Part("text", required=False), "case": Part("json")}
     if calculator.tool.name == "lca":
@@ -73,8 +82,8 @@ def _parts(calculator: Calculator) -> dict[str, Part]:
     return parts
 
 
-def _stager(calculator: Calculator):
-    def stager(run: Run, values: dict) -> Job:
+def _stager(calculator: Calculator) -> Stager[CalculatorMetadata]:
+    def stager(run: Run, values: RequestValues) -> Job[CalculatorMetadata]:
         case = run.inputs / "case.json"
         write_json(case, values["case"])
         arguments = ["--input", str(case), "--output", str(run.results)]
@@ -92,13 +101,15 @@ def _stager(calculator: Calculator):
     return stager
 
 
-def _reader(calculator: Calculator):
-    def reader(run: Run, meta: dict) -> dict:
-        return {
-            "manifest": read_manifest(run.results / "manifest.json", root=run.root),
+def _reader(calculator: Calculator) -> Reader[CalculatorMetadata]:
+    def reader(run: Run, meta: CalculatorMetadata) -> ReadResult:
+        manifest = read_manifest(run.results / "manifest.json", root=run.root)
+        payload = {
+            "manifest": manifest,
             "results": read_json(run.results / "results.json", run.root),
             "details": read_table(run.results / calculator.details[meta.get("mode", "building")]),
         }
+        return ReadResult.reported(payload, manifest.get("status"), {"complete": 0})
 
     return reader
 

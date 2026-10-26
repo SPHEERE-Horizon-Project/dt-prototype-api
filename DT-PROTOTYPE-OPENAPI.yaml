@@ -509,6 +509,8 @@ paths:
         `csv`), or from an earlier run (`energy_run_id` with `source.type`
         `energy_run`, or `thermal_run_id` with `thermal_monthly`). The API fills in
         every file path in the config; values you send for them are replaced.
+        Send only the run reference matching the source type. Conflicting or
+        mismatched run IDs, or run references with a CSV source, return `422`.
 
         Models: `5p_monthly` (the 5P energy signature, always available) and
         `opendsm_billing` or `opendsm_hourly` (OpenDSM, only when installed). Runs that
@@ -578,7 +580,9 @@ paths:
         Engine names inside it use DT Prototype's spelling: `Dynamic_RC`, `Monthly_SS`,
         `Monthly_SS_simplified`, `Monthly_SS_VBDD` or `all`.
 
-        Always answers `202`; poll `GET /runs/{run_id}`.
+        Checks the energy configuration, building coverage and heat boundaries
+        before queueing. Invalid inputs return `422`. Accepted pipelines answer
+        `202`; poll `GET /runs/{run_id}`.
       requestBody:
         $ref: "#/components/requestBodies/Pipeline"
       responses:

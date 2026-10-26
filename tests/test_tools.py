@@ -2,17 +2,21 @@ from __future__ import annotations
 
 import copy
 import json
+import subprocess
 import sys
 import threading
 import time
 from pathlib import Path
+from unittest.mock import Mock
 
 import jsonschema
 import pytest
+from dt_prototype.energy_carriers.config import EnergyConfig
 from fastapi.testclient import TestClient
 
 from spheere_dt_api.app import create_app
 from spheere_dt_api.contract import openapi_spec
+from spheere_dt_api.core import write_json
 
 ROOT = Path(__file__).resolve().parents[1]
 PROTOTYPE = ROOT / "prototype"
@@ -393,8 +397,10 @@ def test_disabled_tool_and_timeouts_stay_local(tmp_path: Path) -> None:
         assert working.status_code == 200
 
 
-def test_broken_dt_prototype_module_fails_only_its_tool(client: TestClient, monkeypatch) -> None:
-    monkeypatch.setitem(sys.modules, "dt_prototype.energy_carriers.config", None)
+def test_dt_prototype_runtime_failure_stays_in_its_tool(client: TestClient, monkeypatch) -> None:
+    monkeypatch.setattr(
+        EnergyConfig, "load", Mock(side_effect=RuntimeError("broken energy reader"))
+    )
     broken = client.post(
         "/runs/monthly/energy", files=energy_request(example_project("Monthly", "broken"))
     )
@@ -462,3 +468,144 @@ def test_every_schema_property_has_a_description() -> None:
         if "description" not in value and "$ref" not in value
     ]
     assert not missing, missing
+
+
+@pytest.mark.parametrize(
+    "source,references,field",
+    [
+        ("csv", {"energy_run_id": "energy", "thermal_run_id": "thermal"}, "thermal_run_id"),
+        ("csv", {"energy_run_id": "energy"}, "energy_run_id"),
+        ("energy_run", {"thermal_run_id": "thermal"}, "thermal_run_id"),
+        ("thermal_monthly", {"energy_run_id": "energy"}, "energy_run_id"),
+        ("energy_run", {}, "energy_run_id"),
+        ("thermal_monthly", {}, "thermal_run_id"),
+        ("energy_run", {"energy_run_id": "missing"}, "energy_run_id"),
+    ],
+)
+def test_inverse_rejects_conflicting_or_missing_references(client, source, references, field):
+    config = {"schema_version": "1.0", "source": {"type": source}}
+    response = client.post(
+        "/inverse", data={"run_id": "bad_source", **references}, files={"config": json_part(config)}
+    )
+    assert response.status_code == 422, response.text
+    assert response.json()["field"] == field
+    assert not client.app.state.context.run("bad_source").inputs.exists()
+
+
+@pytest.mark.parametrize("path", ["/inverse", "/validate", "/pipeline"])
+def test_shared_inverse_staging_rejects_csv_with_energy_reference(client, path):
+    data = {"run_id": "bad_csv", "energy_run_id": "unused"}
+    files = inverse_files()
+    if path == "/validate":
+        data["kind"] = "inverse"
+    elif path == "/pipeline":
+        files["inverse_config"] = files.pop("config")
+        files["pipeline"] = json_part({"schema_version": "1.0", "mode": "inverse"})
+    response = client.post(path, data=data, files=files)
+    assert response.status_code == 422, response.text
+    assert response.json()["field"] == "energy_run_id"
+
+
+@pytest.mark.parametrize(
+    "problem,field",
+    [
+        ("schema", "energy"),
+        ("coverage", "energy"),
+        ("dynamic_boundary", "project"),
+        ("simplified_boundary", "project"),
+        ("nested", "pipeline"),
+        ("options", "pipeline"),
+    ],
+)
+def test_pipeline_rejects_invalid_energy_inputs_before_queueing(client, problem, field):
+    project = example_project("Dynamic", "project")
+    project["dynamic"].update(latent=False, plants=False, pv_battery=False)
+    energy = copy.deepcopy(ENERGY)
+    pipeline = {"schema_version": "1.0", "energy": {"engine": "Monthly_SS"}}
+    if problem == "schema":
+        energy = {}
+    elif problem == "coverage":
+        energy["buildings"] = {"other": energy["buildings"]["B1"]}
+    elif problem == "dynamic_boundary":
+        pipeline["energy"]["engine"] = "all"
+        project["dynamic"]["latent"] = True
+    elif problem == "simplified_boundary":
+        pipeline["energy"]["engine"] = "all"
+        project["simplified"] = {"comparison_mode": "legacy", "zone_mode": "sum"}
+    elif problem == "nested":
+        pipeline["assessment"] = None
+    elif problem == "options":
+        pipeline["energy"]["zone_mode"] = "invalid"
+    response = client.post(
+        "/pipeline",
+        data={"run_id": "bad_pipeline"},
+        files={
+            "pipeline": json_part(pipeline),
+            "project": json_part(project),
+            "weather_epw": ("weather.epw", WEATHER),
+            "energy": json_part(energy),
+        },
+    )
+    assert response.status_code == 422, response.text
+    assert response.json()["field"] == field
+    run = client.app.state.context.run("bad_pipeline")
+    assert not run.inputs.exists()
+    assert not run.results.exists()
+
+
+def test_pipeline_reuse_keeps_existing_results_without_running_other_engines(client):
+    # This project enables latent handling, which would prohibit an all-engine run.
+    project = example_project("Monthly", "energy_source")
+    response = client.post("/runs/monthly/energy", files=energy_request(project))
+    assert response.status_code == 200, response.text
+    pipeline = {"schema_version": "1.0", "energy": {"mode": "reuse"}}
+    response = client.post(
+        "/pipeline",
+        data={"run_id": "reuse", "energy_run_id": "energy_source"},
+        files={"pipeline": json_part(pipeline), **energy_request(project)},
+    )
+    assert response.status_code == 202, response.text
+    record = wait_for(client, "reuse")
+    assert record["status"] == "complete", record
+    assert record["result"]["manifest"]["status"] == "complete"
+    assert record["result"]["manifest"]["stages"]["energy"]["status"] == "reused"
+
+
+@pytest.mark.parametrize(
+    "backend,expected_status,lane",
+    [
+        ("5p_monthly", 200, "fast"),
+        ("opendsm_billing", 202, "slow"),
+    ],
+)
+def test_inverse_backend_selects_worker_and_response_mode(
+    client, monkeypatch, backend, expected_status, lane
+):
+    context = client.app.state.context
+    context.opendsm_python = Path(sys.executable)
+    submissions = {}
+    for name, executor in context.lanes.items():
+        submissions[name] = Mock(wraps=executor.submit)
+        monkeypatch.setattr(executor, "submit", submissions[name])
+
+    def execute(job, run, timeout):
+        # Verify API scheduling without needing an installed OpenDSM environment.
+        run.results.mkdir()
+        write_json(run.results / "manifest.json", {"status": "complete"})
+        write_json(run.results / "model_index.json", {})
+        return subprocess.CompletedProcess(job.command, 0, "", "")
+
+    monkeypatch.setattr("spheere_dt_api.core.execute", execute)
+    config = json.loads((CONFIGS / "inverse_5p_example.json").read_text())
+    config["models"] = [backend]
+    response = client.post("/inverse", data={"run_id": "backend"}, files=inverse_files(config))
+    assert response.status_code == expected_status, response.text
+    submissions[lane].assert_called_once()
+    submissions["slow" if lane == "fast" else "fast"].assert_not_called()
+    record = wait_for(client, "backend")
+    assert record["status"] == "complete", record
+    staged = json.loads((context.run("backend").inputs / "inverse_config.json").read_text())
+    if backend == "opendsm_billing":
+        assert staged["opendsm_python"] == sys.executable
+    else:
+        assert "opendsm_python" not in staged
