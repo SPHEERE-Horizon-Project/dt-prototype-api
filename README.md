@@ -3,15 +3,7 @@
 > [!NOTE]
 > This codebase includes portions derived from and adapted from [EUReCA](https://github.com/BETALAB-team/EUReCA).
 
-The **DT Prototype API** provides annual heating and cooling estimates for buildings. Submit a single request with a building description—including its zones, walls, windows, schedules, and systems—plus a weather file for the target location. The API performs the calculations and returns results as JSON showing both monthly and annual heating and cooling demand (kWh).
-
-All three calculation methods accept the same input:
-
-- **Dynamic**: Simulates each hour of the year to capture how demand varies throughout the day.
-- **Monthly**: Uses monthly-averaged inputs; ideal if you just need total demand per month.
-- **Simplified**: A coarser, alternative approach for cross-checking results from the other methods.
-
-This project wraps the DT Prototype engines (dynamic, monthly, and simplified) in an HTTP API. The original prototype code is located in `prototype/`, and the API wrapper can be found in `src/spheere_dt_api/`.
+An HTTP API over the Digital Twing building-energy tools: heat demand, energy bought, CO2 and cost, life-cycle cost and impact, and models learned from meter readings. The [OpenAPI document](DT-PROTOTYPE-OPENAPI.yaml) lists every endpoint and explains its terms.
 
 ## Start
 
@@ -19,33 +11,41 @@ Install [Task](https://taskfile.dev/) and [uv](https://docs.astral.sh/uv/), then
 
 ```sh
 task setup
-task serve
-```
-
-The server listens at `http://127.0.0.1:8000`. Its contract is [DT-PROTOTYPE-OPENAPI.yaml](DT-PROTOTYPE-OPENAPI.yaml), also available at `/openapi.json` and `/docs` while the server runs.
-
-In another terminal, run a complete one-zone example for each engine:
-
-```sh
-task example:dynamic
-task example:monthly
-task example:simplified
+task serve              # http://127.0.0.1:8000, docs at /docs
+task example:monthly    # in another terminal; also dynamic, simplified, vbdd, energy
+task test
 ```
 
 ## Docker
-
-To run the API in a container instead, use the Compose stack. It listens on the same port, so the examples above work unchanged:
 
 ```sh
 task compose:up
 task compose:down
 ```
 
+OpenDSM models in `/inverse` need a separate Python (pandas 2) from the API (pandas 3). To support OpenDSM, run `WITH_OPENDSM=true task compose:up`. Otherwise, OpenDSM requests return `503`. Locally, use `task setup:opendsm` to create `.venv-opendsm` and set `DT_OPENDSM_PYTHON` to its Python.
+
+## How it works
+
+- `prototype/` is the read-only DT Prototype codebase.
+- Tools in `src/spheere_dt_api/tools/` each run a DT Prototype command in their own process and read its outputs. They only share `core.py` and don’t depend on each other.
+- Run files are stored in `inputs/<run_id>/` and `results/<run_id>/` under `DT_API_RUNS_ROOT`.
+- Long runs (`/pipeline`, OpenDSM) use dedicated workers and return `202` responses.
+
+| Setting                 | Default                             | Effect                                  |
+| ----------------------- | ----------------------------------- | --------------------------------------- |
+| `DT_API_RUNS_ROOT`      | `.runs`                             | Run storage                             |
+| `DT_API_FAST_WORKERS`   | `4`                                 | Parallel runs in the fast lane          |
+| `DT_API_SLOW_WORKERS`   | `1`                                 | Parallel runs in the slow lane          |
+| `DT_API_TIMEOUT_<TOOL>` | per tool                            | Seconds before a run is stopped         |
+| `DT_API_DISABLED_TOOLS` | none                                | Comma-separated tools that answer `503` |
+| `DT_OPENDSM_PYTHON`     | `/opt/opendsm/bin/python` in Docker | OpenDSM environment                     |
+
+Tools: `thermal`, `vbdd`, `energy`, `validate`, `footprints`, `quantities`, `assessment`, `lcc`, `lca`, `circularity`, `inverse`, `acceptance`, `pipeline`.
+
 ## Releases
 
-The API and OpenAPI spec have one version, separate from the engine. Show it with `task version`.
-
-To release a new version from `main`:
+The API and OpenAPI spec share one version, shown by `task version`. From `main`:
 
 ```sh
 task release:patch  # or release:minor / release:major
@@ -53,7 +53,7 @@ git show
 task release:push
 ```
 
-GitHub Actions builds pull requests without publishing and publishes images on `main`, `v*` tags, and manual runs. A release tag publishes a versioned image:
+GitHub Actions builds pull requests and publishes images on `main`, `v*` tags and manual runs:
 
 ```sh
 docker run --rm -p 8000:8000 ghcr.io/spheere-horizon-project/dt-prototype-api:0.2.1
