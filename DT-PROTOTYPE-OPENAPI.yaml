@@ -35,28 +35,50 @@ info:
 
     ## Glossary
 
-    - **Zone**: part of a building kept at one temperature.
-    - **Heat demand**: heat added to or removed from the rooms to hold the set
-      temperature. Not a meter reading.
-    - **Sensible heat** changes air temperature. **Latent heat** changes humidity.
-    - **AHU** (air-handling unit): the ventilation unit that heats or cools fresh
-      air. Reported apart from room heating and cooling.
-    - **Delivered energy**: equipment consumption, including losses, before
-      on-site PV. **Imported energy**: what is bought after PV.
-    - **Efficiency, COP**: heat out per kWh in. A 0.91 boiler turns 1 kWh of gas
-      into 0.91 kWh of heat; a heat pump with COP 2.27 moves 2.27 kWh of heat per
-      kWh of electricity.
-    - **Primary energy**: energy use including production and supply, split into
-      renewable and non-renewable using the configured factors.
-    - **5R1C, 7R2C**: dynamic building models written as circuits of resistances
-      (R) and capacitances (C). 7R2C is more detailed.
-    - **VBDD** (variable-base degree days): demand from how far outdoor
-      temperature falls below, or rises above, a balance temperature worked out
-      per building.
-    - **5P energy signature**: a fitted model with a flat base load plus straight
-      lines for heating below one temperature and cooling above another.
-    - **NMBE, CV(RMSE)**: a fitted model's average bias and typical error, in
-      percent.
+    ### Heating and cooling
+
+    - **Zone**: a room or group of rooms treated as having one temperature.
+    - **Heat demand**: the heating or cooling needed to keep rooms at the chosen
+      temperature. Equipment efficiency determines how much energy this uses.
+    - **Sensible heat**: heating or cooling that changes air temperature.
+    - **Latent heat**: heating or cooling associated with adding or removing
+      moisture from the air.
+    - **AHU (air-handling unit)**: equipment that brings fresh air into a building
+      and heats or cools it. Its demand is reported separately from room demand.
+
+    ### Energy use
+
+    - **Delivered energy**: energy used by equipment, including losses, before
+      subtracting electricity supplied by on-site solar panels.
+    - **Imported energy**: energy bought from outside the building after accounting
+      for on-site solar electricity used in the building.
+    - **PV (photovoltaics)**: solar panels that produce electricity.
+    - **Efficiency**: how much useful heat equipment produces from its energy
+      input. A boiler with 90% efficiency supplies 0.9 kWh of heat per kWh of fuel.
+    - **COP (coefficient of performance)**: heat supplied by a heat pump per unit
+      of electricity used. A COP of 3 means 3 kWh of heat per kWh of electricity.
+    - **Primary energy**: energy used by the building plus the energy needed to
+      produce and supply it. The API uses configured conversion factors and
+      reports renewable and non-renewable shares separately.
+
+    ### Models and accuracy
+
+    - **5R1C and 7R2C**: models of how a building loses and stores heat over time.
+      R represents resistance to heat flow; C represents heat storage. 7R2C uses
+      more detail than 5R1C.
+    - **VBDD (variable-base degree days)**: a method that estimates heating and
+      cooling demand from outdoor temperatures. It calculates a balance
+      temperature for each building: the outdoor temperature at which no heating
+      or cooling is needed.
+    - **5P (five-parameter) energy signature**: a model learned from energy
+      readings. It estimates a steady base use, plus heating in colder weather
+      and cooling in warmer weather, with a separate temperature threshold for each.
+    - **NMBE (normalized mean bias error)**: average model error, as a percentage
+      of average measured use. It shows whether estimates tend to be too high or
+      too low; closer to zero is better.
+    - **CV(RMSE) (coefficient of variation of the root mean square error)**:
+      overall model error, as a percentage of average measured use. Larger errors
+      count more; lower is better.
 
     ## Units
 
