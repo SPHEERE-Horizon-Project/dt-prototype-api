@@ -8,6 +8,9 @@
 **/*.egg-info
 prototype/build
 prototype/tests
+prototype/reports
+prototype/to_be_integrated/*/tests
 prototype/docs
 tests
 scripts
+.venv-opendsm

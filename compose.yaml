@@ -1,6 +1,10 @@
 services:
   api:
-    build: .
+    build:
+      context: .
+      args:
+        # Set WITH_OPENDSM=true to include the OpenDSM inverse models.
+        WITH_OPENDSM: ${WITH_OPENDSM:-false}
     ports:
       - "8000:8000"
     volumes:
