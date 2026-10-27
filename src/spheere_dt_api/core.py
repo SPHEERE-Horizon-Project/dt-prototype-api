@@ -30,6 +30,8 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse
 from starlette.datastructures import UploadFile
 
+from . import hooks
+
 ROOT = Path(__file__).resolve().parents[2]
 PROTOTYPE = ROOT / "prototype"
 RUN_ID_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,63}\Z")
@@ -555,7 +557,15 @@ def route[Meta: Mapping[str, object]](
     invalid_code: Mapping[str, str] | None = None,
 ) -> None:
     """Register one POST endpoint that stages inputs, runs a job and returns its result."""
-    context.readers[tool.name] = reader
+
+    def read(run: Run, meta: Meta) -> ReadResult:
+        result = reader(run, meta)
+        payload = result.payload
+        for hook in hooks.AFTER:
+            payload = hook(tool, payload)
+        return ReadResult(payload, result.expected_exit_code)
+
+    context.readers[tool.name] = read
 
     async def endpoint(request: Request) -> JSONResponse:
         if tool.name in context.disabled:
@@ -563,6 +573,8 @@ def route[Meta: Mapping[str, object]](
         try:
             # Path parameters, such as the method in /runs/{method}/energy, join the parts.
             values = {**request.path_params, **await read_parts(request, parts)}
+            for hook in hooks.BEFORE:
+                values = hook(tool, values)
             if validate is not None:
                 validate(values)
             requested_id = run_id(values)
@@ -577,7 +589,7 @@ def route[Meta: Mapping[str, object]](
         except Exception as exc:
             # A staging failure affects this request only.
             return problem(500, "staging_failed", f"{type(exc).__name__}: {exc}")
-        return await respond(context, tool, run, job, reader)
+        return await respond(context, tool, run, job, read)
 
     app.add_api_route(path, endpoint, methods=["POST"], operation_id=operation_id)
 
