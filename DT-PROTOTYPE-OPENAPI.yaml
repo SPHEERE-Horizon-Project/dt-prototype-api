@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: DT Prototype API
-  version: 0.3.1
+  version: 0.3.2
   description: |
     Calculate building heating and cooling demand, energy use, emissions, costs
     and life-cycle impacts, or fit energy models to meter readings. Most projects
