@@ -562,8 +562,13 @@ def route[Meta: Mapping[str, object]](
         result = reader(run, meta)
         payload = result.payload
         for hook in hooks.AFTER:
-            payload = hook(tool, payload)
+            payload = hook(tool, run, payload)
         return ReadResult(payload, result.expected_exit_code)
+
+    def prepare(run: Run, values: RequestValues) -> Job[Meta]:
+        for hook in hooks.BEFORE:
+            values = hook(tool, run, values)
+        return stager(run, values)
 
     context.readers[tool.name] = read
 
@@ -573,12 +578,10 @@ def route[Meta: Mapping[str, object]](
         try:
             # Path parameters, such as the method in /runs/{method}/energy, join the parts.
             values = {**request.path_params, **await read_parts(request, parts)}
-            for hook in hooks.BEFORE:
-                values = hook(tool, values)
             if validate is not None:
                 validate(values)
             requested_id = run_id(values)
-            run, job = await stage(context, tool, requested_id, lambda run: stager(run, values))
+            run, job = await stage(context, tool, requested_id, lambda run: prepare(run, values))
         except InputError as exc:
             code = exc.code
             if code == "invalid_input" and invalid_code and exc.field in invalid_code:
